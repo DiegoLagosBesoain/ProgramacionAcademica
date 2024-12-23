@@ -190,7 +190,7 @@ function crear_calendario(hoja,opcionesLista) {
  
  
  }
- function escribirEnHojaAgrupacion(diccionario, hoja) {
+ function escribirEnHojaAgrupacion(diccionario, hoja,data_maestro_con_detalles) {
    hoja.clear(); // Limpiar la hoja antes de escribir
    
    const diasSemana = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes"];
@@ -224,9 +224,11 @@ function crear_calendario(hoja,opcionesLista) {
  
          // Llamar a la función para destacar
          if (datosPorDia[dia][i]) {
+             console.log("entre a destacar")
              destacar_por_semestre_visualizacion(
              datosPorDia[dia][i],
-             hoja.getRange(filas.length + 1, idx + 2, 1, 1) // Ajustar posición correctamente
+             hoja.getRange(filas.length + 1, idx + 2, 1, 1),
+             data_maestro_con_detalles // Ajustar posición correctamente
              );
          }
        });
@@ -262,19 +264,19 @@ function crear_calendario(hoja,opcionesLista) {
    hoja.setRowHeightsForced(2, filas.length - 1, 60);
    hoja.getRange(1, 1, 1, diasSemana.length + 1).setFontWeight("bold").setHorizontalAlignment("center");
  }
- function destacar_por_semestre_visualizacion(valorEditado,celda) {
+ function destacar_por_semestre_visualizacion(valorEditado,celda,data_maestro_con_detalles) {
    
    
    
    // Verificar si la edición no está en la primera fila o columna
  
-     const bloques = [...data_maestro_para_triggers]; // Define aquí tu data maestro
+     const bloques = data_maestro_con_detalles; // Define aquí tu data maestro
      const entrada_real = bloques.find((bloque) =>
        (valorEditado.split(" ")[0] == bloque[2])   // Curso
          // Sección
        
      );
-     
+     console.log(entrada_real)
      // Si la celda está vacía, limpia el fondo y elimina el comentario
      if (valorEditado === "") {
        celda.setBackground("#FFFFFF"); // Fondo blanco
@@ -290,7 +292,7 @@ function crear_calendario(hoja,opcionesLista) {
        } else if (entrada_real[7] == "4") {
          celda.setBackground("#deeaf6"); // Azul claro
        }else if (entrada_real[20] != "") {
-         //caleda.setFontColor("#FF0000");; // Azul claro
+         caleda.setFontColor("#FF0000");; // Azul claro
        } else {
          celda.setBackground("#FFFFFF"); // Fondo blanco (default)
        }

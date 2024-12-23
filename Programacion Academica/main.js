@@ -16,6 +16,7 @@ function onOpen() {
         .addItem("Verificar Topes mismo semestre plan comun","verificar_topes_mismo_semestre_plan_comun")
         .addItem("Verificar Disponibilidad profesores semestre plan comun","verificar_Disponibilidad_plan_comun")
         .addItem("Verificar Salas Especiales plan comun","verificar_topes_Salas_Especiales_plan_comun")
+        .addItem("Crear Visualizacion Plan Comun","visualizarPlanComun")
         
     )
     .addSubMenu(
@@ -26,6 +27,7 @@ function onOpen() {
         .addItem("Verificar Salas Especiales 5to y 6to semestre","verificar_topes_Salas_Especiales_5to_y_6to")
         .addItem("Verificar concentraciones 5to y 6to primer semestre", "verifica_concentraciones_5to_y_6to_primer_semestre")
         .addItem("Verificar concentraciones 5to y 6to segundo semestre", "verifica_concentraciones_5to_y_6to_segundo_semestre")
+        .addItem("Crear Visualizacion 5to y 6to semestre","visualizar5y6")
     )
     .addSubMenu(
       ui.createMenu("VII, VIII semestre")
@@ -34,6 +36,7 @@ function onOpen() {
         .addItem("Verificar Salas Especiales 7mo y 8vo semestre","verificar_topes_Salas_Especiales_7mo_y_8vo")
         .addItem("Verificar concentraciones 7mo y 8vo primer semestre", "verifica_concentraciones_7mo_y_8vo_primer_semestre")
         .addItem("Verificar concentraciones 7mo y 8vo segundo semestre", "verifica_concentraciones_7mo_y_8vo_segundo_semestre")
+        .addItem("Crear Visualizacion 7mo y 8vo semestre","visualizar7y8")
     
 
     )
@@ -44,6 +47,7 @@ function onOpen() {
         .addItem("Verificar restricciones titulación", "verificar_titulacion")
         .addItem("Verificar Disponibilidad profesores titulación","verificar_Disponibilidad_titulacion")
         .addItem("Verificar Salas Especiales titulación","verificar_topes_Salas_Especiales_titulacion")
+        .addItem("Crear Visualizacion Titulacion","visualizarTitulacion")
     )
     .addToUi()
 }
@@ -533,6 +537,58 @@ pintarCeldasConComentario(hoja_7y8_comun,topes_disponibilidad_profesores[0],"BLO
 pintarCeldasConComentario(hoja_7y8_comun,topes_disponibilidad_profesores[1],"HORARIO FUERA DE LA DISPONIBILIADAD DEL PROFESOR")
 
 
+}
+function visualizarPlanComun(){
+  const hojasActuales = SpreadsheetApp.getActiveSpreadsheet();
+  const hoja_plan_comun = hojasActuales.getSheetByName("PLAN COMUN")
+  const hoja_data_maestro = hojasActuales.getSheetByName("DATOS MAESTRO")
+  const bloques_plan_comun = obtenerBloquesPorHoraYDia_sin_transformar(hoja_plan_comun,hoja_data_maestro)
+  const agrupacion_plan_comun = agruparSecciones(bloques_plan_comun)
+  const hoja=crear_hoja_nombre("PLAN COMUN VISUALIZACION",hojasActuales)
+  const data_maestro = hoja_data_maestro.getDataRange().getDisplayValues()
+  const hoja_detalles = hojasActuales.getSheetByName("DETALLES SEMESTRE")
+  const detalle_malla=hoja_detalles.getDataRange().getDisplayValues()
+  const data_maestro_con_detalles=data_maestro.map((elemento,idx)=>elemento.concat(detalle_malla[idx]))
+  escribirEnHojaAgrupacion(agrupacion_plan_comun,hoja,data_maestro_con_detalles)
+}
+function visualizar5y6(){
+  const hojasActuales = SpreadsheetApp.getActiveSpreadsheet();
+  const hoja_5y6 = hojasActuales.getSheetByName("V,VI")
+  const hoja_data_maestro = hojasActuales.getSheetByName("DATOS MAESTRO")
+  const bloques_5y6 = obtenerBloquesPorHoraYDia_sin_transformar(hoja_5y6,hoja_data_maestro)
+  const agrupacion_5y6 = agruparSecciones(bloques_5y6)
+  const hoja=crear_hoja_nombre("V,VI VISUALIZACION",hojasActuales)
+  const data_maestro = hoja_data_maestro.getDataRange().getDisplayValues()
+  const hoja_detalles = hojasActuales.getSheetByName("DETALLES SEMESTRE")
+  const detalle_malla=hoja_detalles.getDataRange().getDisplayValues()
+  const data_maestro_con_detalles=data_maestro.map((elemento,idx)=>elemento.concat(detalle_malla[idx]))
+  escribirEnHojaAgrupacion(agrupacion_5y6,hoja,data_maestro_con_detalles)
+}
+function visualizar7y8(){
+  const hojasActuales = SpreadsheetApp.getActiveSpreadsheet();
+  const hoja_7y8 = hojasActuales.getSheetByName("VII,VIII")
+  const hoja_data_maestro = hojasActuales.getSheetByName("DATOS MAESTRO")
+  const bloques_7y8 = obtenerBloquesPorHoraYDia_sin_transformar(hoja_7y8 ,hoja_data_maestro)
+  const agrupacion_5y6 = agruparSecciones(bloques_7y8)
+  const hoja=crear_hoja_nombre("VII,VIII VISUALIZACION",hojasActuales)
+  const data_maestro = hoja_data_maestro.getDataRange().getDisplayValues()
+  const hoja_detalles = hojasActuales.getSheetByName("DETALLES SEMESTRE")
+  const detalle_malla=hoja_detalles.getDataRange().getDisplayValues()
+  const data_maestro_con_detalles=data_maestro.map((elemento,idx)=>elemento.concat(detalle_malla[idx]))
+  escribirEnHojaAgrupacion(agrupacion_5y6,hoja,data_maestro_con_detalles)
+}
+function visualizarTitulacion(){
+  const hojasActuales = SpreadsheetApp.getActiveSpreadsheet();
+  const hoja_titulacion = hojasActuales.getSheetByName("TITULACION")
+  const hoja_data_maestro = hojasActuales.getSheetByName("DATOS MAESTRO")
+  const bloques_titulacion = obtenerBloquesPorHoraYDia_sin_transformar(hoja_titulacion,hoja_data_maestro)
+  const agrupacion_titulacion = agruparSecciones(bloques_titulacion)
+  const hoja=crear_hoja_nombre("TITULACION VISUALIZACION",hojasActuales)
+  const data_maestro = hoja_data_maestro.getDataRange().getDisplayValues()
+  const hoja_detalles = hojasActuales.getSheetByName("DETALLES SEMESTRE")
+  const detalle_malla=hoja_detalles.getDataRange().getDisplayValues()
+  const data_maestro_con_detalles=data_maestro.map((elemento,idx)=>elemento.concat(detalle_malla[idx]))
+  escribirEnHojaAgrupacion(agrupacion_titulacion,hoja,data_maestro_con_detalles)
 }
 
 
