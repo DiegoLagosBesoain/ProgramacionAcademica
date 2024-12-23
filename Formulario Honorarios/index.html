@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <!-- Incluye el bloque CSS desde style.html -->
+    <?!= include('style'); ?>
+  </head>
+  <body>
+    <div class="form-container">
+      <h2 id="titulo">Formulario de horas disponibles para profesores</h2>
+
+      <!-- Pregunta 1: Nombre -->
+      <div id="pregunta1">
+        <p>¿Cuál es tu nombre?</p>
+        <input class="response-input" type="text" id="nombre" placeholder="Escribe tu nombre" />
+        <button class="submit-btn" onclick="validarNombre()">Siguiente</button>
+      </div>
+
+      <!-- Pregunta 2: Rut -->
+      <div id="pregunta2" style="display: none;">
+        <p id="mensajeRut"></p>
+        <input class="response-input" type="text" id="rut" placeholder="Escribe tu RUT" />
+        <button class="submit-btn" onclick="validarRut()">Siguiente</button>
+      </div>
+
+      <!-- Pregunta 3: Cursos -->
+      <div id="pregunta3" style="display: none;">
+        <p id="mensajeCursos"></p>
+        <button class="submit-btn" onclick="salto()">Desplegar preguntas</button>
+      </div>
+
+      <!-- Pregunta Opcional -->
+      <div id="preguntaOpcional" style="display: none;">
+        <h3>¿Cómo prefieres organizar las clases de 3 horas para cada curso?</h3>
+        <div id="contenedor-preferencias"></div>
+        <button class="submit-btn" onclick="cambiarPregunta('preguntaOpcional', 'pregunta3')">Regresar</button>
+        <button class="submit-btn" onclick="validarPreferenciasHoras()">Continuar</button>
+        
+      </div>
+
+      <!-- Pregunta 4: Selección de horarios -->
+      <div id="pregunta4" style="display: none;">
+        <p>Selecciona tus horarios disponibles, sea consciente a la hora de responder:</p>
+        <div id="calendario" class="calendario">
+          <!-- El calendario será generado dinámicamente -->
+        </div>
+        <button id="guardarHorarios" class="submit-btn" onclick="guardarHorarios()">Guardar Horarios</button>
+      </div>
+      <!-- Pregunta Abierta -->
+      <div id="preguntaAbierta" style="display: none;">
+        <h3>Esta es una seccicon de comentarios para cada curso</h3>
+        <div id="contenedor-comentarios"></div>
+        <button class="submit-btn" onclick="cambiarPregunta('preguntaAbierta', 'preguntaTipo')">Regresar</button>
+        <button class="submit-btn" onclick="validar_pregunta_abierta()">FINALIZAR</button>
+      </div>
+      <div id="preguntaExamen" style="display: none;">
+        <h3>Elija si prefiere examen programado por facultad para los siguientes cursos: </h3>
+        <div id="contenedor-examen"></div>
+        <button class="submit-btn" onclick="cambiarPregunta('preguntaExamen', 'pregunta4')">Regresar</button>
+        <button class="submit-btn" onclick="validar_pregunta_examen()">Continuar</button>
+      </div>
+      <div id="preguntaEvaluaciones" style="display: none;">
+        <h3>Elija la cantiad de Evaluaciones(sin contar el examen) prefiere realizar: </h3>
+        <div id="contenedor-evaluaciones"></div>
+        <button class="submit-btn" onclick="cambiarPregunta('preguntaEvaluaciones', 'preguntaExamen')">Regresar</button>
+        <button class="submit-btn" onclick="validar_pregunta_Evaluaciones()">Continuar</button>
+      </div>
+      <div id="preguntaTipo" style="display: none;">
+        <h3>Determine el tipo de horario que prefiere para sus evaluaciones </h3>
+        <div id="contenedor-tipo"></div>
+        <button class="submit-btn" onclick="cambiarPregunta('preguntaTipo', 'preguntaEvaluaciones')">Regresar</button>
+        <button class="submit-btn" onclick="validarPreferenciasTipo()">Continuar</button>
+      </div>      
+
+
+      <!-- Pregunta final -->
+      <div id="preguntafinal" style="display: none;">
+        <p>Muchas gracias por su respuesta, es de mucha ayuda para elaborar la programación académica.  
+        </p>
+        
+      </div>
+
+      <!-- Indicador de carga -->
+      <div id="loading-indicator" style="display: none;">
+        <div class="spinner"></div>
+        <p>Procesando, por favor espera...</p>
+      </div>
+    </div>
+
+    <!-- Incluye los scripts -->
+    <?!= include('Scripts'); ?>
+  </body>
+</html>
