@@ -299,6 +299,59 @@ function crear_calendario(hoja,opcionesLista) {
      }
    
  }
+ function escribirDatosYResaltar(hoja, datos) {
+   
+ 
+   if (!hoja) {
+     throw new Error(`No se encontró la hoja con el nombre: ${sheet}`);
+   }
+ 
+   // Determinar la cantidad de columnas de los datos
+   const numColumnasDatos = datos[0].length;
+ 
+   // Limpiar contenido y formato solo debajo de los encabezados
+   const numFilas = hoja.getLastRow();
+   if (numFilas > 1) {
+     hoja.getRange(2, 1, numFilas - 1, hoja.getLastColumn()).clearContent().clearFormat();
+   }
+ 
+   // Escribe los datos debajo de los encabezados
+   hoja.getRange(2, 1, datos.length, numColumnasDatos).setValues(datos);
+ 
+   // Encuentra la columna "NRC" de los encabezados
+   const encabezados = hoja.getRange(1, 1, 1, hoja.getLastColumn()).getValues()[0];
+   const columnaNRC = encabezados.indexOf("NRC") + 1;
+ 
+   if (columnaNRC === 0) {
+     throw new Error('No se encontró una columna con el encabezado "NRC".');
+   }
+ 
+   // Recorre los datos y resalta las filas según la condición
+   datos.forEach((fila, i) => {
+     if (fila[columnaNRC - 1] === "sin NRC asociado") {
+       const rangoFila = hoja.getRange(i + 2, 1, 1, numColumnasDatos); // i+2 porque los datos empiezan en la fila 2
+       rangoFila.setBackground("yellow");
+     }
+   });
+ }
+ function limpiarColumnas(hoja,columnas) {
+    // Índices de las columnas a limpiar (1 = Columna A, 3 = Columna C, etc.)
+   
+   const rango = hoja.getDataRange(); // Obtén todo el rango de datos
+   const datos = rango.getValues(); // Obtén los valores como una matriz bidimensional
+   
+   // Recorre las filas y limpia las columnas especificadas
+   for (let i = 1; i < datos.length; i++) {
+     columnas.forEach(col => {
+       if (col >= 0 && col < datos[i].length) { 
+         datos[i][col] = ""; // Limpia el contenido de la celda
+       }
+     });
+   }
+   
+   // Escribe los datos actualizados en el rango
+   rango.setValues(datos);
+ }
  
  
  

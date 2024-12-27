@@ -8,6 +8,8 @@ function onOpen() {
         .addItem("Crear templates", "crear_templates")
         .addItem("Extraer datos maestro", "extaer_datos_maestro")
         .addItem("Generar visualizaciones", "visualizar")
+        .addItem("Actualizar maestro","actualizar_maestro")
+        
     )
     .addSubMenu(
       ui.createMenu("Plan común")
@@ -590,6 +592,45 @@ function visualizarTitulacion(){
   const data_maestro_con_detalles=data_maestro.map((elemento,idx)=>elemento.concat(detalle_malla[idx]))
   escribirEnHojaAgrupacion(agrupacion_titulacion,hoja,data_maestro_con_detalles)
 }
+function actualizar_maestro(){
+  const hojasActuales = SpreadsheetApp.getActiveSpreadsheet()
+  const hoja_plan_comun = hojasActuales.getSheetByName("PLAN COMUN")
+  const hoja_5y6 = hojasActuales.getSheetByName("V,VI")
+  const hoja_7y8 = hojasActuales.getSheetByName("VII,VIII")
+  const hoja_titulacion = hojasActuales.getSheetByName("TITULACION")
+  const hoja_data_maestro = hojasActuales.getSheetByName("DATOS MAESTRO")
+  const bloques = obtenerBloquesPorHoraYDia(hoja_plan_comun,hoja_data_maestro)
+  const bloques_5y6 = obtenerBloquesPorHoraYDia(hoja_5y6,hoja_data_maestro)
+  const bloques_7Y8 = obtenerBloquesPorHoraYDia(hoja_7y8,hoja_data_maestro)
+  const bloques_titulacion = obtenerBloquesPorHoraYDia(hoja_titulacion,hoja_data_maestro)
+  let horarios=agruparHorarios(bloques)
+  let horarios_5y6=agruparHorarios(bloques_5y6)
+  let horarios_7y8=agruparHorarios(bloques_7Y8)
+  let horarios_titulacion=agruparHorarios(bloques_titulacion)
+  const horarios_hojas=[horarios,horarios_5y6,horarios_7y8,horarios_titulacion]
+  console.log(horarios)
+  const idSpreadsheet = '1o6HftjnQiU4EB1T9mwZ5FntfkZqy9Bj5wkZKbyHl-m0';
+  const hoja_maestro = SpreadsheetApp.openById(idSpreadsheet).getSheetByName('MAESTRO');
+  const col_lunes= obtenerNumeroDeColumna(hoja_maestro,"Lunes",1)
+  const col_martes= obtenerNumeroDeColumna(hoja_maestro,"Martes",1)
+  const col_miercoles= obtenerNumeroDeColumna(hoja_maestro,"Miercoles",1)
+  const col_jueves= obtenerNumeroDeColumna(hoja_maestro,"Jueves",1)
+  const col_viernes= obtenerNumeroDeColumna(hoja_maestro,"Viernes",1)
+  const col_dias=[col_lunes,col_martes,col_miercoles,col_jueves,col_viernes]
+  const dias=["Lunes","Martes","Miercoles","Jueves","Viernes"]
+  limpiarColumnas(hoja_maestro,col_dias)
+  let data_maestro = hoja_maestro.getDataRange().getDisplayValues();
+  data_maestro.shift()
+
+
+  
+  horarios_hojas.forEach((horario)=>{
+    data_maestro=actualizar_data_maestro(data_maestro,horario,col_dias,dias)
+  })
+  
+  escribirDatosYResaltar(hoja_maestro,data_maestro)
+}
+
 
 
 

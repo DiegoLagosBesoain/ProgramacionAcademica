@@ -763,5 +763,182 @@ function eliminarElementosRepetidos(lista) {
 
   return resultado;
 }
+function agruparHorarios(diccionario) {
+  const horariosAgrupados = {};
+
+  // Iterar sobre cada bloque de hora
+  for (let hora in diccionario) {
+    const dias = diccionario[hora];
+
+    // Iterar sobre cada día de la semana
+    for (let dia in dias) {
+      const actividades = dias[dia];
+
+      actividades.forEach((actividad) => {
+        if (actividad.trim() !== "") {
+          // Extraemos el nombre del curso, tipo y sección
+          const listadoAsignatura = actividad.split(" ");
+          const curso = listadoAsignatura[0];
+          const seccion = listadoAsignatura[1];
+          const tipo = listadoAsignatura[6];
+
+          // Creamos una clave única para el curso y la sección
+          const clave = `${curso} ${seccion}`;
+
+          // Si no existe la clave en el objeto, la inicializamos
+          if (!horariosAgrupados[clave]) {
+            horariosAgrupados[clave] = {};
+          }
+
+          // Inicializamos el día si no existe
+          if (!horariosAgrupados[clave][dia]) {
+            horariosAgrupados[clave][dia] = [];
+          }
+
+          // Obtiene el horario de inicio y fin del bloque actual
+          const [horaInicio, horaFin] = hora.split("-");
+
+          // Revisa si hay un bloque existente que pueda ser extendido
+          let bloqueAgrupado = false;
+
+          for (let i = 0; i < horariosAgrupados[clave][dia].length; i++) {
+  const bloque = horariosAgrupados[clave][dia][i];
+  const [bloqueTipo, bloqueHoras] = bloque.split(" ");
+  let [bloqueInicio, bloqueFin] = bloqueHoras.replace("'", "").split("-");
+
+  // Verifica si el bloque actual es del mismo tipo y consecutivo
+  if (bloqueTipo === tipo) {
+    while (horasConsecutivas(bloqueFin, horaInicio)) {
+      // Extiende el bloque existente
+      bloqueFin = horaFin; // Actualiza el fin del bloque al nuevo horario
+      horariosAgrupados[clave][dia][i] = `${bloqueTipo} ${bloqueInicio}-${bloqueFin}`;
+      
+      // Busca si hay más bloques consecutivos que extender
+      const siguienteHora = horariosAgrupados[clave][dia][i + 1];
+      if (!siguienteHora) break;
+
+      const [siguienteTipo, siguienteHoras] = siguienteHora.split(" ");
+      if (siguienteTipo !== tipo) break;
+
+      const [siguienteInicio, siguienteFin] = siguienteHoras.replace("'", "").split("-");
+      if (!horasConsecutivas(bloqueFin, siguienteInicio)) break;
+
+      horaInicio = siguienteInicio;
+      horaFin = siguienteFin;
+    }
+    bloqueAgrupado = true;
+  }
+}
+
+          // Si no se pudo agrupar, crea un nuevo bloque
+          if (!bloqueAgrupado) {
+            horariosAgrupados[clave][dia].push(`${tipo} ${hora}`);
+          }
+        }
+      });
+    }
+  }
+
+  return horariosAgrupados;
+}
+
+// Función para verificar si las horas son consecutivas
+function horasConsecutivas(horaFin, horaInicio) {
+  const [horaF, minutoF] = horaFin.split(":").map(Number);
+  const [horaI, minutoI] = horaInicio.split(":").map(Number);
+
+  // Verifica si el horario de inicio comienza justo después del horario de fin
+  if (horaF === horaI && minutoF + 10 === minutoI) {
+    return true;
+  }
+
+  return false;
+}
+function quitarAcentos(palabra) {
+  return palabra.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+}
+function agregar_datos_dpsa(horarios,dpsa,datos_maestro_programacion){
+  Object.keys(horarios).forEach((codigo_seccion)=>{
+    let codigo=codigo_seccion.split(" ")[0]
+    let seccion=codigo_seccion.split(" ")[1]
+    Object.keys(horarios[codigo_seccion]).forEach((dia)=>{
+      horarios[codigo_seccion][dia].forEach((bloque)=>{
+        let tipo=bloque.trim().split(" ")[0]
+        let bloque_tiempo=bloque.trim().split(" ")[1]
+        let detalles=datos_maestro_programacion.find((entrada)=>
+        entrada[0]==codigo&&entrada[1]==seccion&&entrada[6]==tipo)
+        let nueva_entrada=new Array(24)
+        nueva_entrada[1]=codigo
+        nueva_entrada[2]=codigo.substring(0,3)
+        nueva_entrada[3]=codigo.substring(3)
+        nueva_entrada[4]=detalles[2]
+        nueva_entrada[5]=seccion
+        nueva_entrada[6]=""
+        nueva_entrada[7]="TEORIA"
+        nueva_entrada[8]=codigo=="ING6103"?i:"1"
+        nueva_entrada[9]="Y"
+        nueva_entrada[10]=""
+        nueva_entrada[11]=tipo=="LAB/TALLER"? "LABT":tipo
+        nueva_entrada[12]=""
+        nueva_entrada[13]=""
+        nueva_entrada[14]=dia.toUpperCase()
+        nueva_entrada[15]=bloque_tiempo.split("-")[0]
+        nueva_entrada[16]=bloque_tiempo.split("-")[1]
+        neuva_entrada[17]=tipo=="LAB/TALLER"? "3":tipo=="CLAS"?"1":"2"
+        nueva_entrada[18]=""
+
+
+
+
+
+
+
+
+      })
+
+
+
+
+
+    })
+
+
+
+
+
+  })
+
+
+
+}
+function actualizar_data_maestro(data_maestro,horarios,col_dias,dias){
+  Object.keys(horarios).forEach((curso_seccion)=>{
+    let codigo=curso_seccion.split(" ")[0]
+    let seccion=curso_seccion.split(" ")[1]
+    let idx=-1
+    nueva_entrada=data_maestro.find((entrada)=>{
+      
+      idx=idx+1
+      return entrada[7]==codigo&&seccion==entrada[13]})
+    Object.keys(horarios[curso_seccion]).forEach((dia)=>{
+    let indice_dia=dias.findIndex((punto)=>punto==quitarAcentos(dia))
+    nueva_entrada[col_dias[indice_dia]]= horarios[curso_seccion][dia].join(" ")
+    
+
+
+    })
+    data_maestro[idx]=nueva_entrada
+
+
+
+  })
+
+  return data_maestro
+
+}
+
+
+
+
 
 
