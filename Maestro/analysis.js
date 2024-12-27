@@ -1,351 +1,567 @@
 function obtener_columnas_especificas(data,cols) {
-    return data.map((curso)=>{
-      let curso_codigo=[]
-      cols.forEach((col)=>{
-        curso_codigo.push(curso[col])
-  
-      })
-      return curso_codigo
-  
+  return data.map((curso)=>{
+    let curso_codigo=[]
+    cols.forEach((col)=>{
+      curso_codigo.push(curso[col])
+
     })
-  }
-  
-  
-  
-  
-  function cortarColumnas(lista, limiteColumna) {
-    
-    return lista.map((sublista )=>{
-      
-        
-        
-        
-        return sublista.slice(0, limiteColumna)}
-  );
-  }
-  const buscarNRCsUnicos = (codigoCurso, nrcs, usados) => {
-    return nrcs
-      .filter((nrc) => `${nrc[6]}${nrc[7]}` === codigoCurso) // Filtra por código de curso
-      .map((nrc) => nrc[3]) // Extrae el NRC (posición 3)
-      .filter((nrc) => {
-        if (!usados.includes(nrc)) { // Si no se ha usado, lo asigna
-          usados.push(nrc); // Marca como usado
-          return true;
-        }
-        return false; // Si ya está usado, lo descarta
-      });
-  };
-  const generarSecciones = (curso, nrcs) => {
-    let usados = []
-    const [codigoCurso, , numSecciones] = curso;
-    console.log("Codigo curso: ",codigoCurso,"nuemro secciones: ",numSecciones)
-    const nrcsAsociados = buscarNRCsUnicos(codigoCurso, nrcs, usados);
-  
-    // Creamos las secciones usando un map sobre un rango de 0 a numSecciones
-    return Array.from({ length: numSecciones }, (_, i) => [
-      codigoCurso,
-      `${i + 1}`,
-      i < nrcsAsociados.length ? nrcsAsociados[i] : "sin NRC asociado",
-    ]);
-  };
-  
-  const asignarSecciones = (cursos, nrcs) => {
-    return cursos.flatMap((curso) => generarSecciones(curso, nrcs));
-  };
-  
-  
-  function generar_Entradas(secciones,data_nrc,data_catalogo,hoja_catalogo,hoja_listado_nrc,hoja_presupuesto,hoja_maestro,procesado_presupuesto){
-    //Obitene las columnas por nombre
-    const col_SCT_Chile_maestro= obtenerNumeroDeColumna(hoja_maestro,"SCT-Chile",1)
-    const col_Requisitos_maestro= obtenerNumeroDeColumna(hoja_maestro,"Requisitos",1)
-    const col_Habilidades_transversales_maestro= obtenerNumeroDeColumna(hoja_maestro,"Habilidades Transversales",1)
-    const col_SCT_Chile_catalogo= obtenerNumeroDeColumna(hoja_catalogo,"SCT-Chile",1)
-    const col_Requisitos_catalogo= obtenerNumeroDeColumna(hoja_catalogo,"Requisitos",1)
-    const col_Habilidades_catalogo= obtenerNumeroDeColumna(hoja_catalogo,"Habilidades Transversales",1)
-    const col_codigo_maestro=obtenerNumeroDeColumna(hoja_maestro,"CURSO",1)
-    const col_materia_maestro=obtenerNumeroDeColumna(hoja_maestro,"MATERIA",1)
-    const col_area=obtenerNumeroDeColumna(hoja_maestro,"MATERIA",1)
-    
-    
-    return secciones.map((seccion,idx)=>{
-  
-      let entrada = new Array(obtenerCantidadDeColumnas(hoja_maestro))
-      entrada[0]="SI"
-      entrada[7]=seccion[0]//codigo ING1101
-      entrada[13]=seccion[1]//seccion 1
-      entrada[4]=seccion[2]// NRC 5670
-      entrada[col_codigo_maestro]=seccion[0].substring(3)
-      entrada[col_materia_maestro]=seccion[0].substring(0, 3)//ING
-  
-      let codigo_seccion = seccion[0]+seccion[1]//ING11011
-      entrada[3]= codigo_seccion
-      let datos_catalogo=data_catalogo.find((curso)=>curso[0]===seccion[0])
-      
-      //Puede que no encuentre ningun dato asociado en catalogo
-      if (datos_catalogo===undefined){
-      datos_catalogo = Array(data_catalogo[0].length) 
-      }
-      console.log("datos_catalogo",datos_catalogo,seccion[0])
-      entrada[1]=datos_catalogo[3]
-      entrada[10]=datos_catalogo[4]
-      let datos_nrc = data_nrc.find((curso)=>curso[3]===seccion[2])//Busca por nrc
-      if (datos_nrc===undefined){
-      datos_nrc= Array(data_nrc[0].length) 
-      }
-      entrada[12]=datos_nrc[28]//cupos de ese NRC si no encuentra devuelve undefined
-      
-      let detalles = extraerRango(datos_catalogo,obtenerNumeroDeColumna(hoja_catalogo,"Plan Común",1),obtenerNumeroDeColumna(hoja_catalogo,"Sala especial",1))
-      console.log(detalles)
-      entrada = reemplazarParteLista(entrada,16,35,detalles)
-      entrada[col_SCT_Chile_maestro]=datos_catalogo[col_SCT_Chile_catalogo]
-      entrada[col_Requisitos_maestro]=datos_catalogo[col_Requisitos_catalogo]
-      entrada[col_Habilidades_transversales_maestro]=datos_catalogo[col_Habilidades_catalogo]
-  
-  
-      return entrada
-  
-  
-    })
-  
-  
-  }
-  function obtenerCantidadDeColumnas(hoja) {
-    // Abre la hoja activa
-   
-    
-    // Obtiene el rango de celdas con datos
-    var rango = hoja.getDataRange();
-    
-    // Obtiene el número de columnas (en el rango con datos)
-    var cantidadDeColumnas = rango.getNumColumns();
-    
-    // Muestra la cantidad de columnas
-    return cantidadDeColumnas
-  }
-  function obtenerRangoColumnas(listaDeListas,inicio,final) {
-    
-    return columnasRango = listaDeListas.map(fila => fila.slice(inicio,final));
-  
-  }
-  function extraerRango(lista, inicio, fin) {
-    if (lista===undefined){
-      return new Array(fin-inicio) 
-    }
-    return lista.slice(inicio, fin + 1); // `fin + 1` porque slice no incluye el último índice
-  }
-  function reemplazarParteLista(lista, inicio, fin, sublista) {
-    // Elimina desde `inicio` hasta `fin` y agrega `sublista` en su lugar.
-    console.log("lista:",lista,"remplazada por :",sublista)
-    lista.splice(inicio, fin - inicio + 1, ...sublista);
-    return lista;
-  }
-  function obtener_entradas_area_especifica(area,entradas,col_area){
-  
-    const entradas_por_area=entradas.filter((entrada)=>entrada[col_area]==area)
-    return entradas_por_area
-  
-  
-  
-  
-  
-  }
-  function obtener_areas(data_maestro,col_area){
-  let revisados=[]
-  data_maestro.filter((tupla)=>{
-  
-    if(revisados.includes(tupla[col_area])||tupla[col_area]===''){
-      return false
-  
-    }
-    revisados.push(tupla[col_area])
-    return true
-  
-  
+    return curso_codigo
+
   })
-  return revisados
+}
+
+
+
+
+function cortarColumnas(lista, limiteColumna) {
   
-  
-  }
-  function mostrarHojaYEnviarArchivo(hojaVisible, usuarioPermitido) {
-    const libro = SpreadsheetApp.getActiveSpreadsheet();
-    const usuarioActual = Session.getEffectiveUser().getEmail();
-    const hojas = libro.getSheets();
-  
-    if (usuarioActual === usuarioPermitido) {
-      // Mostrar solo la hoja permitida
-      hojas.forEach((hoja) => {
-        
-          hoja.showSheet(); // Mostrar la hoja permitida
-        
-      });
-  
-      Logger.log(`Usuario ${usuarioActual} puede ver solo la hoja: ${hojaVisible}`);
-  
-      // Asignar permisos de solo lectura al usuario permitido
-      libro.addViewer(usuarioPermitido);
-  
-      // Enviar correo con enlace al archivo
-      const enlaceArchivo = libro.getUrl();
-      const asunto = `Acceso al archivo: ${libro.getName()}`;
-      const mensaje = `Hola,\n\nSe te ha dado acceso al archivo de Google Sheets para modificar el maestro de tu area con permisos de solo lectura. Puedes accederlo desde el siguiente enlace:\n\n${enlaceArchivo}\n\nSaludos.`;
-  
-      GmailApp.sendEmail(usuarioPermitido, asunto, mensaje);
-  
-      Logger.log(`Correo enviado a ${usuarioPermitido} con el enlace al archivo.`);
-    } else {
-      // Ocultar todas las hojas para usuarios no autorizados
-      hojas.forEach((hoja) => hoja.hideSheet());
-      Logger.log(`Usuario ${usuarioActual} no autorizado. Hojas ocultas.`);
-    }
-  
-  
-  }
-  function resaltarCambiosEnHoja(hoja, datosOriginales, filaInicio, columnasClave, columnaEliminar, listaCambiada) {
-    // Crear un mapa para buscar elementos de manera eficiente en los datos originales
-    const generarClave = (fila, columnas) => columnas.map((col) => fila[col]).join("|");
-    const mapaOriginal = new Map(
-      datosOriginales.map((fila) => [generarClave(fila, columnasClave), fila])
-    );
-  
-    // Iterar sobre la lista cambiada para pintar directamente en la hoja
-    listaCambiada.forEach((filaCambiada, idxCambiado) => {
-      const clave = generarClave(filaCambiada, columnasClave);
-      const valorEliminar = filaCambiada[columnaEliminar];
-      const filaHoja = filaInicio + idxCambiado; // Índice en la hoja para la lista cambiada
-  
-      if (valorEliminar === -1) {
-        // Destacar en rojo si el elemento es para eliminar
-        if (mapaOriginal.has(clave)) {
-          console.log("Eliminado:", filaCambiada);
-          hoja.getRange(filaHoja, 1, 1, filaCambiada.length).setBackground("red");
-        }
-      } else if (mapaOriginal.has(clave)) {
-        // Si existe en la original, revisar si hay cambios
-        const filaOriginal = mapaOriginal.get(clave);
-        let tieneCambios = false;
-  
-        filaCambiada.forEach((valor, idx) => {
-          if (valor !== filaOriginal[idx]) {
-            // Destacar celdas con diferencias en azul
-            console.log("Diferencia:", filaCambiada, filaOriginal);
-            hoja.getRange(filaHoja, idx + 1).setBackground("blue");
-            tieneCambios = true;
-          }
-        });
-  
-        if (!tieneCambios) {
-          // Si no hay cambios, no se hace nada (puedes personalizar este caso)
-        }
-      } else {
-        // Es un nuevo elemento, destacar toda la fila en verde
-        console.log("Nuevo:", filaCambiada);
-        hoja.getRange(filaHoja, 1, 1, filaCambiada.length).setBackground("green");
+  return lista.map((sublista )=>{
+    
+      
+      
+      
+      return sublista.slice(0, limiteColumna)}
+);
+}
+const buscarNRCsUnicos = (codigoCurso, nrcs, usados) => {
+  return nrcs
+    .filter((nrc) => `${nrc[6]}${nrc[7]}` === codigoCurso) // Filtra por código de curso
+    .map((nrc) => nrc[3]) // Extrae el NRC (posición 3)
+    .filter((nrc) => {
+      if (!usados.includes(nrc)) { // Si no se ha usado, lo asigna
+        usados.push(nrc); // Marca como usado
+        return true;
       }
+      return false; // Si ya está usado, lo descarta
     });
+};
+const generarSecciones = (curso, nrcs) => {
+  let usados = []
+  const [codigoCurso, , numSecciones] = curso;
+  console.log("Codigo curso: ",codigoCurso,"nuemro secciones: ",numSecciones)
+  const nrcsAsociados = buscarNRCsUnicos(codigoCurso, nrcs, usados);
+
+  // Creamos las secciones usando un map sobre un rango de 0 a numSecciones
+  return Array.from({ length: numSecciones }, (_, i) => [
+    codigoCurso,
+    `${i + 1}`,
+    i < nrcsAsociados.length ? nrcsAsociados[i] : "sin NRC asociado",
+  ]);
+};
+
+const asignarSecciones = (cursos, nrcs) => {
+  return cursos.flatMap((curso) => generarSecciones(curso, nrcs));
+};
+
+
+function generar_Entradas(secciones,data_nrc,data_catalogo,hoja_catalogo,hoja_listado_nrc,hoja_presupuesto,hoja_maestro,procesado_presupuesto){
+  //Obitene las columnas por nombre
+  const col_SCT_Chile_maestro= obtenerNumeroDeColumna(hoja_maestro,"SCT-Chile",1)
+  const col_Requisitos_maestro= obtenerNumeroDeColumna(hoja_maestro,"Requisitos",1)
+  const col_Habilidades_transversales_maestro= obtenerNumeroDeColumna(hoja_maestro,"Habilidades Transversales",1)
+  const col_SCT_Chile_catalogo= obtenerNumeroDeColumna(hoja_catalogo,"SCT-Chile",1)
+  const col_Requisitos_catalogo= obtenerNumeroDeColumna(hoja_catalogo,"Requisitos",1)
+  const col_Habilidades_catalogo= obtenerNumeroDeColumna(hoja_catalogo,"Habilidades Transversales",1)
+  const col_codigo_maestro=obtenerNumeroDeColumna(hoja_maestro,"CURSO",1)
+  const col_materia_maestro=obtenerNumeroDeColumna(hoja_maestro,"MATERIA",1)
+  const col_area=obtenerNumeroDeColumna(hoja_maestro,"MATERIA",1)
+  
+  
+  return secciones.map((seccion,idx)=>{
+
+    let entrada = new Array(obtenerCantidadDeColumnas(hoja_maestro))
+    entrada[0]="SI"
+    entrada[7]=seccion[0]//codigo ING1101
+    entrada[13]=seccion[1]//seccion 1
+    entrada[4]=seccion[2]// NRC 5670
+    entrada[col_codigo_maestro]=seccion[0].substring(3)
+    entrada[col_materia_maestro]=seccion[0].substring(0, 3)//ING
+
+    let codigo_seccion = seccion[0]+seccion[1]//ING11011
+    entrada[3]= codigo_seccion
+    let datos_catalogo=data_catalogo.find((curso)=>curso[0]===seccion[0])
+    
+    //Puede que no encuentre ningun dato asociado en catalogo
+    if (datos_catalogo===undefined){
+    datos_catalogo = Array(data_catalogo[0].length) 
+    }
+    console.log("datos_catalogo",datos_catalogo,seccion[0])
+    entrada[1]=datos_catalogo[3]
+    entrada[10]=datos_catalogo[4]
+    let datos_nrc = data_nrc.find((curso)=>curso[3]===seccion[2])//Busca por nrc
+    if (datos_nrc===undefined){
+    datos_nrc= Array(data_nrc[0].length) 
+    }
+    entrada[12]=datos_nrc[28]//cupos de ese NRC si no encuentra devuelve undefined
+    
+    let detalles = extraerRango(datos_catalogo,obtenerNumeroDeColumna(hoja_catalogo,"Plan Común",1),obtenerNumeroDeColumna(hoja_catalogo,"Sala especial",1))
+    console.log(detalles)
+    entrada = reemplazarParteLista(entrada,16,35,detalles)
+    entrada[col_SCT_Chile_maestro]=datos_catalogo[col_SCT_Chile_catalogo]
+    entrada[col_Requisitos_maestro]=datos_catalogo[col_Requisitos_catalogo]
+    entrada[col_Habilidades_transversales_maestro]=datos_catalogo[col_Habilidades_catalogo]
+
+
+    return entrada
+
+
+  })
+
+
+}
+function obtenerCantidadDeColumnas(hoja) {
+  // Abre la hoja activa
+ 
+  
+  // Obtiene el rango de celdas con datos
+  var rango = hoja.getDataRange();
+  
+  // Obtiene el número de columnas (en el rango con datos)
+  var cantidadDeColumnas = rango.getNumColumns();
+  
+  // Muestra la cantidad de columnas
+  return cantidadDeColumnas
+}
+function obtenerRangoColumnas(listaDeListas,inicio,final) {
+  
+  return columnasRango = listaDeListas.map(fila => fila.slice(inicio,final));
+
+}
+function extraerRango(lista, inicio, fin) {
+  if (lista===undefined){
+    return new Array(fin-inicio) 
   }
-  function actualizarListaOriginal(listaOriginal, listaCambiada, columnaClave, columnaEliminar) {
-    // Crea un mapa para buscar elementos de manera eficiente en la lista original
-    const mapaOriginal = new Map(
-      listaOriginal.map((fila) => [fila[columnaClave], fila])
-    );
-  
-    // Lista para almacenar la lista actualizada
-    const listaActualizada = [];
-  
-    // Procesa los elementos de la lista cambiada
-    listaCambiada.forEach((filaCambiada) => {
-      const clave = filaCambiada[columnaClave];
-      const valorEliminar = filaCambiada[columnaEliminar];
-  
-      if (valorEliminar === -1) {
-        // Si el valor en la columna de eliminación es -1, elimina de listaOriginal
-        console.log("eliminar",clave)
-        mapaOriginal.delete(clave);
-      } else if (mapaOriginal.has(clave)) {
-        // Si existe en el mapa original y no hay cambios, se mantiene
-        const filaOriginal = mapaOriginal.get(clave);
-  
-        if (!filaCambiada.every((val, idx) => val === filaOriginal[idx])) {
-          // Hay cambios, reemplaza la fila en el mapa
-          console.log("actualizar")
-          mapaOriginal.set(clave, filaCambiada);
+  return lista.slice(inicio, fin + 1); // `fin + 1` porque slice no incluye el último índice
+}
+function reemplazarParteLista(lista, inicio, fin, sublista) {
+  // Elimina desde `inicio` hasta `fin` y agrega `sublista` en su lugar.
+  console.log("lista:",lista,"remplazada por :",sublista)
+  lista.splice(inicio, fin - inicio + 1, ...sublista);
+  return lista;
+}
+function obtener_entradas_area_especifica(area,entradas,col_area){
+
+  const entradas_por_area=entradas.filter((entrada)=>entrada[col_area]==area)
+  return entradas_por_area
+
+
+
+
+
+}
+function obtener_areas(data_maestro,col_area){
+let revisados=[]
+data_maestro.filter((tupla)=>{
+
+  if(revisados.includes(tupla[col_area])||tupla[col_area]===''){
+    return false
+
+  }
+  revisados.push(tupla[col_area])
+  return true
+
+
+})
+return revisados
+
+
+}
+function mostrarHojaYEnviarArchivo(hojaVisible, usuarioPermitido) {
+  const libro = SpreadsheetApp.getActiveSpreadsheet();
+  const usuarioActual = Session.getEffectiveUser().getEmail();
+  const hojas = libro.getSheets();
+
+  if (usuarioActual === usuarioPermitido) {
+    // Mostrar solo la hoja permitida
+    hojas.forEach((hoja) => {
+      
+        hoja.showSheet(); // Mostrar la hoja permitida
+      
+    });
+
+    Logger.log(`Usuario ${usuarioActual} puede ver solo la hoja: ${hojaVisible}`);
+
+    // Asignar permisos de solo lectura al usuario permitido
+    libro.addViewer(usuarioPermitido);
+
+    // Enviar correo con enlace al archivo
+    const enlaceArchivo = libro.getUrl();
+    const asunto = `Acceso al archivo: ${libro.getName()}`;
+    const mensaje = `Hola,\n\nSe te ha dado acceso al archivo de Google Sheets para modificar el maestro de tu area con permisos de solo lectura. Puedes accederlo desde el siguiente enlace:\n\n${enlaceArchivo}\n\nSaludos.`;
+
+    GmailApp.sendEmail(usuarioPermitido, asunto, mensaje);
+
+    Logger.log(`Correo enviado a ${usuarioPermitido} con el enlace al archivo.`);
+  } else {
+    // Ocultar todas las hojas para usuarios no autorizados
+    hojas.forEach((hoja) => hoja.hideSheet());
+    Logger.log(`Usuario ${usuarioActual} no autorizado. Hojas ocultas.`);
+  }
+
+
+}
+function resaltarCambiosEnHoja(hoja, datosOriginales, filaInicio, columnasClave, columnaEliminar, listaCambiada) {
+  // Crear un mapa para buscar elementos de manera eficiente en los datos originales
+  const generarClave = (fila, columnas) => columnas.map((col) => fila[col]).join("|");
+  const mapaOriginal = new Map(
+    datosOriginales.map((fila) => [generarClave(fila, columnasClave), fila])
+  );
+
+  // Iterar sobre la lista cambiada para pintar directamente en la hoja
+  listaCambiada.forEach((filaCambiada, idxCambiado) => {
+    const clave = generarClave(filaCambiada, columnasClave);
+    const valorEliminar = filaCambiada[columnaEliminar];
+    const filaHoja = filaInicio + idxCambiado; // Índice en la hoja para la lista cambiada
+
+    if (valorEliminar === -1) {
+      // Destacar en rojo si el elemento es para eliminar
+      if (mapaOriginal.has(clave)) {
+        console.log("Eliminado:", filaCambiada);
+        hoja.getRange(filaHoja, 1, 1, filaCambiada.length).setBackground("red");
+      }
+    } else if (mapaOriginal.has(clave)) {
+      // Si existe en la original, revisar si hay cambios
+      const filaOriginal = mapaOriginal.get(clave);
+      let tieneCambios = false;
+
+      filaCambiada.forEach((valor, idx) => {
+        if (valor !== filaOriginal[idx]) {
+          // Destacar celdas con diferencias en azul
+          console.log("Diferencia:", filaCambiada, filaOriginal);
+          hoja.getRange(filaHoja, idx + 1).setBackground("blue");
+          tieneCambios = true;
         }
-      } else {
-        // Es un nuevo elemento, agrégalo al mapa
-        console.log("insersion")
+      });
+
+      if (!tieneCambios) {
+        // Si no hay cambios, no se hace nada (puedes personalizar este caso)
+      }
+    } else {
+      // Es un nuevo elemento, destacar toda la fila en verde
+      console.log("Nuevo:", filaCambiada);
+      hoja.getRange(filaHoja, 1, 1, filaCambiada.length).setBackground("green");
+    }
+  });
+}
+function actualizarListaOriginal(listaOriginal, listaCambiada, columnaClave, columnaEliminar) {
+  // Crea un mapa para buscar elementos de manera eficiente en la lista original
+  const mapaOriginal = new Map(
+    listaOriginal.map((fila) => [fila[columnaClave], fila])
+  );
+
+  // Lista para almacenar la lista actualizada
+  const listaActualizada = [];
+
+  // Procesa los elementos de la lista cambiada
+  listaCambiada.forEach((filaCambiada) => {
+    const clave = filaCambiada[columnaClave];
+    const valorEliminar = filaCambiada[columnaEliminar];
+
+    if (valorEliminar === -1) {
+      // Si el valor en la columna de eliminación es -1, elimina de listaOriginal
+      console.log("eliminar",clave)
+      mapaOriginal.delete(clave);
+    } else if (mapaOriginal.has(clave)) {
+      // Si existe en el mapa original y no hay cambios, se mantiene
+      const filaOriginal = mapaOriginal.get(clave);
+
+      if (!filaCambiada.every((val, idx) => val === filaOriginal[idx])) {
+        // Hay cambios, reemplaza la fila en el mapa
+        console.log("actualizar")
         mapaOriginal.set(clave, filaCambiada);
       }
-    });
-  
-    // Reconstruye la lista a partir del mapa actualizado
-    mapaOriginal.forEach((fila) => listaActualizada.push(fila));
-  
-    return listaActualizada;
-  }
-  
-  function horariosPorRut(data){
-  const horariosPorRut = data.reduce((acc, [fecha, nombre, rut, dia, hora]) => {
-     
-      if (!acc[rut]) {
-          acc[rut] = {
-              rut,
-              horarios: {
-                  Lunes: [],
-                  Martes: [],
-                  Miércoles: [],
-                  Jueves: [],
-                  Viernes: []
-              }
-          };
-      }
-      
-      
-      acc[rut].horarios[dia].push(hora);
-      return acc;
-  }, {});
-  
-  
-  return Object.values(horariosPorRut).map(profesor => {
-      const { rut, horarios } = profesor;
-      const horariosConcatenados = Object.keys(horarios).reduce((acc, dia) => {
-          
-          acc[dia] = horarios[dia].join(",");
-          return acc;
-      }, {});
-  
-      return { rut, ...horariosConcatenados };
+    } else {
+      // Es un nuevo elemento, agrégalo al mapa
+      console.log("insersion")
+      mapaOriginal.set(clave, filaCambiada);
+    }
   });
+
+  // Reconstruye la lista a partir del mapa actualizado
+  mapaOriginal.forEach((fila) => listaActualizada.push(fila));
+
+  return listaActualizada;
+}
+
+function horariosPorRut(data){
+const horariosPorRut = data.reduce((acc, [fecha, nombre, rut, dia, hora]) => {
+   
+    if (!acc[rut]) {
+        acc[rut] = {
+            rut,
+            horarios: {
+                Lunes: [],
+                Martes: [],
+                Miércoles: [],
+                Jueves: [],
+                Viernes: []
+            }
+        };
+    }
+    
+    
+    acc[rut].horarios[dia].push(hora);
+    return acc;
+}, {});
+
+
+return Object.values(horariosPorRut).map(profesor => {
+    const { rut, horarios } = profesor;
+    const horariosConcatenados = Object.keys(horarios).reduce((acc, dia) => {
+        
+        acc[dia] = horarios[dia].join(",");
+        return acc;
+    }, {});
+
+    return { rut, ...horariosConcatenados };
+});
+
+
+
+
+}
+function interseccion_de_bloques(dia1,dia2){
+  const lista1=dia1.split(",")
+  const lista2=dia2.split(",")
+  const set1 = new Set(lista1);
+  const set2 = new Set(lista2);
+
+
+  const interseccion = [...set1].filter(item => set2.has(item));
+
+  return interseccion.join(",")
+
+
+}
+function verificarCasillasNoVacias(lista, indices) {
+  return indices.some(indice => lista[indice] !== "");
+}
+function verificarCasillastodasVacias(lista, indices) {
+  return indices.every(indice => lista[indice] === "");
+}
+function rellenar_dpsa(data_maestro,col_dias,dias,hoja_maestro){
+  const col_codigo=obtenerNumeroDeColumna(hoja_maestro,"CODIGO",1)
+  const col_NRC=obtenerNumeroDeColumna(hoja_maestro,"NRC",1)
+  const col_materia=obtenerNumeroDeColumna(hoja_maestro,"MATERIA",1)
+  const col_curso=obtenerNumeroDeColumna(hoja_maestro,"CURSO",1)
+  const col_seccion=obtenerNumeroDeColumna(hoja_maestro,"SECCIONES",1)
+  const col_titulo=obtenerNumeroDeColumna(hoja_maestro,"TITULO",1)
+  const col_Lista_cruzada=obtenerNumeroDeColumna(hoja_maestro,"LC",1)
+  const col_profesor1=obtenerNumeroDeColumna(hoja_maestro,"RUT PROFESOR 1",1)
+  const col_profesor2=obtenerNumeroDeColumna(hoja_maestro,"RUT PROFESOR 2",1)
+  const col_profesor_lab=obtenerNumeroDeColumna(hoja_maestro,"RUT PROFESOR LABT",1)
+  const col_cupos=obtenerNumeroDeColumna(hoja_maestro,"CUPOS 202420",1)
+  const dPSA=[]
+  console.log("numero de columnas dias",col_dias)
+  data_maestro.forEach((entrada)=>{
+    col_dias.forEach((columna,idx)=>{
+      const bloques=entrada[columna].split(",")
+      
+      bloques.forEach((tipo_hora)=>{
+        if(tipo_hora||entrada[col_Lista_cruzada]){
+        let tipo = tipo_hora.trim().split(" ")[0]
+        let hora = tipo_hora.trim().split(" ")[1]
+        
+        let nueva_entrada=new Array(24)
+        nueva_entrada[0]=entrada[col_NRC]
+        nueva_entrada[1]=entrada[col_codigo]
+        nueva_entrada[2]=entrada[col_materia]
+        nueva_entrada[3]=entrada[col_curso]
+        nueva_entrada[4]=entrada[col_titulo]
+        nueva_entrada[5]=entrada[col_seccion]
+        nueva_entrada[6]=entrada[col_Lista_cruzada]
+        nueva_entrada[7]="TEORIA"
+        nueva_entrada[8]=entrada[col_codigo]=="ING6103"?"i":"1"
+        nueva_entrada[9]="Y"
+        nueva_entrada[10]=entrada[col_cupos]
+        if(tipo_hora){
+        nueva_entrada[11]=tipo=="LAB/TALLER"?"LABT":tipo
+        nueva_entrada[12]=""
+        nueva_entrada[13]=""
+        console.log(dias[idx],dias,idx)
+        nueva_entrada[14]=dias[idx].toUpperCase()
+        nueva_entrada[15]=hora.split("-")[0]
+        nueva_entrada[16]=hora.split("-")[1]
+        nueva_entrada[17]=tipo=="CLAS"?1:tipo=="AYUD"?2:3
+        nueva_entrada[18]=tipo=="CLAS"?entrada[col_profesor1]:""
+        nueva_entrada[19]=nueva_entrada[11]=="LABT"? entrada[col_profesor_lab]:tipo=="CLAS"?entrada[col_profesor2]:""
+        nueva_entrada[20]=""
+        nueva_entrada[21]=""
+        nueva_entrada[22]=""
+        nueva_entrada[23]=""
+        }
+
+        dPSA.push(nueva_entrada)
+
+
+
+
+      
+    }
+    
+    })
+
+
+
+
+    })
+
+
+
+
+  })
+
+  return dPSA
   
+}
+function agregar_fechas(dpsa,fecha_inicio_clases,fecha_fin_clases,fecha_inicio_ayud,fecha_fin_ayud,data_programacion){
+  console.log(data_programacion)
+  return dpsa.map((entrada)=>{
+    if (entrada[11]=="CLAS"){
+    entrada[12]=fecha_inicio_clases
+    entrada[13]=fecha_fin_clases
+    }
+    else{
+      entrada[12]=fecha_inicio_ayud
+      entrada[13]=fecha_fin_ayud
+      let tipo=entrada[11]=="LABT"?"LAB/TALLER":entrada[11]
+      let sala_especial=data_programacion.find((fila)=>
+      entrada[1]==fila[0]&&
+      entrada[5]==fila[1]&&
+      tipo==fila[6])[5]
+      console.log(entrada)
+      console.log(sala_especial)
+      entrada[20]=sala_especial
+    }
+    return entrada
+
+
+
+  })
+}
+function rellenar_HORARIO_ING(data_maestro,col_dias,dias,hoja_maestro){
+  const col_area=obtenerNumeroDeColumna(hoja_maestro,"AREA",1)
+  const col_plan_estudio=obtenerNumeroDeColumna(hoja_maestro,"PLAN DE ESTUDIO",1)
+  const col_codigo=obtenerNumeroDeColumna(hoja_maestro,"CODIGO",1)
+  const col_NRC=obtenerNumeroDeColumna(hoja_maestro,"NRC",1)
+  const col_materia=obtenerNumeroDeColumna(hoja_maestro,"MATERIA",1)
+  const col_curso=obtenerNumeroDeColumna(hoja_maestro,"CURSO",1)
+  const col_seccion=obtenerNumeroDeColumna(hoja_maestro,"SECCIONES",1)
+  const col_titulo=obtenerNumeroDeColumna(hoja_maestro,"TITULO",1)
+  const col_Lista_cruzada=obtenerNumeroDeColumna(hoja_maestro,"LC",1)
+  const col_profesor1=obtenerNumeroDeColumna(hoja_maestro,"RUT PROFESOR 1",1)
+  const col_nombre_profesor1=obtenerNumeroDeColumna(hoja_maestro,"NOMBRE PROFESOR BANNER 1 \n(PROFESOR PRINCIPAL SESIÓN 01)",1)
+  const col_nombre_profesor2=obtenerNumeroDeColumna(hoja_maestro,"NOMBRE PROFESOR 2\n(2DO PROFESOR - SESIÓN 02)",1)
+  const col_nombre_profesorlab=obtenerNumeroDeColumna(hoja_maestro,"PROFESOR LABT ",1)
+
+  const col_profesor2=obtenerNumeroDeColumna(hoja_maestro,"RUT PROFESOR 2",1)
+  const col_profesor_lab=obtenerNumeroDeColumna(hoja_maestro,"RUT PROFESOR LABT",1)
+  const col_cupos=obtenerNumeroDeColumna(hoja_maestro,"CUPOS 202420",1)
+  const dPSA=[]
+  console.log("numero de columnas dias",col_dias)
+  data_maestro.forEach((entrada)=>{
+    col_dias.forEach((columna,idx)=>{
+      const bloques=entrada[columna].split(",")
+      
+      bloques.forEach((tipo_hora)=>{
+        if(tipo_hora||entrada[col_Lista_cruzada]){
+        let tipo = tipo_hora.trim().split(" ")[0]
+        let hora = tipo_hora.trim().split(" ")[1]
+        
+        let nueva_entrada=new Array(18)
+        nueva_entrada[0]=entrada[col_area]
+        nueva_entrada[1]=entrada[col_plan_estudio]
+        nueva_entrada[2]=entrada[col_NRC]
+        nueva_entrada[3]=entrada[col_Lista_cruzada]
+        nueva_entrada[4]=entrada[col_materia]
+        nueva_entrada[5]=entrada[col_curso]
+        nueva_entrada[6]=entrada[col_seccion]
+        nueva_entrada[7]=entrada[col_titulo]
+        if(tipo_hora){
+          if(idx==0){
+            nueva_entrada[8]=hora
+          }
+          if(idx==1){
+            nueva_entrada[9]=hora
+          }
+          if(idx==2){
+            nueva_entrada[10]=hora
+          }
+          if(idx==3){
+            nueva_entrada[11]=hora
+          }
+          if(idx==4){
+            nueva_entrada[12]=hora
+          }
+        
+        nueva_entrada[13]=""
+        nueva_entrada[14]=""
+        nueva_entrada[15]=""
+        nueva_entrada[16]=tipo=="LAB/TALLER"?"LABT":tipo
+        let nombreprofesor=""
+        if(tipo=="LAB/TALLER"){
+          if(entrada[col_nombre_profesorlab]){
+            nombreprofesor=entrada[col_nombre_profesorlab]
+          }else{
+            nombreprofesor=entrada[col_nombre_profesor1]
+            if(entrada[col_nombre_profesor2]!=""){
+              nombreprofesor=entrada[col_nombre_profesor1]+"/"+ entrada[col_nombre_profesor2]
+            }
+
+
+          }
+        }else{
+          nombreprofesor=entrada[col_nombre_profesor1]
+          if(entrada[col_nombre_profesor2]!=""){
+          nombreprofesor=entrada[col_nombre_profesor1]+"/"+ entrada[col_nombre_profesor2]
+          }    
+        }
+        nueva_entrada[17]=nombreprofesor
+
+        }
+        dPSA.push(nueva_entrada)
+
+
+
+
+      
+    }
+    
+    })
+
+
+
+
+    })
+
+
+
+
+  })
+
+  return dPSA
   
-  
-  
-  }
-  function interseccion_de_bloques(dia1,dia2){
-    const lista1=dia1.split(",")
-    const lista2=dia2.split(",")
-    const set1 = new Set(lista1);
-    const set2 = new Set(lista2);
-  
-  
-    const interseccion = [...set1].filter(item => set2.has(item));
-  
-    return interseccion.join(",")
-  
-  
-  }
-  function verificarCasillasNoVacias(lista, indices) {
-    return indices.some(indice => lista[indice] !== "");
-  }
-  function verificarCasillastodasVacias(lista, indices) {
-    return indices.every(indice => lista[indice] === "");
-  }
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
+}
+function agregar_fechas_HORARIO_ING(horario_ing,fecha_inicio_clases,fecha_fin_clases,fecha_inicio_ayud,fecha_fin_ayud,data_programacion){
+  console.log(data_programacion)
+  return horario_ing.map((entrada)=>{
+    if (entrada[16]=="CLAS"){
+    entrada[13]=fecha_inicio_clases
+    entrada[14]=fecha_fin_clases
+    }
+    else{
+      entrada[13]=fecha_inicio_ayud
+      entrada[14]=fecha_fin_ayud
+      
+    }
+    return entrada
+
+
+
+  })
+}
+
+
+
+
+
