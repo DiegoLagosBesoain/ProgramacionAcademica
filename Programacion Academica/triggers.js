@@ -367,5 +367,156 @@ function destacar_por_semestre_visualizacion(valorEditado,celda,data_maestro_con
     }
   
 }
+function retornar_por_semestre_visualizacion(valorEditado,data_maestro_con_detalles) {
+  
+  
+  
+  // Verificar si la edición no está en la primera fila o columna
+    console.log(data_maestro_con_detalles)
+    const bloques = data_maestro_con_detalles; // Define aquí tu data maestro
+    const entrada_real = bloques.find((bloque) =>
+      (valorEditado.split(" ")[0] == bloque[2])   // Curso
+        // Sección
+      
+    );
+    console.log("entrada real",entrada_real)
+    // Si la celda está vacía, limpia el fondo y elimina el comentario
+    if (valorEditado === "") {
+      return ("#FFFFFF"); // Fondo blanco
+       // Eliminar comentario
+    } else if (entrada_real) {
+      // Asignar el color basado en la entrada
+      if (entrada_real[7] == "1") {
+        return("#fef2cb"); // Amarillo claro
+      } else if (entrada_real[7] == "2") {
+        return("#e2efd9"); // Verde claro
+      } else if (entrada_real[7] == "3") {
+        return("#fbe4d5"); // Naranja claro
+      } else if (entrada_real[7] == "4") {
+       return("#deeaf6"); // Azul claro
+      }else if (entrada_real[20] != "") {
+        return("#FFFFFF");; // Azul claro
+      }
+      else if (entrada_real[0].includes("IOC")) {
+        if(entrada_real[16]=="5"){
+         return("#acbde2")
+        }
+        if(entrada_real[16]=="6"){
+         return("#4472c4")
+        }
+        if(entrada_real[16]=="7"){
+         return("#acbde2")
+        }
+        if(entrada_real[16]=="8"){
+         return("#4472c4")
+        }
+        if(entrada_real[16]=="9"){
+         return("#d9e2f3")
+        }
+        if(entrada_real[16]=="10"){
+         return("#8eaadb")
+        }
+        if(entrada_real[16]=="11"){
+         return("#2f5496")
+        }
+      }
+      else if (entrada_real[0].includes("ICC")) {
+        if(entrada_real[18]=="5"){
+         return("#c5c5c5")
+        }
+        if(entrada_real[18]=="6"){
+         return("#7b7b7b")
+        }
+        if(entrada_real[18]=="7"){
+         return("#c5c5c5")
+        }
+        if(entrada_real[18]=="8"){
+         return("#7b7b7b")
+        }
+        if(entrada_real[18]=="9"){
+         return("#e2e2e2")
+        }
+        if(entrada_real[18]=="10"){
+         return("#aeaeae")
+        }
+        if(entrada_real[18]=="11"){
+         return("#606060")
+        }
+      }
+      else if (entrada_real[0].includes("ICE")) {
+        if(entrada_real[17]=="5"){
+         return("#f8be9e")
+        }
+        if(entrada_real[17]=="6"){
+         return("#de8400")
+        }
+        if(entrada_real[17]=="7"){
+         return("#f8be9e")
+        }
+        if(entrada_real[17]=="8"){
+         return("#de8400")
+        }
+        if(entrada_real[17]=="9"){
+         return("#fbe4d5")
+        }
+        if(entrada_real[17]=="10"){
+         return("#f6ae86")
+        }
+        if(entrada_real[17]=="11"){
+         return("#de8400")
+        }
+      }
+      else if (entrada_real[0].includes("ICI")) {
+        if(entrada_real[15]=="5"){
+         return("#e2efd9")
+        }
+        if(entrada_real[15]=="6"){
+         return("#548135")
+        }
+        if(entrada_real[15]=="7"){
+         return("#e2efd9")
+        }
+        if(entrada_real[15]=="8"){
+         return("#548135")
+        }
+        if(entrada_real[15]=="9"){
+         return("#e2efd9")
+        }
+        if(entrada_real[15]=="10"){
+         return("#a8d08d")
+        }
+        if(entrada_real[15]=="11"){
+         return("#00b050")
+        }
+      }
+      else if (entrada_real[0].includes("ICA")) {
+        if(entrada_real[19]=="5"){
+         return("#ff99cc")
+        }
+        if(entrada_real[19]=="6"){
+         return("#ff3399")
+        }
+        if(entrada_real[19]=="7"){
+         return("#ff99cc")
+        }
+        if(entrada_real[19]=="8"){
+         return("#ff3399")
+        }
+        if(entrada_real[19]=="9"){
+         return("#f5d7f0")
+        }
+        if(entrada_real[19]=="10"){
+         return("#ff99cc")
+        }
+        if(entrada_real[19]=="11"){
+         return("#ff3399")
+        }
+      }
+       else {
+         return("#FFFFFF"); // Fondo blanco (default)
+      }
+    }
+  
+}
 
 

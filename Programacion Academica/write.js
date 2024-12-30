@@ -131,29 +131,7 @@ function crear_calendario(hoja,opcionesLista) {
      rango.setComment(nuevoComentario);
    });
  }
- function limpiarBackgroundsYComentarios(sheet, startRow, startCol) {
-   // Obtener el rango desde la fila y columna especificadas hasta el final de la hoja
-   const lastRow = sheet.getLastRow();
-   const lastCol = sheet.getLastColumn();
-   const range = sheet.getRange(startRow, startCol, lastRow - startRow + 1, lastCol - startCol + 1);
  
-   // Recorremos cada celda del rango
-   for (let i = 0; i < range.getNumRows(); i++) {
-     for (let j = 0; j < range.getNumColumns(); j++) {
-       const cell = range.getCell(i + 1, j + 1); // Obtener la celda actual
- 
-       // Verificar si la celda tiene un comentario
-       const comment = cell.getComment();
-       if (comment) {
-         cell.clearNote();
-         cell.setBackground(null); // Elimina el comentario solo si existe
-       }
- 
-       // Eliminar el fondo de la celda
-       
-     }
-   }
- }
  function crear_hoja_nombre(nombre,hojasActuales) {
    
    const hoja = hojasActuales.getSheetByName(nombre)
@@ -298,6 +276,97 @@ function crear_calendario(hoja,opcionesLista) {
        }
      }
    
+ }
+ function escribirDatosYResaltar(hoja, datos) {
+   
+ 
+   if (!hoja) {
+     throw new Error(`No se encontró la hoja con el nombre: ${sheet}`);
+   }
+ 
+   // Determinar la cantidad de columnas de los datos
+   const numColumnasDatos = datos[0].length;
+ 
+   // Limpiar contenido y formato solo debajo de los encabezados
+   const numFilas = hoja.getLastRow();
+   if (numFilas > 1) {
+     hoja.getRange(2, 1, numFilas - 1, hoja.getLastColumn()).clearContent().clearFormat();
+   }
+ 
+   // Escribe los datos debajo de los encabezados
+   hoja.getRange(2, 1, datos.length, numColumnasDatos).setValues(datos);
+ 
+   // Encuentra la columna "NRC" de los encabezados
+   const encabezados = hoja.getRange(1, 1, 1, hoja.getLastColumn()).getValues()[0];
+   const columnaNRC = encabezados.indexOf("NRC") + 1;
+ 
+   if (columnaNRC === 0) {
+     throw new Error('No se encontró una columna con el encabezado "NRC".');
+   }
+ 
+   // Recorre los datos y resalta las filas según la condición
+   datos.forEach((fila, i) => {
+     if (fila[columnaNRC - 1] === "sin NRC asociado") {
+       const rangoFila = hoja.getRange(i + 2, 1, 1, numColumnasDatos); // i+2 porque los datos empiezan en la fila 2
+       rangoFila.setBackground("yellow");
+     }
+   });
+ }
+ function limpiarColumnas(hoja,columnas) {
+    // Índices de las columnas a limpiar (1 = Columna A, 3 = Columna C, etc.)
+   
+   const rango = hoja.getDataRange(); // Obtén todo el rango de datos
+   const datos = rango.getValues(); // Obtén los valores como una matriz bidimensional
+   
+   // Recorre las filas y limpia las columnas especificadas
+   for (let i = 1; i < datos.length; i++) {
+     columnas.forEach(col => {
+       if (col >= 0 && col < datos[i].length) { 
+         datos[i][col] = ""; // Limpia el contenido de la celda
+       }
+     });
+   }
+   
+   // Escribe los datos actualizados en el rango
+   rango.setValues(datos);
+ }
+ function limpiarBackgroundsYComentarios(sheet, startRow, startCol, substringObjetivo,data_maestro_con_detalles) {
+   // Obtener el rango desde la fila y columna especificadas hasta el final de la hoja
+   console.log("dentro de la escritura",data_maestro_con_detalles)
+   const lastRow = sheet.getLastRow();
+   const lastCol = sheet.getLastColumn();
+   const range = sheet.getRange(startRow, startCol, lastRow - startRow + 1, lastCol - startCol + 1);
+   
+   // Obtener todos los comentarios y valores de fondo del rango en una sola operación
+   const valores = range.getDisplayValues(); 
+   const comments = range.getNotes(); // Obtiene una matriz con los comentarios del rango
+   const backgrounds = range.getBackgrounds(); // Obtiene una matriz con los colores de fondo
+ 
+   // Iterar sobre las filas y columnas del rango
+   for (let i = 0; i < comments.length; i++) {
+     for (let j = 0; j < comments[i].length; j++) {
+       let comment = comments[i][j];
+ 
+       // Si el comentario contiene el substring, procesarlo
+       if (comment && comment.includes(substringObjetivo)) {
+         // Eliminar todas las ocurrencias del substring en el comentario
+         comment = comment.split(substringObjetivo).join("").trim();
+ 
+         // Si el comentario queda vacío, eliminamos el fondo y el comentario
+         if (comment === "") {
+           comments[i][j] = null; // Limpiar el comentario
+           let valor = valores[i][j]
+           backgrounds[i][j] = retornar_por_semestre_visualizacion(valor,data_maestro_con_detalles); // Limpiar el fondo
+         } else {
+           comments[i][j] = comment; // Actualizar el comentario modificado
+         }
+       }
+     }
+   }
+ 
+   // Aplicar las modificaciones al rango en una sola operación
+   range.setNotes(comments); // Aplica los comentarios modificados
+   range.setBackgrounds(backgrounds); // Actualiza los fondos
  }
  
  

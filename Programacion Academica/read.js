@@ -103,6 +103,30 @@ function verifySheets(hojas_sheets,hoja_existente){ //verifica si la hoja que se
   const  nombresHojas=hojas.map((sheet)=>sheet.getName()) ; // Inicializa un array para almacenar los nombres de las hojas
   return  !nombresHojas.includes(hoja_existente)
 }
+function obtenerNumeroDeColumna(sheet, nombreColumna, filaEncabezados) {
+  // Obtener la hoja por su nombre
+ 
+  // Verificar si la hoja existe
+  if (!sheet) {
+    throw new Error(`La hoja "${sheetName}" no existe.`);
+  }
+
+  // Obtener los valores de la fila donde están los encabezados
+  const encabezados = sheet
+    .getRange(filaEncabezados, 1, 1, sheet.getLastColumn()) // Obtiene una fila específica
+    .getValues()[0]; // Accede a la primera fila del rango seleccionado
+  
+  // Buscar el índice del nombre de la columna
+  const indice = encabezados.indexOf(nombreColumna);
+
+  // Si no se encuentra el nombre, lanzar un error o devolver un valor específico
+  if (indice === -1) {
+    throw new Error(`La columna con el nombre "${nombreColumna}" no fue encontrada en la fila ${filaEncabezados}.`);
+  }
+
+  // Los índices empiezan desde 0, pero las columnas en Sheets empiezan desde 1
+  return indice;
+}
 
 
 
