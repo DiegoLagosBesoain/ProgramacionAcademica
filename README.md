@@ -5,7 +5,7 @@
 Este script automatiza procesos administrativos relacionados con la gestión académica, como la creación y actualización de hojas de cálculo para diferentes áreas, validación de cambios en datos, y asignación de horarios o secciones. 
 Está diseñado para usarse en el entorno de Google Sheets, utilizando Google Apps Script para integrar hojas de cálculo con funcionalidades personalizadas, conexion con appWeb de formularios.
 
-###Características
+### Características
 
 - **Agregar Secciones:** Asigna secciones a los cursos según datos predefinidos.
 - **Crear Hojas por Área:** Divide los datos en hojas separadas por área creando hojas en espejo para el maestro y para lso cordinadores de cada area.
