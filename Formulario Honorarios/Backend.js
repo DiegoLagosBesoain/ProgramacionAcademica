@@ -36,6 +36,27 @@ function validarRut(rut,nombre) {
   if (data_profesores.length < 1) {
     throw new Error("El rut ingresado no es valido(si es guion 'k' ingreselo en mayusculas)."); // Lanza un error si el rut no es válido.
     }
+  const ss = SpreadsheetApp.openById("1o6HftjnQiU4EB1T9mwZ5FntfkZqy9Bj5wkZKbyHl-m0")
+  const hoja = ss.getSheetByName("ENTREGADOS");
+  
+  if (!hoja) {
+    Logger.log("La hoja 'ENTREGADOS' no existe.");
+    return { success: false, message: "La hoja 'ENTREGADOS' no existe." };
+  }
+
+  // Obtener los valores de la primera columna (RUTs registrados)
+  const lastRow = hoja.getLastRow();
+  let rutColumna = [];
+  
+  if (lastRow > 0) {
+    // Obtener los valores de la primera columna solo si hay datos
+    rutColumna = hoja.getRange(1, 1, lastRow).getValues().flat();
+  }
+  console.log(rut,rutColumna)
+  // Verificar si el RUT ya está registrado
+  if (rutColumna.some((dato)=>dato==rut)) {
+    return { success: false, message: "Este RUT ya fue registrado previamente." };
+  }
   const semestres_protegidos_minor=["2","3","4","5"]
   const horas_totales = data_profesores.reduce((total, actual) => 
   actual[4] == 0 
@@ -43,9 +64,13 @@ function validarRut(rut,nombre) {
     : total + Number(actual[4]), 
   0
 );
-  const restriccion_horario_plan_comun = data_profesores.every((curso_seccion)=>
-  semestres_protegidos_minor
-  .includes(curso_seccion[5]))
+  const restriccion_horario_plan_comun = data_profesores.every((curso_seccion)=>{
+  
+  return curso_seccion.slice(8).some((especialidad)=>semestres_protegidos_minor.includes(especialidad))
+  
+  
+  
+  })
   console.log(nombre)
   const mensaje = getPreguntaDinamica(nombre, data_profesores,horas_totales)
   console.log(data_profesores)
@@ -89,10 +114,29 @@ function obtener_data_profesor(rut) {
   const col_codigo_semestre = obtenerNumeroDeColumna(hoja_maestro, "Plan Común", 1);
   const col_codigo_horas_laboratorio = obtenerNumeroDeColumna(hoja_maestro, "Laboratorios o Talleres PROGRAMAR", 1);
   const col_rut_profesor2=obtenerNumeroDeColumna(hoja_maestro,"RUT PROFESOR 2",1)
+  const col_clases=obtenerNumeroDeColumna(hoja_maestro,"Clases",1)
+  
   
 
-  const profesores_curso = data_maestro.map((entrada) => [entrada[col_rut], entrada[col_nombre_curso], entrada[col_codigo_curso], entrada[col_codigo_seccion],entrada[col_codigo_horas_clases],entrada[col_codigo_semestre],
-  entrada[col_codigo_horas_laboratorio],entrada[col_rut_profesor2]]);
+  const profesores_curso = data_maestro.map((entrada) => {
+  // Asegúrate de que `entrada` es un array.
+  if (Array.isArray(entrada)) {
+    return [
+      entrada[col_rut],
+      entrada[col_nombre_curso],
+      entrada[col_codigo_curso],
+      entrada[col_codigo_seccion],
+      entrada[col_codigo_horas_clases],
+      entrada[col_codigo_semestre],
+      entrada[col_codigo_horas_laboratorio],
+      entrada[col_rut_profesor2],
+      ...entrada.slice(col_codigo_semestre, col_clases) // Uso correcto de propagación
+    ];
+  } else {
+    console.error("Entrada no es un array:", entrada);
+    return null; // Manejo de errores
+  }
+});
   const data_profesor = profesores_curso.filter((data) => data[0] === rut||data[7] === rut);
   return data_profesor;
 }
@@ -170,14 +214,49 @@ function guardarPreferenciasHoras(rut, preferencias) {
     return { success: false, message: "Error al guardar las preferencias: " + error.message };
   }
 }
-function enviar_datos(nombre,rut,horarios,preferencias,comentarios,examenes,evaluaciones,tipos){
-  console.log(comentarios,examenes,evaluaciones,tipos)
-  guardarHorariosEnHoja(nombre,rut,horarios)
-  guardarPreferenciasHoras(rut,preferencias)
-  enviar_datos_otros(rut,comentarios,examenes,evaluaciones,tipos)
+function enviar_datos(nombre, rut, horarios, preferencias, comentarios, examenes, evaluaciones, tipos) {
+  const ss = SpreadsheetApp.openById("1o6HftjnQiU4EB1T9mwZ5FntfkZqy9Bj5wkZKbyHl-m0")
+  const hoja = ss.getSheetByName("ENTREGADOS");
+  
+  if (!hoja) {
+    Logger.log("La hoja 'ENTREGADOS' no existe.");
+    return { success: false, message: "La hoja 'ENTREGADOS' no existe." };
+  }
 
+  // Obtener los valores de la primera columna (RUTs registrados)
+  const lastRow = hoja.getLastRow();
+  let rutColumna = [];
+  
+  if (lastRow > 0) {
+    // Obtener los valores de la primera columna solo si hay datos
+    rutColumna = hoja.getRange(1, 1, lastRow).getValues().flat();
+  }
+  console.log(rut,rutColumna)
+  // Verificar si el RUT ya está registrado
+  if (rutColumna.some((dato)=>dato==rut)) {
+    return { success: false, message: "Este RUT ya fue registrado previamente." };
+  }
 
+  // Si el RUT no está registrado, proceder con el envío de datos
+  console.log(comentarios, examenes, evaluaciones, tipos);
+
+  // Guardar horarios en la hoja
+  guardarHorariosEnHoja(nombre, rut, horarios);
+  
+  // Guardar preferencias en la hoja
+  guardarPreferenciasHoras(rut, preferencias);
+  
+  // Guardar otros datos
+  enviar_datos_otros(rut, comentarios, examenes, evaluaciones, tipos);
+
+  // Después de guardar los datos, agregar el RUT al final de la columna
+  hoja.appendRow([rut]);
+
+  return { success: true, message: "Datos enviados correctamente y RUT registrado." };
 }
+
+
+
 function enviar_datos_otros(rut,comentarios,examenes,evaluaciones,tipos){
   try {
     const hoja = SpreadsheetApp.openById("1o6HftjnQiU4EB1T9mwZ5FntfkZqy9Bj5wkZKbyHl-m0").getSheetByName("OTROS");

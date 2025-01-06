@@ -1,4 +1,6 @@
 var id_hoja_programacion='1pQBxylZzoIWAY0RKcbgDMUKrZLg6u0cGIsxd-GleUYE'
+var id_archivo_actual="1o6HftjnQiU4EB1T9mwZ5FntfkZqy9Bj5wkZKbyHl-m0"
+var id_carpeta_archivos_cordinadores="1_65rwp56jrcRsxoMO-HnBAOFGFI1z9Mc"
 function onOpen(){
   const ui = SpreadsheetApp.getUi(); //crea referencia a la interfaz de usuario de Spreadsheet
 
@@ -6,8 +8,9 @@ function onOpen(){
     .addItem("Agregar secciones", "agregar_secciones")
     .addItem("Crear hoja por area","crear_hoja_por_area")
     .addItem("Validar Cambios","validar_cambios")
-    .addItem("mostrarTodasLasHojas","mostrarTodasLasHojas")
+    .addItem("Crear Calendario","crearCalendario")
     .addItem("Compartir enlaces","compartirYEnviarEnlace")
+    .addItem("Quitar permisos de edicion archivos cordinaldores","quitar_permisos")
     .addItem("Extraer datos Hojas cordinadores","extraer_datos")
     .addItem("Actualizar con datos formulario","actualizar_datos")
     .addItem("Envio de formularios Jornada y honorarios","enviarFormulariosCondicional")
@@ -21,7 +24,7 @@ function agregar_secciones(){
 const hojasActuales = SpreadsheetApp.getActiveSpreadsheet();
 const hoja_presupuesto = hojasActuales.getSheetByName('Presupuesto');
 const semestre_espejo = Number(pedirParametro())
-const data_presupuesto = hoja_presupuesto.getDataRange().getValues();
+const data_presupuesto = hoja_presupuesto.getDataRange().get<Values();
 
 const columna_semestre = obtenerNumeroDeColumna(hoja_presupuesto,semestre_espejo,1)
 const columna_curso = obtenerNumeroDeColumna(hoja_presupuesto,"CURSO",1)
@@ -200,9 +203,7 @@ function pedirParametro_fechas(mensaje_grande,mensaje_pequeno) {
 }
 function compartirYEnviarEnlace() {
   const lista_datos =[
-    {name:"Danae",mail:"dolavarria@uandes.cl",archivos:["MATEMATICA","COMPUTACION"]},
-    {name:"Diego",mail:"deyzaguirre1@miaundes.cl",archivo:["FISICA","OBRAS CIVILES"]},
-    {name:"Andrea",mail:"amirandac@uandes.cl",archivo:["MATEMATICA"]},
+    {name:"Diego Lagos",mail:"diego.lagos.besoain@gmail.com",archivos:["MATEMATICA","COMPUTACION"]}
     //cambiar aqui las diferentes areas de cordinacion y sus encargados
 
   ]
@@ -344,8 +345,8 @@ function enviarFormulariosCondicional() {
   const data = sheet.getDataRange().getDisplayValues(); 
   data.shift()
   // Links de los formularios
-  const linkFormulario1 = "https://script.google.com/macros/s/AKfycbx2eNURsM9bm-aGlQA_Mcq0dnZ1_uUGKgDpgXHMdZ5KtoIJc7FQ5os9_B6Bxqi6lyun/exec"; // Cambiar por el link del formulario Honorarios
-  const linkFormulario2 = "https://script.google.com/macros/s/AKfycbyEGSRI-VGzTkcnGLYNCMEh19F4Gqh2Qth_nmLL8LtNmY5pkMJcu7kqMBUxsHibEdZ6Eg/exec"; // Cambiar por el link del formulario Jornada
+  const linkFormulario1 = "https://script.google.com/macros/s/AKfycbxSHjR1VZxcZqeYqyuIbQ2D9Y-HXpkL_kL30ym4l3WzAEJkhr-OT43EeTZVrYFTtd2D/exec"; // Cambiar por el link del formulario Honorarios
+  const linkFormulario2 = "https://script.google.com/macros/s/AKfycbyobQf5Zffk-bDaIY1JszLMKDSdLVs_IxBWkNtCFFdfXlDElu3D1qiCzxtDjFSbPSAw/exec"; // Cambiar por el link del formulario Jornada
 
   data.forEach((fila, i) => {
     const email1 = fila[colMail1];
@@ -388,7 +389,8 @@ function condicionPersonalizada(rut,rut_profesores_jornada) {
 function crear_template_dpsa(){
   const hojasActuales = SpreadsheetApp.getActiveSpreadsheet();
   const hoja_maestro = hojasActuales.getSheetByName("MAESTRO");
-  const data_maestro = hoja_maestro.getDataRange().getDisplayValues(); 
+  const data_maestro = hoja_maestro.getDataRange().getDisplayValues();
+  const encabezado_evaluaciones = hoja_maestro.getDataRange().getValues()[0]
   data_maestro.shift()
   const col_lunes= obtenerNumeroDeColumna(hoja_maestro,"Lunes",1)
   const col_martes= obtenerNumeroDeColumna(hoja_maestro,"Martes",1)
@@ -397,7 +399,8 @@ function crear_template_dpsa(){
   const col_viernes= obtenerNumeroDeColumna(hoja_maestro,"Viernes",1)
   const col_dias=[col_lunes,col_martes,col_miercoles,col_jueves,col_viernes]
   const dias=["Lunes","Martes","Miercoles","Jueves","Viernes"]
-  const encabezado=["NRC",	"MATERIA/CURSO",	"MATERIA",	"CURSO",	"TITULO",	"SECC.",	"LISTA CRUZADA",	"TIPO DE HORARIO",	"PARTE PERIODO",	"CALIFICABLE",	"CUPOS TOTALES NRC",	"TIPO DE REUNIÓN",	"INICIO",	"FIN",	"DIA",	"HORA INICIO",	"HORA FIN",	"INDICADOR SESION LINEA/PROFESOR",	"PROFESOR PRINCIPAL",	"OTROS PROFESORES",	"LABORATORIOS",	"SALA CARACTERISTICA ESPECIAL",	"SOBREPASO",	"OBSERVACIONES"]
+  const encabezado=["NRC","MATERIA",	"CURSO",	"TITULO",	"SECC.",	"LISTA CRUZADA",	"TIPO DE HORARIO",	"PARTE PERIODO",	"CALIFICABLE",	"CUPOS TOTALES NRC",	"TIPO DE REUNIÓN",	"INICIO",	"FIN",	"DIA",	"HORA INICIO",	"HORA FIN",	"INDICADOR SESION LINEA/PROFESOR",	"PROFESOR PRINCIPAL",	"OTROS PROFESORES",	"LABORATORIOS",	"SALA CARACTERISTICA ESPECIAL",	"SOBREPASO",	"OBSERVACIONES"," "]
+  const encabezado2=["NRC",	"MATERIA","CURSO",	"TITULO",	"SECC.",	"LISTA CRUZADA",	"TIPO DE HORARIO",	"PARTE PERIODO",	"CALIFICABLE",	"CUPOS TOTALES NRC",	"TIPO DE REUNIÓN",	"INICIO",	"FIN",	"DIA",	"HORA INICIO",	"HORA FIN",	"INDICADOR SESION LINEA/PROFESOR",	"PROFESOR PRINCIPAL",	"OTROS PROFESORES",	"LABORATORIOS",	"SALA CARACTERISTICA ESPECIAL",	"SOBREPASO",	"OBSERVACIONES","OBSERVACIONES INTERNA"]
   const fecha_inicio_clases=pedirParametro_fechas("Introduce la fecha de INICIO de clases","dd/mm/aaaa")
   const fecha_fin_clases=pedirParametro_fechas("Introduce la fecha de FIN de clases","dd/mm/aaaa")
   const fecha_inicio_ayud=pedirParametro_fechas("Introduce la fecha de \INICIO de AYUD/LAB","en formato dd/mm/aaaa")
@@ -405,14 +408,34 @@ function crear_template_dpsa(){
   const idSpreadsheet = id_hoja_programacion;
   const hoja_programacion = SpreadsheetApp.openById(idSpreadsheet).getSheetByName('DATOS MAESTRO');
   const data_programacion = hoja_programacion.getDataRange().getDisplayValues();
-  data_maestro.shift()
+  
   const dPSA=agregar_fechas(rellenar_dpsa(data_maestro,col_dias,dias,hoja_maestro),fecha_inicio_clases,fecha_fin_clases,fecha_inicio_ayud,fecha_fin_ayud,data_programacion)
   
-  console.log(dPSA)
+  
   dPSA.unshift(encabezado)
-  const hoja_dpsa=crear_hoja_nombre("DPSA1",hojasActuales)
+  const hoja_dpsa=crear_hoja_nombre("DPSA",hojasActuales)
+  const data_dpsa_anterior=hoja_dpsa.getDataRange().getDisplayValues()
+  const hoja_evaluaciones=crear_hoja_nombre("EVALUACIONES",hojasActuales)
+  const data_evaluaciones_anterior=hoja_evaluaciones.getDataRange().getDisplayValues()
+  const evaluaciones=rellenar_evaluaciones(data_maestro,hoja_maestro,encabezado_evaluaciones)
+  evaluaciones.unshift(encabezado2)
+  hoja_dpsa.getDataRange().clear()
+  hoja_evaluaciones.getDataRange().clear()
   escribirListaDeListas(hoja_dpsa,dPSA,1,1)
+  escribirListaDeListas(hoja_evaluaciones,evaluaciones,1,1)
 
+  const hoja_ajustes=crear_hoja_nombre("AJUSTES DPSA",hojasActuales)
+  
+  const llaves_p=[0,1,2,4,5,10,13]
+  const enunciado_evaluaciones=["AJUSTES","HORA-DIA CAMBIO","NRC",	"MATERIA","CURSO",	"TITULO",	"SECC.",	"LISTA CRUZADA",	"TIPO DE HORARIO",	"PARTE PERIODO",	"CALIFICABLE",	"CUPOS TOTALES NRC",	"TIPO DE REUNIÓN",	"INICIO",	"FIN",	"DIA",	"HORA INICIO",	"HORA FIN",	"INDICADOR SESION LINEA/PROFESOR",	"PROFESOR PRINCIPAL",	"OTROS PROFESORES",	"LABORATORIOS",	"SALA CARACTERISTICA ESPECIAL",	"SOBREPASO",	"OBSERVACIONES","OBSERVACIONES INTERNA"]
+  const cambios=compareLists(data_dpsa_anterior,dPSA,llaves_p,enunciado_evaluaciones).filter((elemento)=>elemento[0]!="")
+  const enunciado=["AJUSTES","HORA-DIA CAMBIO","NRC",	"MATERIA/CURSO",	"MATERIA",	"CURSO",	"TITULO",	"SECC.",	"LISTA CRUZADA",	"TIPO DE HORARIO",	"PARTE PERIODO",	"CALIFICABLE",	"CUPOS TOTALES NRC",	"TIPO DE REUNIÓN",	"INICIO",	"FIN",	"DIA",	"HORA INICIO",	"HORA FIN",	"INDICADOR SESION LINEA/PROFESOR",	"PROFESOR PRINCIPAL",	"OTROS PROFESORES",	"LABORATORIOS",	"SALA CARACTERISTICA ESPECIAL",	"SOBREPASO",	"OBSERVACIONES"]
+  const llaves_evaluaciones=[0,1,2,4,5,10,11,12]
+  const cambios_evaluaciones=compareLists(data_evaluaciones_anterior,evaluaciones,llaves_evaluaciones,enunciado_evaluaciones).filter((elemento)=>elemento[0]!="")
+  
+  agregarAlFinal(hoja_ajustes,cambios,enunciado_evaluaciones)
+  agregarAlFinal(hoja_ajustes,cambios_evaluaciones,enunciado_evaluaciones)
+  
 
 
 
@@ -442,12 +465,12 @@ function crear_template_HorariosING(){
   const idSpreadsheet = id_hoja_programacion;
   const hoja_programacion = SpreadsheetApp.openById(idSpreadsheet).getSheetByName('DATOS MAESTRO');
   const data_programacion = hoja_programacion.getDataRange().getDisplayValues();
-  data_maestro.shift()
   const horario_ing=agregar_fechas_HORARIO_ING(rellenar_HORARIO_ING(data_maestro,col_dias,dias,hoja_maestro),fecha_inicio_clases,fecha_fin_clases,fecha_inicio_ayud,fecha_fin_ayud,data_programacion)
   
   console.log(horario_ing)
   horario_ing.unshift(encabezado)
   const hoja_horario_ing=crear_hoja_nombre("HORARIO ING",hojasActuales)
+  hoja_horario_ing.getDataRange().clear()
   escribirListaDeListas(hoja_horario_ing,horario_ing,1,1)
 
 
@@ -456,6 +479,37 @@ function crear_template_HorariosING(){
 
 
 }
+function crearCalendario(){
+const fecha_inicio=pedirParametro_fechas("Introduce la fecha de INICIO de programacion","en formato dd/mm/aaaa")
+const fecha_fin=pedirParametro_fechas("Introduce la fecha de FIN de programacion","en formato dd/mm/aaaa")
+const listaFechas=generarFechasEntre(fecha_inicio, fecha_fin)
+const dias_feriados=verificarFinDeSemana(listaFechas)
+const hojasActuales = SpreadsheetApp.getActiveSpreadsheet();
+const hoja_maestro = hojasActuales.getSheetByName("MAESTRO");
+const columnainicio=obtenerNumeroDeColumna(hoja_maestro,"OBSERVACION",1)+2
 
 
+
+
+escribirFechasEnFila(listaFechas,dias_feriados,1, columnainicio)
+
+
+
+
+
+
+}
+function quitar_permisos(){
+  const lista_datos =[
+    {name:"Diego Lagos",mail:"diego.lagos.besoain@gmail.com",archivos:["MATEMATICA","COMPUTACION"]}
+    
+    //cambiar aqui las diferentes areas de cordinacion y sus encargados
+
+  ]
+  
+  removePermissionsFromList(id_carpeta_archivos_cordinadores, lista_datos)
+
+
+  
+}
 

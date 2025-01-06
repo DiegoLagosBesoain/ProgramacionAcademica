@@ -81,6 +81,10 @@ google.script.run
   mostrarCursos(respuesta.message);
     
   } else {
+    if(respuesta.message=="Este RUT ya fue registrado previamente."){
+      document.getElementById("pregunta2").style.display = "none";
+      document.getElementById("Rut ya enviado").style.display = "block";
+    }
     alert(`Error: ${respuesta.message}`);
   }
 })
@@ -122,9 +126,14 @@ function terminar_formulario() {
   document.getElementById("preguntafinal").style.display = "block";
   mostrarCarga()
   google.script.run
-      .withSuccessHandler(() => {
+      .withSuccessHandler((e) => {
         ocultarCarga();
         console.log("Comentarios guardados exitosamente.");
+        if(!e.success){
+          document.getElementById("preguntafinal").style.display = "none";
+          document.getElementById("Rut ya enviado").style.display = "block";
+
+        }
         
       })
       .withFailureHandler(errorCarga)

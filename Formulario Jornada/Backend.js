@@ -36,6 +36,27 @@ function validarRut(rut,nombre) {
   if (data_profesores.length < 1) {
     throw new Error("El rut ingresado no es valido(si es guion 'k' ingreselo en mayusculas)."); // Lanza un error si el rut no es válido.
     }
+  const ss = SpreadsheetApp.openById("1o6HftjnQiU4EB1T9mwZ5FntfkZqy9Bj5wkZKbyHl-m0")
+  const hoja = ss.getSheetByName("ENTREGADOS");
+  
+  if (!hoja) {
+    Logger.log("La hoja 'ENTREGADOS' no existe.");
+    return { success: false, message: "La hoja 'ENTREGADOS' no existe." };
+  }
+
+  // Obtener los valores de la primera columna (RUTs registrados)
+  const lastRow = hoja.getLastRow();
+  let rutColumna = [];
+  
+  if (lastRow > 0) {
+    // Obtener los valores de la primera columna solo si hay datos
+    rutColumna = hoja.getRange(1, 1, lastRow).getValues().flat();
+  }
+  console.log(rut,rutColumna)
+  // Verificar si el RUT ya está registrado
+  if (rutColumna.some((dato)=>dato==rut)) {
+    return { success: false, message: "Este RUT ya fue registrado previamente." };
+  }
   const semestres_protegidos_minor=["2","3","4","5"]
   const horas_totales = data_profesores.reduce((total, actual) => 
   actual[4] == 0 
@@ -158,14 +179,55 @@ function guardarHorariosEnHoja(nombre, rut, horarios) {
     scriptProperties.deleteProperty(lockKey);
   }
 }
+function guardarPreferenciasHoras(rut, preferencias) {
+  try {
+    const hoja = SpreadsheetApp.openById("1o6HftjnQiU4EB1T9mwZ5FntfkZqy9Bj5wkZKbyHl-m0").getSheetByName("PREFERENCIAS");
+    preferencias.forEach(preferencia => {
+      hoja.appendRow([rut, ...preferencia.curso.split(" "), preferencia.preferencia, new Date()]);
+    });
+    return { success: true, message: "Preferencias guardadas exitosamente." };
+  } catch (error) {
+    return { success: false, message: "Error al guardar las preferencias: " + error.message };
+  }
+}
+function enviar_datos(nombre, rut, horarios, preferencias, comentarios, examenes, evaluaciones, tipos) {
+  const ss = SpreadsheetApp.openById("1o6HftjnQiU4EB1T9mwZ5FntfkZqy9Bj5wkZKbyHl-m0")
+  const hoja = ss.getSheetByName("ENTREGADOS");
+  
+  if (!hoja) {
+    Logger.log("La hoja 'ENTREGADOS' no existe.");
+    return { success: false, message: "La hoja 'ENTREGADOS' no existe." };
+  }
 
-function enviar_datos(nombre,rut,horarios,preferencias,comentarios,examenes,evaluaciones,tipos){
-  console.log(comentarios,examenes,evaluaciones,tipos)
-  guardarHorariosEnHoja(nombre,rut,horarios)
-  guardarPreferenciasHoras(rut,preferencias)
-  enviar_datos_otros(rut,comentarios,examenes,evaluaciones,tipos)
+  // Obtener los valores de la primera columna (RUTs registrados)
+  const lastRow = hoja.getLastRow();
+  let rutColumna = [];
+  
+  if (lastRow > 0) {
+    // Obtener los valores de la primera columna solo si hay datos
+    rutColumna = hoja.getRange(1, 1, lastRow).getValues().flat();
+  }
+  console.log(rut,rutColumna)
+  // Verificar si el RUT ya está registrado
+  if (rutColumna.some((dato)=>dato==rut)) {
+    return { success: false, message: "Este RUT ya fue registrado previamente." };
+  }
 
+  // Si el RUT no está registrado, proceder con el envío de datos
+  console.log(comentarios, examenes, evaluaciones, tipos);
 
+  // Guardar horarios en la hoja
+  
+  // Guardar preferencias en la hoja
+  guardarPreferenciasHoras(rut, preferencias);
+  
+  // Guardar otros datos
+  enviar_datos_otros(rut, comentarios, examenes, evaluaciones, tipos);
+
+  // Después de guardar los datos, agregar el RUT al final de la columna
+  hoja.appendRow([rut]);
+
+  return { success: true, message: "Datos enviados correctamente y RUT registrado." };
 }
 function enviar_datos_otros(rut,comentarios,examenes,evaluaciones,tipos){
   try {

@@ -18,12 +18,14 @@ function obtener_bloques(data_maestro,encabezado){
   const col_horario_jueves =  obtener_nombre_columna_data(encabezado,"JUEVES")
   const col_horario_viernes =  obtener_nombre_columna_data(encabezado,"VIERNES")
   const col_concentracion = obtener_nombre_columna_data(encabezado,"Concentración")
+  const col_mandante = obtener_nombre_columna_data(encabezado,"CURSO MANDANTE")
 
 
   const resultados=[]
   const bloques=[]
   const detalles=[]
   data_maestro.forEach((seccion,idx)=>{
+    if(seccion[col_mandante]){
     let bloque =[]
     let detalle=[]
     let cant_clases=Number(seccion[col_codigo_clases])
@@ -102,7 +104,7 @@ function obtener_bloques(data_maestro,encabezado){
   resultados.push(bloques)
   resultados.push(detalles)
 
-
+  }
 
   })
   return resultados
@@ -974,10 +976,10 @@ function actualizar_data_maestro(data_maestro,horarios,col_dias,dias){
     nueva_entrada=data_maestro.find((entrada)=>{
       
       idx=idx+1
-      return entrada[7]==codigo&&seccion==entrada[13]})
+      return entrada[7]==codigo&&seccion==entrada[13]&&entrada[0]=="SI"})
     Object.keys(horarios[curso_seccion]).forEach((dia)=>{
     let indice_dia=dias.findIndex((punto)=>punto==quitarAcentos(dia))
-    nueva_entrada[col_dias[indice_dia]]= horarios[curso_seccion][dia].join(" ")
+    nueva_entrada[col_dias[indice_dia]]= horarios[curso_seccion][dia].join(",")
     
 
 
@@ -991,6 +993,7 @@ function actualizar_data_maestro(data_maestro,horarios,col_dias,dias){
   return data_maestro
 
 }
+
 
 
 

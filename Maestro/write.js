@@ -149,7 +149,7 @@ function crearSpreadsheetEnCarpeta(nombreArchivo) {
 function crearSpreadsheetEnCarpetaConRemplazo(nombreArchivo) {
   try {
     // Obtener la carpeta por su ID
-    const idCarpeta = "1_65rwp56jrcRsxoMO-HnBAOFGFI1z9Mc";
+    const idCarpeta = id_carpeta_archivos_cordinadores;
     const carpeta = DriveApp.getFolderById(idCarpeta);
     
     // Buscar si ya existe un archivo con el mismo nombre en la carpeta
@@ -289,3 +289,102 @@ function escribirListaDeListas(hoja, datos, filaInicial, columnaInicial) {
   const rango = hoja.getRange(filaInicial, columnaInicial, numFilas, numColumnas);
   rango.setValues(datos); // Escribe los datos
 }
+function escribirFechasEnFila(listaFechas, listaDiasHabiles, fila, columna) {
+    // Abre la hoja activa
+    const hoja = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+
+    // Limpia las celdas a la derecha y hacia abajo de la columna donde vamos a escribir
+    const ultimaColumna = columna + listaFechas.length - 1;
+    const ultimaFila = hoja.getMaxRows(); // Última fila de la hoja
+    
+    // Limpia las celdas que están después de la última fecha escrita
+    const rangoLimpiar = hoja.getRange(fila, ultimaColumna + 1, ultimaFila - fila + 1, hoja.getMaxColumns() - ultimaColumna);
+    rangoLimpiar.clear(); // Elimina todo después de la última columna y hacia abajo
+
+    // Escribe las fechas y aplica el formato horizontalmente
+    listaFechas.forEach((fecha, index) => {
+        const celda = hoja.getRange(fila, columna + index); // Determina la celda horizontalmente
+
+        // Escribe la fecha
+        celda.setValue(fecha);
+
+        // Si no es día hábil (fin de semana), aplica formato rojo
+        if (!listaDiasHabiles[index]) {
+            celda.setBackground("#FF7F7F"); // Fondo rojo suave
+            celda.setFontColor("#FFFFFF"); // Texto blanco
+        } else {
+            celda.setBackground(null); // Fondo normal
+            celda.setFontColor(null); // Texto normal
+        }
+    });
+}
+function resaltarCambios(cambios, nuevaHoja, rangoInicio) {
+  cambios.forEach((cambio) => {
+    const { tipoCambio, filaAnterior, filaNueva, indice } = cambio;
+
+    // Calcular la fila de destino asegurándonos de que sea al menos 1
+    const filaDestino = Math.max(rangoInicio.fila + indice, 1); // Asegura que la fila sea >= 1
+    const columnaDestino = rangoInicio.columna;  // Columna de inicio
+
+    // Obtener el rango a partir de la fila y columna de destino
+    const rango = nuevaHoja.getRange(filaDestino, columnaDestino, 1, filaNueva.length);
+
+    // Resaltar según el tipo de cambio
+    if (tipoCambio === "insertado") {
+      rango.setBackground("#DFF0D8"); // Color verde claro para inserciones
+      nuevaHoja.getRange(filaDestino, columnaDestino, 1, filaNueva.length).setValues([filaNueva]);
+    } else if (tipoCambio === "eliminado") {
+      // Escribir la fila eliminada en la nueva hoja
+      rango.setBackground("#F2D7D5"); // Color rojo claro para eliminaciones
+      nuevaHoja.getRange(filaDestino, columnaDestino, 1, filaAnterior.length).setValues([filaAnterior]); // Escribir la fila eliminada
+    } else if (tipoCambio === "modificado") {
+      rango.setBackground("#FCF8E3"); // Color amarillo claro para cambios
+      nuevaHoja.getRange(filaDestino, columnaDestino, 1, filaNueva.length).setValues([filaNueva]);
+    }
+  });
+}
+function crearListaDesplegableConFormato(hoja, fila, inicioColumna, finColumna,opciones) {
+  // Ajustar índices de columnas (de 0-indexado a 1-indexado de Google Sheets)
+  const inicioColumnaIndex = inicioColumna + 1;
+  const finColumnaIndex = finColumna + 1;
+
+  // Define el rango donde quieres aplicar la lista desplegable
+  const rango = hoja.getRange(fila + 1, inicioColumnaIndex, 1, finColumnaIndex - inicioColumnaIndex + 1);
+
+  // Define las opciones para la lista desplegable
+   // Cambia según tus opciones
+
+  // Configura la validación de datos
+  const validacion = SpreadsheetApp.newDataValidation()
+    .requireValueInList(opciones)
+    .setAllowInvalid(true) // Permite valores no válidos
+    .build();
+
+  // Aplica la validación al rango
+  rango.setDataValidation(validacion);
+
+  // Configura el formato condicional
+  
+}
+function agregarAlFinal(hoja, datos, enunciado) {
+  // Verificar si la lista de listas está vacía
+  if (!datos || datos.length === 0) {
+    Logger.log("No hay datos para agregar. Operación terminada.");
+    return;
+  }
+
+  // Verificar si la hoja ya tiene contenido
+  const ultimaFila = hoja.getLastRow();
+
+  if (ultimaFila === 0) {
+    const columnas = datos[0].length; // Determinar el número de columnas de los datos
+    hoja.getRange(1, 1, 1, columnas).setValues([enunciado]);
+    hoja.getRange(2, 1, datos.length, datos[0].length).setValues(datos); // Escribir los datos debajo del enunciado
+  } else {
+    // Agregar los datos al final de lo existente
+    const nuevaFilaInicio = ultimaFila + 1; // Determinar dónde comenzar a escribir
+    hoja.getRange(nuevaFilaInicio, 1, datos.length, datos[0].length).setValues(datos);
+  }
+}
+
+

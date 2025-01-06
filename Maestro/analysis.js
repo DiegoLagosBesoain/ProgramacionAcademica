@@ -351,44 +351,51 @@ function rellenar_dpsa(data_maestro,col_dias,dias,hoja_maestro){
   const col_profesor2=obtenerNumeroDeColumna(hoja_maestro,"RUT PROFESOR 2",1)
   const col_profesor_lab=obtenerNumeroDeColumna(hoja_maestro,"RUT PROFESOR LABT",1)
   const col_cupos=obtenerNumeroDeColumna(hoja_maestro,"CUPOS 202420",1)
+  const col_mandante=obtenerNumeroDeColumna(hoja_maestro,"CURSO MANDANTE",1)
   const dPSA=[]
   console.log("numero de columnas dias",col_dias)
   data_maestro.forEach((entrada)=>{
     col_dias.forEach((columna,idx)=>{
       const bloques=entrada[columna].split(",")
+      if (entrada[col_Lista_cruzada]&&entrada[col_mandante]!="SI"){
+        console.log("entrada con lista cruzada;",entrada)
+        bloques[" "]
+      }
       
       bloques.forEach((tipo_hora)=>{
-        if(tipo_hora||entrada[col_Lista_cruzada]){
+        console.log("curso-tipo,hora:",entrada,tipo_hora)
+        if(tipo_hora||(entrada[col_Lista_cruzada]&&entrada[col_mandante]!="SI")){
         let tipo = tipo_hora.trim().split(" ")[0]
         let hora = tipo_hora.trim().split(" ")[1]
         
-        let nueva_entrada=new Array(24)
+        let nueva_entrada=new Array(24).fill("")
         nueva_entrada[0]=entrada[col_NRC]
-        nueva_entrada[1]=entrada[col_codigo]
-        nueva_entrada[2]=entrada[col_materia]
-        nueva_entrada[3]=entrada[col_curso]
-        nueva_entrada[4]=entrada[col_titulo]
-        nueva_entrada[5]=entrada[col_seccion]
-        nueva_entrada[6]=entrada[col_Lista_cruzada]
-        nueva_entrada[7]="TEORIA"
-        nueva_entrada[8]=entrada[col_codigo]=="ING6103"?"i":"1"
-        nueva_entrada[9]="Y"
-        nueva_entrada[10]=entrada[col_cupos]
+        nueva_entrada[1]=entrada[col_materia]
+        nueva_entrada[2]=entrada[col_curso]
+        nueva_entrada[3]=entrada[col_titulo]
+        nueva_entrada[4]=entrada[col_seccion]
+        nueva_entrada[5]=entrada[col_Lista_cruzada]
+        if((entrada[col_Lista_cruzada]&&entrada[col_mandante]!="SI")){
+          entrada[col_Lista_cruzada]=""}
+        nueva_entrada[6]="TEORIA"
+        nueva_entrada[7]=entrada[col_codigo]=="ING6103"?"i":"1"
+        nueva_entrada[8]="Y"
+        nueva_entrada[9]=entrada[col_cupos]
         if(tipo_hora){
-        nueva_entrada[11]=tipo=="LAB/TALLER"?"LABT":tipo
+        nueva_entrada[10]=tipo=="LAB/TALLER"?"LABT":tipo
+        nueva_entrada[11]=""
         nueva_entrada[12]=""
-        nueva_entrada[13]=""
         console.log(dias[idx],dias,idx)
-        nueva_entrada[14]=dias[idx].toUpperCase()
-        nueva_entrada[15]=hora.split("-")[0]
-        nueva_entrada[16]=hora.split("-")[1]
-        nueva_entrada[17]=tipo=="CLAS"?1:tipo=="AYUD"?2:3
-        nueva_entrada[18]=tipo=="CLAS"?entrada[col_profesor1]:""
-        nueva_entrada[19]=nueva_entrada[11]=="LABT"? entrada[col_profesor_lab]:tipo=="CLAS"?entrada[col_profesor2]:""
+        nueva_entrada[13]=dias[idx].toUpperCase()
+        nueva_entrada[14]=hora.split("-")[0]
+        nueva_entrada[15]=hora.split("-")[1]
+        nueva_entrada[16]=tipo=="CLAS"?"1":tipo=="AYUD"?"2":"3"
+        nueva_entrada[17]=tipo=="CLAS"?entrada[col_profesor1]:""
+        nueva_entrada[18]=nueva_entrada[11]=="LABT"? entrada[col_profesor_lab]:tipo=="CLAS"?entrada[col_profesor2]:""
+        nueva_entrada[19]=""
         nueva_entrada[20]=""
         nueva_entrada[21]=""
         nueva_entrada[22]=""
-        nueva_entrada[23]=""
         }
 
         dPSA.push(nueva_entrada)
@@ -417,21 +424,27 @@ function rellenar_dpsa(data_maestro,col_dias,dias,hoja_maestro){
 function agregar_fechas(dpsa,fecha_inicio_clases,fecha_fin_clases,fecha_inicio_ayud,fecha_fin_ayud,data_programacion){
   console.log(data_programacion)
   return dpsa.map((entrada)=>{
-    if (entrada[11]=="CLAS"){
-    entrada[12]=fecha_inicio_clases
-    entrada[13]=fecha_fin_clases
+    
+    if(!entrada[16]){
+
+      //no hace nada
+    }
+    else if (entrada[11]=="CLAS"){
+    entrada[11]=fecha_inicio_clases
+    entrada[12]=fecha_fin_clases
     }
     else{
-      entrada[12]=fecha_inicio_ayud
-      entrada[13]=fecha_fin_ayud
-      let tipo=entrada[11]=="LABT"?"LAB/TALLER":entrada[11]
+      entrada[11]=fecha_inicio_ayud
+      entrada[12]=fecha_fin_ayud
+      let tipo=entrada[10]=="LABT"?"LAB/TALLER":entrada[10]
       let sala_especial=data_programacion.find((fila)=>
-      entrada[1]==fila[0]&&
-      entrada[5]==fila[1]&&
+      entrada[1]==fila[0].slice(0,3)&&
+      entrada[2]==fila[0].slice(-4)&&
+      entrada[4]==fila[1]&&
       tipo==fila[6])[5]
       console.log(entrada)
       console.log(sala_especial)
-      entrada[20]=sala_especial
+      entrada[19]=sala_especial
     }
     return entrada
 
@@ -453,22 +466,28 @@ function rellenar_HORARIO_ING(data_maestro,col_dias,dias,hoja_maestro){
   const col_nombre_profesor1=obtenerNumeroDeColumna(hoja_maestro,"NOMBRE PROFESOR BANNER 1 \n(PROFESOR PRINCIPAL SESIÓN 01)",1)
   const col_nombre_profesor2=obtenerNumeroDeColumna(hoja_maestro,"NOMBRE PROFESOR 2\n(2DO PROFESOR - SESIÓN 02)",1)
   const col_nombre_profesorlab=obtenerNumeroDeColumna(hoja_maestro,"PROFESOR LABT ",1)
-
+  const col_mandante=obtenerNumeroDeColumna(hoja_maestro,"CURSO MANDANTE",1)
   const col_profesor2=obtenerNumeroDeColumna(hoja_maestro,"RUT PROFESOR 2",1)
   const col_profesor_lab=obtenerNumeroDeColumna(hoja_maestro,"RUT PROFESOR LABT",1)
   const col_cupos=obtenerNumeroDeColumna(hoja_maestro,"CUPOS 202420",1)
   const dPSA=[]
   console.log("numero de columnas dias",col_dias)
   data_maestro.forEach((entrada)=>{
+    if(entrada[col_Lista_cruzada]&&entrada[col_mandante]!="SI"){
+      let curso_mandante=data_maestro.find((elemento)=>elemento[col_Lista_cruzada]==entrada[col_Lista_cruzada])
+      col_dias.forEach((columna)=>{
+        entrada[columna]=curso_mandante[columna]
+      })
+    }
     col_dias.forEach((columna,idx)=>{
       const bloques=entrada[columna].split(",")
       
       bloques.forEach((tipo_hora)=>{
-        if(tipo_hora||entrada[col_Lista_cruzada]){
+        if(tipo_hora){
         let tipo = tipo_hora.trim().split(" ")[0]
         let hora = tipo_hora.trim().split(" ")[1]
         
-        let nueva_entrada=new Array(18)
+        let nueva_entrada=new Array(18).fill("")
         nueva_entrada[0]=entrada[col_area]
         nueva_entrada[1]=entrada[col_plan_estudio]
         nueva_entrada[2]=entrada[col_NRC]
@@ -545,7 +564,9 @@ function rellenar_HORARIO_ING(data_maestro,col_dias,dias,hoja_maestro){
 function agregar_fechas_HORARIO_ING(horario_ing,fecha_inicio_clases,fecha_fin_clases,fecha_inicio_ayud,fecha_fin_ayud,data_programacion){
   console.log(data_programacion)
   return horario_ing.map((entrada)=>{
-    if (entrada[16]=="CLAS"){
+    if(!entrada[16]){}
+
+    else if (entrada[16]=="CLAS"){
     entrada[13]=fecha_inicio_clases
     entrada[14]=fecha_fin_clases
     }
@@ -560,6 +581,244 @@ function agregar_fechas_HORARIO_ING(horario_ing,fecha_inicio_clases,fecha_fin_cl
 
   })
 }
+function rellenar_evaluaciones(data_maestro,hoja_maestro,encabezado){
+  const col_codigo=obtenerNumeroDeColumna(hoja_maestro,"CODIGO",1)
+  const col_NRC=obtenerNumeroDeColumna(hoja_maestro,"NRC",1)
+  const col_materia=obtenerNumeroDeColumna(hoja_maestro,"MATERIA",1)
+  const col_curso=obtenerNumeroDeColumna(hoja_maestro,"CURSO",1)
+  const col_seccion=obtenerNumeroDeColumna(hoja_maestro,"SECCIONES",1)
+  const col_titulo=obtenerNumeroDeColumna(hoja_maestro,"TITULO",1)
+  const col_Lista_cruzada=obtenerNumeroDeColumna(hoja_maestro,"LC",1)
+  const col_profesor1=obtenerNumeroDeColumna(hoja_maestro,"RUT PROFESOR 1",1)
+  const col_profesor2=obtenerNumeroDeColumna(hoja_maestro,"RUT PROFESOR 2",1)
+  const col_profesor_lab=obtenerNumeroDeColumna(hoja_maestro,"RUT PROFESOR LABT",1)
+  const col_cupos=obtenerNumeroDeColumna(hoja_maestro,"CUPOS 202420",1)
+  const col_mandante=obtenerNumeroDeColumna(hoja_maestro,"CURSO MANDANTE",1)
+  const col_observaciones=obtenerNumeroDeColumna(hoja_maestro,"OBSERVACION",1)
+  const dPSA=[]
+  const diasSemana = ['DOMINGO', 'LUNES', 'MARTES', 'MIERCOLES', 'JUEVES', 'VIERNES', 'SABADO'];
+  const dias = encabezado.slice(col_observaciones)
+  data_maestro.forEach((entrada,idx)=>{
+    let col_dias=entrada.slice(col_observaciones)
+    col_dias.forEach((columna,idx)=>{
+      if(columna){
+        let salida=columna.trim().split(" ")
+        let dia=''
+        let tipo=''
+        let hora=""
+        if (salida.length==2){
+        tipo = salida[0]
+        hora = salida[1]
+        }else if(salida.length==1){
+        tipo ="T"
+        hora = "19:30-21:20"
+        }else{
+        dia = salida[0]
+        tipo = salida[1]
+        hora = salida[2]
+        }
+        console.log("dia:",dia,"tipo:",tipo,"hora:",hora)
+        let nueva_entrada=new Array(24).fill("")
+        nueva_entrada[0]=entrada[col_NRC]
+        nueva_entrada[1]=entrada[col_materia]
+        nueva_entrada[2]=entrada[col_curso]
+        nueva_entrada[3]=entrada[col_titulo]
+        nueva_entrada[4]=entrada[col_seccion]
+        nueva_entrada[5]=entrada[col_Lista_cruzada]
+        if((entrada[col_Lista_cruzada]&&entrada[col_mandante]!="SI")){
+          entrada[col_Lista_cruzada]=""}
+        nueva_entrada[6]="TEORIA"
+        nueva_entrada[7]=entrada[col_codigo]=="ING6103"?"i":"1"
+        nueva_entrada[8]=""
+        nueva_entrada[9]=entrada[col_cupos]
+        nueva_entrada[10]=tipo=="EXAM"?"EXAM":"PRBA"
+        nueva_entrada[11]=convertirFechaAString(dias[idx])
+        nueva_entrada[12]=convertirFechaAString(dias[idx])
+        
+        nueva_entrada[13]=diasSemana[dias[idx].getDay()]
+        nueva_entrada[14]=hora.split("-")[0]
+        nueva_entrada[15]=hora.split("-")[1]
+        nueva_entrada[16]=''
+        nueva_entrada[17]=""
+        nueva_entrada[18]=""
+        nueva_entrada[19]=""
+        nueva_entrada[20]=""
+        nueva_entrada[21]=""
+        nueva_entrada[22]=""
+        nueva_entrada[23]=tipo
+        
+
+        dPSA.push(nueva_entrada)
+
+
+
+
+      
+    
+
+
+
+    }
+    })
+
+
+
+
+  })
+
+  return dPSA
+  
+}
+function generarFechasEntre(fInicial, fFinal) {
+    const fechas = [];
+    const [diaInicio, mesInicio, añoInicio] = fInicial.split('/').map(Number);
+    const [diaFin, mesFin, añoFin] = fFinal.split('/').map(Number);
+
+    const inicio = new Date(añoInicio, mesInicio - 1, diaInicio);
+    const fin = new Date(añoFin, mesFin - 1, diaFin);
+
+    while (inicio <= fin) {
+        const dia = String(inicio.getDate()).padStart(2, '0');
+        const mes = String(inicio.getMonth() + 1).padStart(2, '0');
+        const año = inicio.getFullYear();
+        fechas.push(`${dia}/${mes}/${año}`);
+        inicio.setDate(inicio.getDate() + 1); // Incrementa el día
+    }
+
+    return fechas;
+}
+function verificarFinDeSemana(listaFechas) {
+    return listaFechas.map(fecha => {
+        const [dia, mes, año] = fecha.split('/').map(Number);
+        const diaSemana = new Date(año, mes - 1, dia).getDay(); // Obtiene el día de la semana
+        return diaSemana !== 0 && diaSemana !== 6; // true si no es fin de semana
+    });
+}
+function compareLists(oldList, newList, keyColumns,enunciado) {
+  // Convert both lists to maps using the key as the unique identifier
+  function listToMap(list, keyCols) {
+  const map = new Map();
+  list.forEach(row => {
+    const key = keyCols.map(col => row[col]).join('||');
+    console.log('Generated key:', key, 'from row:', row);
+    map.set(key, row);
+  });
+  return map;
+}
+
+  const oldMap = listToMap(oldList, keyColumns);
+  const newMap = listToMap(newList, keyColumns);
+  console.log("Antiguo Dpsa",oldList)
+  console.log("Nuevo DPSA",newList)
+
+  const differences = [];
+
+  // Compare oldMap and newMap for changes, additions, and removals
+  oldMap.forEach((oldRow, key) => {
+    if (!newMap.has(key)) {
+      // Row was removed
+      differences.push([`REMOVED `,getCurrentDateDayAndTime(),...oldRow]);
+    } else {
+      const newRow = newMap.get(key);
+      const changedColumns = [];
+      oldRow.forEach((value, colIndex) => {
+        // Skip checking key columns
+        if (!keyColumns.includes(colIndex) && value != newRow[colIndex]) {
+          changedColumns.push([colIndex+3,enunciado[colIndex+2]]);
+        }
+      });
+
+      if (changedColumns.length > 0) {
+        differences.push([`CHANGED ${changedColumns.join('|')}` ,getCurrentDateDayAndTime(), ...newRow]);
+      } else {
+        // No changes
+        differences.push(['',, ...newRow]);
+      }
+    }
+  });
+
+  // Check for added rows
+  newMap.forEach((newRow, key) => {
+    if (!oldMap.has(key)) {
+      differences.push([`ADDED `,getCurrentDateDayAndTime(), ...newRow]);
+    }
+  });
+
+  return differences;
+}
+function getCurrentDateDayAndTime() {
+  const now = new Date();
+  const currentDate = now.toISOString().split('T')[0]; // YYYY-MM-DD
+  const days = ['DOMINGO', 'LUNES', 'MARTES', 'MIERCOLES', 'JUEVES', 'VIERNES', 'SABADO'];
+  const currentDay = days[now.getDay()];
+  const hours = now.getHours().toString().padStart(2, '0');
+  const minutes = now.getMinutes().toString().padStart(2, '0');
+  const seconds = now.getSeconds().toString().padStart(2, '0');
+  const currentTime = `${hours}:${minutes}:${seconds}`;
+  return `${currentDate}, ${currentTime}`;
+}
+function convertirFechaAString(fecha) {
+  const dia = fecha.getDate(); // Día del mes
+  const mes = fecha.getMonth() + 1; // Mes (nota: getMonth() es 0-indexado)
+  const anio = fecha.getFullYear(); // Año completo
+  
+  // Formatear la fecha como dd/mm/aaaa
+  const fechaFormateada = `${dia.toString()}/${mes.toString().padStart(2, '0')}/${anio}`;
+  
+  // Imprimir el resultado
+  console.log(fechaFormateada);
+  return fechaFormateada;
+}
+function removeSpecificPermissions(fileId, emails) {
+  // Obtén el archivo por su ID
+  var file = DriveApp.getFileById(fileId);
+
+  // Recorre la lista de correos y elimina permisos
+  emails.forEach(function(email) {
+    try {
+      // Intenta eliminar como editor
+      file.removeEditor(email);
+
+      // Intenta eliminar como visualizador
+
+      Logger.log("Permisos eliminados para: " + email);
+    } catch (e) {
+      Logger.log("No se pudieron eliminar permisos para: " + email + ". Error: " + e.message);
+    }
+  });
+}
+function removePermissionsFromList(folderId, lista_datos) {
+  // Obtén la carpeta por su ID
+  var folder = DriveApp.getFolderById(folderId);
+
+  // Recorre cada elemento de la lista
+  lista_datos.forEach(function(entry) {
+    var email = entry.mail;
+    var archivos = entry.archivos;
+
+    // Para cada archivo en la lista del usuario
+    archivos.forEach(function(fileName) {
+      // Busca el archivo por su nombre dentro de la carpeta
+      var files = folder.getFilesByName(fileName);
+
+      if (files.hasNext()) {
+        var file = files.next(); // Obtén el archivo
+
+        try {
+          // Quita permisos para este correo
+          file.removeEditor(email); // Intenta eliminar como editor
+          
+          Logger.log("Permisos eliminados para " + email + " en el archivo: " + fileName);
+        } catch (e) {
+          Logger.log("No se pudo eliminar permisos para " + email + " en el archivo: " + fileName + ". Error: " + e.message);
+        }
+      } else {
+        Logger.log("No se encontró el archivo: " + fileName + " en la carpeta para el usuario: " + entry.name);
+      }
+    });
+  });
+}
+
 
 
 

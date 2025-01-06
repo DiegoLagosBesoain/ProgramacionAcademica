@@ -13,7 +13,7 @@ function onOpen() {
     )
     .addSubMenu(
       ui.createMenu("Plan común")
-        .addItem("Verificar restricciones Plan Común", "verificar_plan_comun")
+        
         .addItem("Verificar Horarios Protegidos plan comun","verificar_Horarios_plan_comun")
         .addItem("Verificar Topes mismo semestre plan comun","verificar_topes_mismo_semestre_plan_comun")
         .addItem("Verificar Disponibilidad profesores semestre plan comun","verificar_Disponibilidad_plan_comun")
@@ -23,7 +23,7 @@ function onOpen() {
     )
     .addSubMenu(
       ui.createMenu("V, VI semestre")
-        .addItem("Verificar restricciones 5to y 6to semestre", "verificar_5_6")
+        
         .addItem("Verificar topes mismo semestre 5to y 6to semestre","verificar_topes_mismo_semestre_5to_y_6to")
         .addItem("Verificar Disponibilidad profesores 5to y 6to semestre","verificar_Disponibilidad_5to_y_6to")
         .addItem("Verificar Salas Especiales 5to y 6to semestre","verificar_topes_Salas_Especiales_5to_y_6to")
@@ -47,7 +47,7 @@ function onOpen() {
       ui.createMenu("Titulación")
       
         .addItem("Verificar topes mismo semestre titulacion","verificar_topes_mismo_semestre_titulacion")
-        .addItem("Verificar restricciones titulación", "verificar_titulacion")
+        
         .addItem("Verificar Disponibilidad profesores titulación","verificar_Disponibilidad_titulacion")
         .addItem("Verificar Salas Especiales titulación","verificar_topes_Salas_Especiales_titulacion")
         .addItem("Crear Visualizacion Titulacion","visualizarTitulacion")
@@ -216,10 +216,13 @@ const hoja_data_maestro = hojasActuales.getSheetByName("DATOS MAESTRO")
 const bloques4y5 = obtenerBloquesPorHoraYDia(hoja_5y6_comun,hoja_data_maestro)
 const hoja_detalles_malla= hojasActuales.getSheetByName("DETALLES SEMESTRE")
 const data_detalles_malla = hoja_detalles_malla.getDataRange().getDisplayValues()
+const data_maestro=hoja_data_maestro.getDataRange().getDisplayValues()
+const data_maestro_con_detalles=data_maestro.map((elemento,idx)=>elemento.concat(data_detalles_malla[idx]))
 const bloques4y5_con_detalles= agregar_detalles(bloques4y5,data_detalles_malla)
 console.log(bloques4y5_con_detalles)
 const topes_concentraciones=obtener_topes_concentraciones_primer_semestre(bloques4y5_con_detalles)
 console.log(topes_concentraciones)
+limpiarBackgroundsYComentarios(hoja_5y6_comun,2,2,"CONCENTRACION TOPANDO CON RAMOS DEL SEMESTRE",data_maestro_con_detalles)
 pintarCeldasConComentario(hoja_5y6_comun,topes_concentraciones,"CONCENTRACION TOPANDO CON RAMOS DEL SEMESTRE")
 
 }
@@ -230,10 +233,15 @@ const hoja_data_maestro = hojasActuales.getSheetByName("DATOS MAESTRO")
 const bloques4y5 = obtenerBloquesPorHoraYDia(hoja_5y6_comun,hoja_data_maestro)
 const hoja_detalles_malla= hojasActuales.getSheetByName("DETALLES SEMESTRE")
 const data_detalles_malla = hoja_detalles_malla.getDataRange().getDisplayValues()
+
 const bloques4y5_con_detalles= agregar_detalles(bloques4y5,data_detalles_malla)
 console.log(bloques4y5_con_detalles)
+const data_maestro=hoja_data_maestro.getDataRange().getDisplayValues()
+const data_maestro_con_detalles=data_maestro.map((elemento,idx)=>elemento.concat(data_detalles_malla[idx]))
+
+limpiarBackgroundsYComentarios(hoja_5y6_comun,2,2,"CONCENTRACION TOPANDO CON RAMOS DEL SEMESTRE",data_maestro_con_detalles)
 const topes_concentraciones=obtener_topes_concentraciones_segundo_semestre(bloques4y5_con_detalles)
-console.log(topes_concentraciones)
+
 pintarCeldasConComentario(hoja_5y6_comun,topes_concentraciones,"CONCENTRACION TOPANDO CON RAMOS DEL SEMESTRE")
 
 }
@@ -277,9 +285,14 @@ const bloques4y5_con_detalles= agregar_detalles(bloques4y5,data_detalles_malla)
 console.log(bloques4y5_con_detalles)
 const topes_concentraciones=obtener_topes_concentraciones_primer_semestre(bloques4y5_con_detalles)
 console.log(topes_concentraciones)
+const data_maestro=hoja_data_maestro.getDataRange().getDisplayValues()
+const data_maestro_con_detalles=data_maestro.map((elemento,idx)=>elemento.concat(data_detalles_malla[idx]))
+
+limpiarBackgroundsYComentarios(hoja_5y6_comun,2,2,"CONCENTRACION TOPANDO CON RAMOS DEL SEMESTRE",data_maestro_con_detalles)
 pintarCeldasConComentario(hoja_5y6_comun,topes_concentraciones,"CONCENTRACION TOPANDO CON RAMOS DEL SEMESTRE")
 
 }
+//ARREGLAR EL SISTEMA DE NOMBRES DE ESTAS FUNCIONES
 function verifica_concentraciones_7mo_y_8vo_segundo_semestre(){
 const hojasActuales = SpreadsheetApp.getActiveSpreadsheet();
 const hoja_5y6_comun = hojasActuales.getSheetByName("VII,VIII")
@@ -291,6 +304,10 @@ const bloques4y5_con_detalles= agregar_detalles(bloques4y5,data_detalles_malla)
 console.log(bloques4y5_con_detalles)
 const topes_concentraciones=obtener_topes_concentraciones_segundo_semestre(bloques4y5_con_detalles)
 console.log(topes_concentraciones)
+const data_maestro=hoja_data_maestro.getDataRange().getDisplayValues()
+const data_maestro_con_detalles=data_maestro.map((elemento,idx)=>elemento.concat(data_detalles_malla[idx]))
+
+limpiarBackgroundsYComentarios(hoja_5y6_comun,2,2,"CONCENTRACION TOPANDO CON RAMOS DEL SEMESTRE",data_maestro_con_detalles)
 pintarCeldasConComentario(hoja_5y6_comun,topes_concentraciones,"CONCENTRACION TOPANDO CON RAMOS DEL SEMESTRE")
 
 }
@@ -468,8 +485,8 @@ const hoja_detalles_malla= hojasActuales.getSheetByName("DETALLES SEMESTRE")
 const data_detalles_malla = hoja_detalles_malla.getDataRange().getDisplayValues()
 const data_maestro=hoja_data_maestro.getDataRange().getDisplayValues()
 const data_maestro_con_detalles=data_maestro.map((elemento,idx)=>elemento.concat(data_detalles_malla[idx]))
-limpiarBackgroundsYComentarios(hoja_4y5,2,2,"MISMA SALA ESPECIAL EN USO PARA DIFERENTES SECCIONES",data_maestro_con_detalles)
-limpiarBackgroundsYComentarios(hoja_4y5,2,2,"SALA ESPECIAL YA ASIGNADA EN ESTE BLOQUE DE HORARIO EN OTRA HOJA",data_maestro_con_detalles)
+limpiarBackgroundsYComentarios(hoja_5y6_comun,2,2,"MISMA SALA ESPECIAL EN USO PARA DIFERENTES SECCIONES",data_maestro_con_detalles)
+limpiarBackgroundsYComentarios(hoja_5y6_comun,2,2,"SALA ESPECIAL YA ASIGNADA EN ESTE BLOQUE DE HORARIO EN OTRA HOJA",data_maestro_con_detalles)
 pintarCeldasConComentario(hoja_tutulacion_comun,topes_sala_especial,"MISMA SALA ESPECIAL EN USO PARA DIFERENTES SECCIONES")
 const topes_sala_esoacial_otras_hojas = obtener_topes_sala_especial_otras_hojas( bloques4y5,bloques,bloques5y6,bloques7y8)
 console.log(topes_sala_esoacial_otras_hojas)
@@ -491,8 +508,8 @@ const hoja_detalles_malla= hojasActuales.getSheetByName("DETALLES SEMESTRE")
 const data_detalles_malla = hoja_detalles_malla.getDataRange().getDisplayValues()
 const data_maestro=hoja_data_maestro.getDataRange().getDisplayValues()
 const data_maestro_con_detalles=data_maestro.map((elemento,idx)=>elemento.concat(data_detalles_malla[idx]))
-limpiarBackgroundsYComentarios(hoja_4y5,2,2,"BLOQUE DE HORARIO YA ASIGNADO AL PROFESOR",data_maestro_con_detalles)
-limpiarBackgroundsYComentarios(hoja_4y5,2,2,"HORARIO FUERA DE LA DISPONIBILIADAD DEL PROFESOR",data_maestro_con_detalles)
+limpiarBackgroundsYComentarios(hoja_5y6_comun,2,2,"BLOQUE DE HORARIO YA ASIGNADO AL PROFESOR",data_maestro_con_detalles)
+limpiarBackgroundsYComentarios(hoja_5y6_comun,2,2,"HORARIO FUERA DE LA DISPONIBILIADAD DEL PROFESOR",data_maestro_con_detalles)
 pintarCeldasConComentario(hoja_5y6_comun,topes_disponibilidad_profesores[0],"BLOQUE DE HORARIO YA ASIGNADO AL PROFESOR")
 pintarCeldasConComentario(hoja_5y6_comun,topes_disponibilidad_profesores[1],"HORARIO FUERA DE LA DISPONIBILIADAD DEL PROFESOR")
 
@@ -531,8 +548,8 @@ const hoja_detalles_malla= hojasActuales.getSheetByName("DETALLES SEMESTRE")
 const data_detalles_malla = hoja_detalles_malla.getDataRange().getDisplayValues()
 const data_maestro=hoja_data_maestro.getDataRange().getDisplayValues()
 const data_maestro_con_detalles=data_maestro.map((elemento,idx)=>elemento.concat(data_detalles_malla[idx]))
-limpiarBackgroundsYComentarios(hoja_titulacion,2,2,"MISMA SALA ESPECIAL EN USO PARA DIFERENTES SECCIONES",data_maestro_con_detalles)
-limpiarBackgroundsYComentarios(hoja_titulacion,2,2,"SALA ESPECIAL YA ASIGNADA EN ESTE BLOQUE DE HORARIO EN OTRA HOJA",data_maestro_con_detalles)
+limpiarBackgroundsYComentarios(hoja_tutulacion_comun,2,2,"MISMA SALA ESPECIAL EN USO PARA DIFERENTES SECCIONES",data_maestro_con_detalles)
+limpiarBackgroundsYComentarios(hoja_tutulacion_comun,2,2,"SALA ESPECIAL YA ASIGNADA EN ESTE BLOQUE DE HORARIO EN OTRA HOJA",data_maestro_con_detalles)
 pintarCeldasConComentario(hoja_tutulacion_comun,topes_sala_especial,"MISMA SALA ESPECIAL EN USO PARA DIFERENTES SECCIONES")
 const topes_sala_esoacial_otras_hojas = obtener_topes_sala_especial_otras_hojas(bloques7y8,bloques5y6,bloques4y5,bloques)
 console.log(topes_sala_esoacial_otras_hojas)
@@ -554,8 +571,8 @@ const hoja_detalles_malla= hojasActuales.getSheetByName("DETALLES SEMESTRE")
 const data_detalles_malla = hoja_detalles_malla.getDataRange().getDisplayValues()
 const data_maestro=hoja_data_maestro.getDataRange().getDisplayValues()
 const data_maestro_con_detalles=data_maestro.map((elemento,idx)=>elemento.concat(data_detalles_malla[idx]))
-limpiarBackgroundsYComentarios(hoja_titulacion,2,2,"BLOQUE DE HORARIO YA ASIGNADO AL PROFESOR",data_maestro_con_detalles)
-limpiarBackgroundsYComentarios(hoja_titulacion,2,2,"HORARIO FUERA DE LA DISPONIBILIADAD DEL PROFESOR",data_maestro_con_detalles)
+limpiarBackgroundsYComentarios(hoja_tutulacion_comun,2,2,"BLOQUE DE HORARIO YA ASIGNADO AL PROFESOR",data_maestro_con_detalles)
+limpiarBackgroundsYComentarios(hoja_tutulacion_comun,2,2,"HORARIO FUERA DE LA DISPONIBILIADAD DEL PROFESOR",data_maestro_con_detalles)
 const topes_disponibilidad_profesores = obtener_topes_disponibilidad_profesores(bloques7y8,bloques5y6,bloques4y5,bloques)
 pintarCeldasConComentario(hoja_tutulacion_comun,topes_disponibilidad_profesores[0],"BLOQUE DE HORARIO YA ASIGNADO AL PROFESOR")
 pintarCeldasConComentario(hoja_tutulacion_comun,topes_disponibilidad_profesores[1],"HORARIO FUERA DE LA DISPONIBILIADAD DEL PROFESOR")
@@ -595,8 +612,8 @@ const hoja_detalles_malla= hojasActuales.getSheetByName("DETALLES SEMESTRE")
 const data_detalles_malla = hoja_detalles_malla.getDataRange().getDisplayValues()
 const data_maestro=hoja_data_maestro.getDataRange().getDisplayValues()
 const data_maestro_con_detalles=data_maestro.map((elemento,idx)=>elemento.concat(data_detalles_malla[idx]))
-limpiarBackgroundsYComentarios(hoja_7_y_8,2,2,"MISMA SALA ESPECIAL EN USO PARA DIFERENTES SECCIONES",data_maestro_con_detalles)
-limpiarBackgroundsYComentarios(hoja_7_y_8,2,2,"SALA ESPECIAL YA ASIGNADA EN ESTE BLOQUE DE HORARIO EN OTRA HOJA",data_maestro_con_detalles)
+limpiarBackgroundsYComentarios(hoja_7y8_comun,2,2,"MISMA SALA ESPECIAL EN USO PARA DIFERENTES SECCIONES",data_maestro_con_detalles)
+limpiarBackgroundsYComentarios(hoja_7y8_comun,2,2,"SALA ESPECIAL YA ASIGNADA EN ESTE BLOQUE DE HORARIO EN OTRA HOJA",data_maestro_con_detalles)
 pintarCeldasConComentario(hoja_7y8_comun,topes_sala_especial,"MISMA SALA ESPECIAL EN USO PARA DIFERENTES SECCIONES")
 const topes_sala_esoacial_otras_hojas = obtener_topes_sala_especial_otras_hojas( bloques5y6,bloques4y5,bloques,bloques7y8)
 console.log(topes_sala_esoacial_otras_hojas)
@@ -619,8 +636,8 @@ const data_detalles_malla = hoja_detalles_malla.getDataRange().getDisplayValues(
 const data_maestro=hoja_data_maestro.getDataRange().getDisplayValues()
 const data_maestro_con_detalles=data_maestro.map((elemento,idx)=>elemento.concat(data_detalles_malla[idx]))
 const topes_disponibilidad_profesores = obtener_topes_disponibilidad_profesores(bloques5y6,bloques4y5,bloques,bloques7y8)
-limpiarBackgroundsYComentarios(hoja_7_y_8,2,2,"BLOQUE DE HORARIO YA ASIGNADO AL PROFESOR",data_maestro_con_detalles)
-limpiarBackgroundsYComentarios(hoja_7_y_8,2,2,"HORARIO FUERA DE LA DISPONIBILIADAD DEL PROFESOR",data_maestro_con_detalles)
+limpiarBackgroundsYComentarios(hoja_7y8_comun,2,2,"BLOQUE DE HORARIO YA ASIGNADO AL PROFESOR",data_maestro_con_detalles)
+limpiarBackgroundsYComentarios(hoja_7y8_comun,2,2,"HORARIO FUERA DE LA DISPONIBILIADAD DEL PROFESOR",data_maestro_con_detalles)
 pintarCeldasConComentario(hoja_7y8_comun,topes_disponibilidad_profesores[0],"BLOQUE DE HORARIO YA ASIGNADO AL PROFESOR")
 pintarCeldasConComentario(hoja_7y8_comun,topes_disponibilidad_profesores[1],"HORARIO FUERA DE LA DISPONIBILIADAD DEL PROFESOR")
 
@@ -715,6 +732,7 @@ function actualizar_maestro(){
   })
   
   escribirDatosYResaltar(hoja_maestro,data_maestro)
+  agregar_listas_desplegables(data_maestro,hoja_maestro,col_dias,dias)
 }
 
 

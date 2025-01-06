@@ -368,6 +368,94 @@ function crear_calendario(hoja,opcionesLista) {
    range.setNotes(comments); // Aplica los comentarios modificados
    range.setBackgrounds(backgrounds); // Actualiza los fondos
  }
+ function agregar_listas_desplegables(data_maestro,hoja_maestro,col_dias,dias){
+   const columna_inicio=obtenerNumeroDeColumna(hoja_maestro,"OBSERVACION",1)+1
+   const columnaFinal=data_maestro[0].length-1
+   const horas = [
+     "EXAM 8:30-10:20", "EXAM 9:30-11:20", "EXAM 10:30-12:20", "EXAM 11:30-13:20",
+     "EXAM 12:30-14:20","EXAM 13:30-15:20", "EXAM 14:30-16:20", "EXAM 15:30-17:20", "EXAM 16:30-18:20",
+     "EXAM 17:30-19:20", "EXAM 18:30-20:20"
+   ];
+   data_maestro.forEach((entrada,idx2)=>{
+     let opciones=["TARDE 19:30-21:20"]
+ 
+     col_dias.forEach((col_dia,idx)=>{
+       
+         let bloque=entrada[col_dia].split(",")
+         bloque.forEach((tipo_hora)=>{
+           if(tipo_hora){
+           opciones.push(`${dias[idx]} ${tipo_hora}`)
+           }  
+         })
+ 
+       
+ 
+ 
+ 
+     })
+     opciones=opciones.concat(horas)
+     crearListaDesplegableConFormato(hoja_maestro,idx2+1,columna_inicio,columnaFinal,opciones)
+ 
+ 
+ 
+   })
+ 
+ 
+ 
+ 
+ 
+ 
+ }
+ function crearListaDesplegableConFormato(hoja, fila, inicioColumna, finColumna,opciones) {
+   // Ajustar índices de columnas (de 0-indexado a 1-indexado de Google Sheets)
+   const inicioColumnaIndex = inicioColumna + 1;
+   const finColumnaIndex = finColumna + 1;
+ 
+   // Define el rango donde quieres aplicar la lista desplegable
+   const rango = hoja.getRange(fila + 1, inicioColumnaIndex, 1, finColumnaIndex - inicioColumnaIndex + 1);
+ 
+   // Define las opciones para la lista desplegable
+    // Cambia según tus opciones
+ 
+   // Configura la validación de datos
+   const validacion = SpreadsheetApp.newDataValidation()
+     .requireValueInList(opciones)
+     .setAllowInvalid(true) // Permite valores no válidos
+     .build();
+ 
+   // Aplica la validación al rango
+   rango.setDataValidation(validacion);
+ 
+   // Configura el formato condicional
+   
+ }
+ function resaltarCambios(cambios, nuevaHoja, rangoInicio) {
+   cambios.forEach((cambio) => {
+     const { tipoCambio, filaAnterior, filaNueva, indice } = cambio;
+ 
+     // Calcular la fila de destino asegurándonos de que sea al menos 1
+     const filaDestino = Math.max(rangoInicio.fila + indice, 1); // Asegura que la fila sea >= 1
+     const columnaDestino = rangoInicio.columna;  // Columna de inicio
+ 
+     // Obtener el rango a partir de la fila y columna de destino
+     const rango = nuevaHoja.getRange(filaDestino, columnaDestino, 1, filaNueva.length);
+ 
+     // Resaltar según el tipo de cambio
+     if (tipoCambio === "insertado") {
+       rango.setBackground("#DFF0D8"); // Color verde claro para inserciones
+       nuevaHoja.getRange(filaDestino, columnaDestino, 1, filaNueva.length).setValues([filaNueva]);
+     } else if (tipoCambio === "eliminado") {
+       // Escribir la fila eliminada en la nueva hoja
+       rango.setBackground("#F2D7D5"); // Color rojo claro para eliminaciones
+       nuevaHoja.getRange(filaDestino, columnaDestino, 1, filaAnterior.length).setValues([filaAnterior]); // Escribir la fila eliminada
+     } else if (tipoCambio === "modificado") {
+       rango.setBackground("#FCF8E3"); // Color amarillo claro para cambios
+       nuevaHoja.getRange(filaDestino, columnaDestino, 1, filaNueva.length).setValues([filaNueva]);
+     }
+   });
+ }
+ 
+ 
  
  
  
