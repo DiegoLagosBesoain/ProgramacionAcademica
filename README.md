@@ -1,5 +1,5 @@
 # Gestión Académica en Google Sheets 📋
-##
+## MAESTRO
 ### Descripción
 
 Este script automatiza procesos administrativos relacionados con la gestión académica, como la creación y actualización de hojas de cálculo para diferentes áreas, validación de cambios en datos, y asignación de horarios o secciones. 
