@@ -16,6 +16,7 @@ function onOpen(){
     .addItem("Envio de formularios Jornada y honorarios","enviarFormulariosCondicional")
     .addItem("Crear archivo para DPSA","crear_template_dpsa")
     .addItem("Crear archivo para Alumnos","crear_template_HorariosING")
+    .addItem("Actualizar areas con catalogo antiguo","actualizarCatalogo")
     
     
     .addToUi();
@@ -24,7 +25,7 @@ function agregar_secciones(){
 const hojasActuales = SpreadsheetApp.getActiveSpreadsheet();
 const hoja_presupuesto = hojasActuales.getSheetByName('Presupuesto');
 const semestre_espejo = Number(pedirParametro())
-const data_presupuesto = hoja_presupuesto.getDataRange().get<Values();
+const data_presupuesto = hoja_presupuesto.getDataRange().getValues();
 
 const columna_semestre = obtenerNumeroDeColumna(hoja_presupuesto,semestre_espejo,1)
 const columna_curso = obtenerNumeroDeColumna(hoja_presupuesto,"CURSO",1)
@@ -98,7 +99,7 @@ const data_maestro = hoja_maestro.getDataRange().getValues();
 const encabezado = data_maestro[0]
 data_maestro.shift()
 
-const col_area = obtenerNumeroDeColumna(hoja_maestro,"AREA",1)
+const col_area = obtenerNumeroDeColumna(hoja_maestro,"AREA",1)//NO CAMBIAR NOMBRE A LA COLUMNA
 const areas = obtener_areas(data_maestro,col_area)
 console.log(areas)
 areas.forEach((area)=>{
@@ -135,7 +136,7 @@ data_maestro.shift()
 const col_area = obtenerNumeroDeColumna(hoja_maestro,"AREA",1)
 const areas = obtener_areas(data_maestro,col_area)
 areas.forEach((area)=>{
-  let hojas_area_cordinador=obtenerSpreadsheetDeCarpeta("1_65rwp56jrcRsxoMO-HnBAOFGFI1z9Mc",area)
+  let hojas_area_cordinador=obtenerSpreadsheetDeCarpeta(id_carpeta_archivos_cordinadores,area)
   let hoja_cordinador=hojas_area_cordinador.getSheetByName(area);
   let data_cordinador= hoja_cordinador.getDataRange().getValues();
   data_cordinador.shift()
@@ -207,7 +208,7 @@ function compartirYEnviarEnlace() {
     //cambiar aqui las diferentes areas de cordinacion y sus encargados
 
   ]
-    enviarLinksConPermisos("1_65rwp56jrcRsxoMO-HnBAOFGFI1z9Mc",lista_datos)
+    enviarLinksConPermisos(id_carpeta_archivos_cordinadores,lista_datos)
 
 
 
@@ -236,9 +237,7 @@ function validar_cambios(){
 function actualizar_datos(){
 const hojasActuales = SpreadsheetApp.getActiveSpreadsheet();  
 const hoja_maestro = hojasActuales.getSheetByName('MAESTRO');
-
-
-
+const hoja_profesores=hojasActuales.getSheetByName('PROFESORES');
 const hoja_respuestas =hojasActuales.getSheetByName('RESPUESTAS');
 const data_respuestas = hoja_respuestas.getDataRange().getValues();
 const col_lunes=obtenerNumeroDeColumna(hoja_maestro,"LUNES",1)
@@ -250,16 +249,37 @@ const col_rut_profesor=obtenerNumeroDeColumna(hoja_maestro,"RUT PROFESOR 1",1)
 const col_rut_profesor2=obtenerNumeroDeColumna(hoja_maestro,"RUT PROFESOR 2",1)
 const horarios_por_rut = horariosPorRut(data_respuestas)
 const columnasDias=[col_lunes,col_martes,col_miercoles,col_jueves,col_viernes]
+
+const rut_profesores_jornada=hoja_profesores.getDataRange().getValues().map((fila)=>fila[1]);
+console.log(rut_profesores_jornada)
 limpiarColumnas(hoja_maestro,columnasDias)
 const data_maestro = hoja_maestro.getDataRange().getValues();
 data_maestro.shift()
 console.log(horarios_por_rut)
-
+const horarios_jornada="8:30-9:20,9:30-10:20,10:30-11:20,11:30-12:20,12:30-13:20,13:30-14:20,14:30-15:20,15:30-16:20,16:30-17:20,17:30-18:20,18:30-19:20"
+  
 
 const dias = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes"];
+ 
 data_maestro.forEach((fila,idx) => {
     const rut = fila[col_rut_profesor];
     const rut2= fila[col_rut_profesor2]
+    
+    if (condicionPersonalizada(rut,rut_profesores_jornada)) {
+      console.log("Rut jornada:",rut)
+      columnasDias.forEach((columnaDia, i) => {
+              fila[columnaDia] = horarios_jornada
+        })
+
+    }
+    if (condicionPersonalizada(rut2,rut_profesores_jornada)) {
+      columnasDias.forEach((columnaDia, i) => {
+              fila[columnaDia] = horarios_jornada
+        })
+
+    }
+
+    
     const profesores = horarios_por_rut.filter(prof => (prof.rut === rut)||(prof.rut === rut2)); 
     profesores.forEach((profesor)=>{
     if (profesor) {
@@ -357,19 +377,19 @@ function enviarFormulariosCondicional() {
     // Verifica si las columnas de correo y RUT no están vacías
     if (email1 && rut1) {
       // Condición personalizada: Define aquí la lógica
-      if (condicionPersonalizada(rut1, rut_profesores_jornada)) {
-        enviarCorreo(email1, rut1, linkFormulario1,`Estimado profesor/a,\n\nPor favor, complete el siguiente formulario para su preferencias del semestre: ${linkFormulario2}\n\nMuchas Gracias.\nArea de Analisis Curricular`,"Formulario de preferencias");
+      if (condicionPersonalizada(rut1, rut_profesores_jornada)) {//es un jornada
+        enviarCorreo(email1, rut1, linkFormulario1,`Estimado profesor/a,\n\nPor favor, complete el siguiente formulario para su preferencias del semestre: ${linkFormulario2}\n\nMuchas Gracias.\nArea de Analisis Curricular`,"FORMULARIO DE PREFERENCIAS");
       } else {
-        enviarCorreo(email1, rut1, linkFormulario1,`Estimado profesor/a,\n\nPor favor, complete el siguiente formulario para su disponibilidad del semestre: ${linkFormulario1}\n\nMuchas Gracias.\nArea de Analisis Curricular`,"Formulario de disponibilidad y preferencias");
+        enviarCorreo(email1, rut1, linkFormulario1,`Estimado profesor/a,\n\nPor favor, complete el siguiente formulario para su disponibilidad del semestre: ${linkFormulario1}\n\nMuchas Gracias.\nArea de Analisis Curricular`,"FORMULARIO DE DISPONIBILIDAD Y PREFERENCIAS");
       }
     }
     
     if (email2 && rut2) {
       // Condición personalizada: Define aquí la lógica
-      if (condicionPersonalizada(rut2,rut_profesores_jornada)) {
-        enviarCorreo(email2, rut2, linkFormulario2,`Estimado profesor/a,\n\nPor favor, complete el siguiente formulario para su preferencias del semestre: ${linkFormulario2}\n\nMuchas Gracias.\nArea de Analisis Curricular`,"Formulario de preferencias");
+      if (condicionPersonalizada(rut2,rut_profesores_jornada)) {//es jornada
+        enviarCorreo(email2, rut2, linkFormulario2,`Estimado profesor/a,\n\nPor favor, complete el siguiente formulario para su preferencias del semestre: ${linkFormulario2}\n\nMuchas Gracias.\nArea de Analisis Curricular`,"FORMULARIO DE PREFERENCIAS");
       } else {
-        enviarCorreo(email2, rut2, linkFormulario2,`Estimado profesor/a,\n\nPor favor, complete el siguiente formulario para su disponibilidad del semestre: ${linkFormulario1}\n\nMuchas Gracias.\nArea de Analisis Curricular`,"Formulario de disponibilidad y preferencias");
+        enviarCorreo(email2, rut2, linkFormulario2,`Estimado profesor/a,\n\nPor favor, complete el siguiente formulario para su disponibilidad del semestre: ${linkFormulario1}\n\nMuchas Gracias.\nArea de Analisis Curricular`,"FORMULARIO DE DISPONIBILIDAD Y PREFERENCIAS");
       }
     }
   });
@@ -382,6 +402,8 @@ function enviarCorreo(email, rut, linkFormulario,mensaje,asunto) {
 
 // Ejemplo de una condición personalizada
 function condicionPersonalizada(rut,rut_profesores_jornada) {
+  
+  
   // Define tu lógica aquí, por ejemplo:
   // Retorna true si rut1 termina en 'K' o false en caso contrario
   return rut_profesores_jornada.includes(rut) ;
@@ -448,7 +470,8 @@ function crear_template_HorariosING(){
 
   const hojasActuales = SpreadsheetApp.getActiveSpreadsheet();
   const hoja_maestro = hojasActuales.getSheetByName("MAESTRO");
-  const data_maestro = hoja_maestro.getDataRange().getDisplayValues(); 
+  const data_maestro = hoja_maestro.getDataRange().getValues(); 
+  const encabezado_fechas=data_maestro[0]
   data_maestro.shift()
   const col_lunes= obtenerNumeroDeColumna(hoja_maestro,"Lunes",1)
   const col_martes= obtenerNumeroDeColumna(hoja_maestro,"Martes",1)
@@ -469,9 +492,11 @@ function crear_template_HorariosING(){
   
   console.log(horario_ing)
   horario_ing.unshift(encabezado)
+  const evaluaciones=rellenar_evaluaciones_horarioING(data_maestro,hoja_maestro,encabezado_fechas)
+  console.log(evaluaciones)
   const hoja_horario_ing=crear_hoja_nombre("HORARIO ING",hojasActuales)
   hoja_horario_ing.getDataRange().clear()
-  escribirListaDeListas(hoja_horario_ing,horario_ing,1,1)
+  escribirListaDeListas(hoja_horario_ing,horario_ing.concat(evaluaciones),1,1)
 
 
 
@@ -511,5 +536,37 @@ function quitar_permisos(){
 
 
   
+}
+
+
+
+function actualizarCatalogo(){
+
+const hojasActuales = SpreadsheetApp.getActiveSpreadsheet();
+const hoja_catalogo = hojasActuales.getSheetByName("CATALOGO");
+const hoja_catalogo_antiguo = hojasActuales.getSheetByName("CATALOGO ANTIGUO");
+const data_catalogo=hoja_catalogo.getDataRange().getDisplayValues()
+const data_catalogo_antiguo=hoja_catalogo_antiguo.getDataRange().getDisplayValues()
+const col_area_antiguo=obtenerNumeroDeColumna(hoja_catalogo_antiguo,"AREA",1)
+const col_area_nuevo=obtenerNumeroDeColumna(hoja_catalogo,"AREA",1)//SE TUVO QUE CAMBIAR EL NOMBRE
+const col_codigo_antiguo=obtenerNumeroDeColumna(hoja_catalogo_antiguo,"CODIGO",1)
+const col_codigo_nuevo=obtenerNumeroDeColumna(hoja_catalogo,"CODIGO",1)
+data_catalogo.forEach((curso)=>{
+  let area = data_catalogo_antiguo.find((curso_antiguo)=>
+  curso_antiguo[col_codigo_antiguo]==curso[col_codigo_nuevo])
+  if(area){
+  curso[col_area_nuevo]=area[col_area_antiguo]
+  }
+  
+
+})
+console.log(data_catalogo)
+hoja_catalogo.getDataRange().clearContent()
+escribirListaDeListas(hoja_catalogo,data_catalogo,1,1)
+
+
+
+
+
 }
 

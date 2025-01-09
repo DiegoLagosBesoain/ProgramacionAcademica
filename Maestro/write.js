@@ -293,22 +293,35 @@ function escribirFechasEnFila(listaFechas, listaDiasHabiles, fila, columna) {
     // Abre la hoja activa
     const hoja = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
 
-    // Limpia las celdas a la derecha y hacia abajo de la columna donde vamos a escribir
+    // Determina la última columna donde se escribirá y la cantidad de columnas necesarias
     const ultimaColumna = columna + listaFechas.length - 1;
-    const ultimaFila = hoja.getMaxRows(); // Última fila de la hoja
-    
-    // Limpia las celdas que están después de la última fecha escrita
-    const rangoLimpiar = hoja.getRange(fila, ultimaColumna + 1, ultimaFila - fila + 1, hoja.getMaxColumns() - ultimaColumna);
-    rangoLimpiar.clear(); // Elimina todo después de la última columna y hacia abajo
 
-    // Escribe las fechas y aplica el formato horizontalmente
+    // Limpia las celdas que están después de la última fecha escrita
+    const rangoLimpiar = hoja.getRange(
+    fila, // Fila inicial
+    columna, // Columna inicial
+    hoja.getMaxRows() - fila + 1, // Total de filas restantes (desde `fila` hasta el final)
+    hoja.getMaxColumns() - columna + 1 // Total de columnas restantes (desde `columna` hasta el final)
+);
+    rangoLimpiar.clear({ contentsOnly: true, validationsOnly: true }); // Elimina contenido y listas desplegables
+
+    // Obtiene el rango de toda la fila donde se escribirán las fechas
+    const rangoFormato = hoja.getRange(fila, columna, 1, listaFechas.length);
+
+    // Aplica formato a toda la fila
+    rangoFormato
+        .setNumberFormat("ddd dd mmm") // Formato de fecha
+        .setFontWeight("bold")         // Texto en negrita
+        .setTextRotation(90);          // Rotación del texto a 90 grados
+
+    // Escribe las fechas y aplica formato condicional a cada celda
     listaFechas.forEach((fecha, index) => {
         const celda = hoja.getRange(fila, columna + index); // Determina la celda horizontalmente
 
         // Escribe la fecha
         celda.setValue(fecha);
 
-        // Si no es día hábil (fin de semana), aplica formato rojo
+        // Si no es día hábil (fin de semana), aplica formato condicional
         if (!listaDiasHabiles[index]) {
             celda.setBackground("#FF7F7F"); // Fondo rojo suave
             celda.setFontColor("#FFFFFF"); // Texto blanco
@@ -318,6 +331,7 @@ function escribirFechasEnFila(listaFechas, listaDiasHabiles, fila, columna) {
         }
     });
 }
+
 function resaltarCambios(cambios, nuevaHoja, rangoInicio) {
   cambios.forEach((cambio) => {
     const { tipoCambio, filaAnterior, filaNueva, indice } = cambio;
