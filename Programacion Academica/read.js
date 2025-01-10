@@ -1,5 +1,5 @@
 function obterner_data_maestro() {
-  const idSpreadsheet = '1o6HftjnQiU4EB1T9mwZ5FntfkZqy9Bj5wkZKbyHl-m0';
+  const idSpreadsheet = id_hoja_maestro;
   const hoja_maestro = SpreadsheetApp.openById(idSpreadsheet).getSheetByName('MAESTRO');
   const data_maestro = hoja_maestro.getDataRange().getDisplayValues();
   

@@ -84,6 +84,7 @@ function onEdit(e) {
       rangoEditado.setBackground("#FFFFFF").setFontColor("#000000"); // Fondo blanco
        // Eliminar comentario
     } else if (entrada_real) {
+      console.log(entrada_real)
       // Asignar el color basado en la entrada
       if (entrada_real[7] == "1") {
         rangoEditado.setBackground("#fef2cb"); // Amarillo claro

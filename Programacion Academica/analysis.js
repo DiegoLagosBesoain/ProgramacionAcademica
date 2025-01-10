@@ -436,9 +436,9 @@ function obtener_topes_disponibilidad_profesores(bloques,bloques5y6,bloques7y8,b
       bloques[hora][dia].forEach((entrada,indice)=>{
       let curso=entrada.split(" ")
       
-      if(curso[3]!="" &&curso[6]=="CLAS"){
+      if(curso[3]!="" &&(curso[6]=="CLAS"||curso[6]=="LAB/TALLER")){
         
-        horarios_usados[hora][dia]
+        
         if(dia=="Lunes"){
             
             if(revisar_otras_hojas(bloques5y6[hora][dia],bloques7y8[hora][dia],bloques_titulacion[hora][dia],curso[3])){
@@ -447,15 +447,13 @@ function obtener_topes_disponibilidad_profesores(bloques,bloques5y6,bloques7y8,b
 
 
             }
-            if(!curso[8].includes(hora)){
+            if(!curso[8].includes(hora)&&curso[6]!="LAB/TALLER"){
               topes_disponibilidad.push([2+indice+idx2*10,columna])
             }
-            else if(horarios_usados[hora][dia].includes(curso[3])){//ese horario ya se ocupo para ese profesor
+            if(existe_rut_bloque(bloques[hora][dia].filter((elemento)=>elemento!=entrada),curso[3])){//ese horario ya se ocupo para ese profesor
               topes_bloque_ya_asignado.push([2+indice+idx2*10,columna])
             }
-            else {
-              horarios_usados[hora][dia].push(curso[3])
-            }
+            
 
             
           
@@ -469,15 +467,13 @@ function obtener_topes_disponibilidad_profesores(bloques,bloques5y6,bloques7y8,b
 
             }          
           
-            if(!curso[9].includes(hora)){
+            if(!curso[9].includes(hora)&&curso[6]!="LAB/TALLER"){
               topes_disponibilidad.push([2+indice+idx2*10,columna])
             }
-            else if(horarios_usados[hora][dia].includes(curso[3])){//ese horario ya se ocupo para ese profesor
+            if(existe_rut_bloque(bloques[hora][dia].filter((elemento)=>elemento!=entrada),curso[3])){//ese horario ya se ocupo para ese profesor
               topes_bloque_ya_asignado.push([2+indice+idx2*10,columna])
             }
-            else {
-              horarios_usados[hora][dia].push(curso[3])
-            }
+            
           
 
         }
@@ -488,15 +484,13 @@ function obtener_topes_disponibilidad_profesores(bloques,bloques5y6,bloques7y8,b
 
 
             }          
-            if(!curso[10].includes(hora)){
+            if(!curso[10].includes(hora)&&curso[6]!="LAB/TALLER"){
               topes_disponibilidad.push([2+indice+idx2*10,columna])
             }
-            else if(horarios_usados[hora][dia].includes(curso[3])){//ese horario ya se ocupo para ese profesor
+            if(existe_rut_bloque(bloques[hora][dia].filter((elemento)=>elemento!=entrada),curso[3])){//ese horario ya se ocupo para ese profesor
               topes_bloque_ya_asignado.push([2+indice+idx2*10,columna])
             }
-            else {
-              horarios_usados[hora][dia].push(curso[3])
-            }
+            
           
 
         }
@@ -507,15 +501,13 @@ function obtener_topes_disponibilidad_profesores(bloques,bloques5y6,bloques7y8,b
 
 
             }          
-            if(!curso[11].includes(hora)){
+            if(!curso[11].includes(hora)&&curso[6]!="LAB/TALLER"){
               topes_disponibilidad.push([2+indice+idx2*10,columna])
             }
-            else if(horarios_usados[hora][dia].includes(curso[3])){//ese horario ya se ocupo para ese profesor
+            if(existe_rut_bloque(bloques[hora][dia].filter((elemento)=>elemento!=entrada),curso[3])){//ese horario ya se ocupo para ese profesor
               topes_bloque_ya_asignado.push([2+indice+idx2*10,columna])
             }
-            else {
-              horarios_usados[hora][dia].push(curso[3])
-            }
+            
           
 
         }
@@ -526,15 +518,13 @@ function obtener_topes_disponibilidad_profesores(bloques,bloques5y6,bloques7y8,b
 
 
             }          
-            if(!curso[12].includes(hora)){
+            if(!curso[12].includes(hora)&&curso[6]!="LAB/TALLER"){
               topes_disponibilidad.push([2+indice+idx2*10,columna])
             }
-            else if(horarios_usados[hora][dia].includes(curso[3])){//ese horario ya se ocupo para ese profesor
+            if(existe_rut_bloque(bloques[hora][dia].filter((elemento)=>elemento!=entrada),curso[3])){//ese horario ya se ocupo para ese profesor
               topes_bloque_ya_asignado.push([2+indice+idx2*10,columna])
             }
-            else {
-              horarios_usados[hora][dia].push(curso[3])
-            }
+            
           
 
         }
@@ -669,8 +659,8 @@ function obtenerIndicesPorElementos_sala_especial(lista) {
   return indices;
 }
 function existe_rut_bloque(lista,rut){
-
-  return lista.map((string)=>string.split(" ")).some((lista)=>lista.includes(rut))
+  
+  return lista.map((string)=>string.split(" ")).some((lista)=>lista.includes(rut)&&lista[6]!="AYUD")
 }
 function revisar_otras_hojas(bloque1,bloque2,bloque3,rut){
   // los 3 otros bloques de los cuales no se esta viendo restricciones lee la hora y el dia especificado

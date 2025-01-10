@@ -242,41 +242,7 @@ function crear_calendario(hoja,opcionesLista) {
    hoja.setRowHeightsForced(2, filas.length - 1, 60);
    hoja.getRange(1, 1, 1, diasSemana.length + 1).setFontWeight("bold").setHorizontalAlignment("center");
  }
- function destacar_por_semestre_visualizacion(valorEditado,celda,data_maestro_con_detalles) {
-   
-   
-   
-   // Verificar si la edición no está en la primera fila o columna
  
-     const bloques = data_maestro_con_detalles; // Define aquí tu data maestro
-     const entrada_real = bloques.find((bloque) =>
-       (valorEditado.split(" ")[0] == bloque[2])   // Curso
-         // Sección
-       
-     );
-     console.log(entrada_real)
-     // Si la celda está vacía, limpia el fondo y elimina el comentario
-     if (valorEditado === "") {
-       celda.setBackground("#FFFFFF"); // Fondo blanco
-        // Eliminar comentario
-     } else if (entrada_real) {
-       // Asignar el color basado en la entrada
-       if (entrada_real[7] == "1") {
-         celda.setBackground("#fef2cb"); // Amarillo claro
-       } else if (entrada_real[7] == "2") {
-         celda.setBackground("#e2efd9"); // Verde claro
-       } else if (entrada_real[7] == "3") {
-         celda.setBackground("#fbe4d5"); // Naranja claro
-       } else if (entrada_real[7] == "4") {
-         celda.setBackground("#deeaf6"); // Azul claro
-       }else if (entrada_real[20] != "") {
-         caleda.setFontColor("#FF0000");; // Azul claro
-       } else {
-         celda.setBackground("#FFFFFF"); // Fondo blanco (default)
-       }
-     }
-   
- }
  function escribirDatosYResaltar(hoja, datos) {
    
  
@@ -384,7 +350,7 @@ function crear_calendario(hoja,opcionesLista) {
          let bloque=entrada[col_dia].split(",")
          bloque.forEach((tipo_hora)=>{
            if(tipo_hora){
-           opciones.push(`${dias[idx]} ${tipo_hora}`)
+           opciones.push(`${tipo_hora}`)
            }  
          })
  
@@ -453,6 +419,68 @@ function crear_calendario(hoja,opcionesLista) {
        nuevaHoja.getRange(filaDestino, columnaDestino, 1, filaNueva.length).setValues([filaNueva]);
      }
    });
+ }
+ function actualizar_calendario(hoja,opcionesLista) {
+   
+   opcionesLista=opcionesLista.map((lista)=>lista.join(" "))
+   const dias = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes"];
+   hoja.getRange(1, 2, 1, dias.length).setValues([dias]).setFontWeight("bold");
+   
+   // Configurar horarios
+   const horaInicio = "08:30";
+   const horaFin = "19:20";
+   const duracionBloque = 50; // Duración en minutos
+   const intervaloDescanso = 10; // Duración en minutos entre bloques
+   const filasPorBloque = 10; // Filas por bloque horario
+   const horarios = [];
+   let horaActual = new Date(`1970-01-01T${horaInicio}:00`);
+   const fin = new Date(`1970-01-01T${horaFin}:00`);
+   
+   while (horaActual <= fin) {
+     const siguienteHora = new Date(horaActual.getTime() + duracionBloque * 60000);
+     horarios.push(
+       `${horaActual.getHours()}:${horaActual.getMinutes().toString().padStart(2, "0")}-` +
+       `${siguienteHora.getHours()}:${siguienteHora.getMinutes().toString().padStart(2, "0")}`
+     );
+     horaActual = new Date(siguienteHora.getTime() + intervaloDescanso * 60000); // Sumar descanso
+   }
+   
+   // Escribir horarios y días con colores alternados
+   let fila = 2; // Comenzar en la fila 2
+   horarios.forEach((rango, index) => {
+     const color = index % 2 === 0 ? "#d9eaf7" : "#f7d9d9"; // Alternar colores por bloque
+     
+     for (let i = 0; i < filasPorBloque; i++) {
+       // Escribir horario en la columna 1
+       hoja.getRange(fila, 1)
+         .setValue(rango)
+         .setFontWeight("bold")
+         .setBackground(color);
+       
+       // Espacios por día con listas desplegables
+       dias.forEach((_, colIndex) => {
+         const columna = colIndex + 2; // Días comienzan en la columna 2
+         const celda = hoja.getRange(fila, columna);
+         
+         celda.setDataValidation(SpreadsheetApp.newDataValidation()
+           .requireValueInList(opcionesLista)
+           .setAllowInvalid(false)
+           .build());
+       });
+       
+       fila++; // Siguiente fila
+     }
+   });
+   
+   // Ajustar tamaño de columnas y filas
+   hoja.setColumnWidth(1, 120); // Columna de horarios
+   hoja.setColumnWidths(2, dias.length, 350); // Columnas de días
+   hoja.setRowHeights(2, horarios.length * filasPorBloque,40); // Altura de filas
+   
+   // Formato de la hoja
+   hoja.getRange(1, 1, 1, dias.length + 1).setFontWeight("bold").setBackground("#f4b084"); // Encabezados
+   hoja.setFrozenRows(1); // Fijar encabezados
+   hoja.setFrozenColumns(1);
  }
  
  

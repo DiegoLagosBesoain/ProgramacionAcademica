@@ -1,3 +1,5 @@
+var id_hoja_maestro="1o6HftjnQiU4EB1T9mwZ5FntfkZqy9Bj5wkZKbyHl-m0"
+
 function onOpen() {
   const ui = SpreadsheetApp.getUi(); // Crea referencia a la interfaz de usuario de Spreadsheet
 
@@ -8,7 +10,8 @@ function onOpen() {
         .addItem("Crear templates", "crear_templates")
         .addItem("Extraer datos maestro", "extaer_datos_maestro")
         .addItem("Generar visualizaciones", "visualizar")
-        .addItem("Actualizar maestro","actualizar_maestro")
+        .addItem("Enviar maestro","actualizar_maestro")
+        .addItem("Actualizar Hojas","actualizarDesplegables")
         
     )
     .addSubMenu(
@@ -28,8 +31,8 @@ function onOpen() {
         .addItem("Verificar Disponibilidad profesores 5to y 6to semestre","verificar_Disponibilidad_5to_y_6to")
         .addItem("Verificar Salas Especiales 5to y 6to semestre","verificar_topes_Salas_Especiales_5to_y_6to")
         .addItem("Verificar Horarios Protegidos 5to y 6to semestre","verificar_Horarios_5to_y_6to")
-        .addItem("Verificar concentraciones 5to y 6to primer semestre", "verifica_concentraciones_5to_y_6to_primer_semestre")
-        .addItem("Verificar concentraciones 5to y 6to segundo semestre", "verifica_concentraciones_5to_y_6to_segundo_semestre")
+        .addItem("Verificar concentraciones 5to y 6to semestre Par", "verifica_concentraciones_5to_y_6to_primer_semestre")
+        .addItem("Verificar concentraciones 5to y 6to semestre Impar", "verifica_concentraciones_5to_y_6to_segundo_semestre")
         .addItem("Crear Visualizacion 5to y 6to semestre","visualizar5y6")
     )
     .addSubMenu(
@@ -37,8 +40,8 @@ function onOpen() {
         .addItem("Verificar topes mismo semestre 7mo y 8vo","verificar_topes_mismo_semestre_7mo_y_8vo")
         .addItem("Verificar Disponibilidad profesores 7mo y 8vo semestre","verificar_Disponibilidad_7mo_y_8vo")
         .addItem("Verificar Salas Especiales 7mo y 8vo semestre","verificar_topes_Salas_Especiales_7mo_y_8vo")
-        .addItem("Verificar concentraciones 7mo y 8vo primer semestre", "verifica_concentraciones_7mo_y_8vo_primer_semestre")
-        .addItem("Verificar concentraciones 7mo y 8vo segundo semestre", "verifica_concentraciones_7mo_y_8vo_segundo_semestre")
+        .addItem("Verificar concentraciones 7mo y 8vo semestre Par", "verifica_concentraciones_7mo_y_8vo_primer_semestre")
+        .addItem("Verificar concentraciones 7mo y 8vo semestre Impar", "verifica_concentraciones_7mo_y_8vo_segundo_semestre")
         .addItem("Crear Visualizacion 7mo y 8vo semestre","visualizar7y8")
     
 
@@ -712,7 +715,7 @@ function actualizar_maestro(){
   let horarios_titulacion=agruparHorarios(bloques_titulacion)
   const horarios_hojas=[horarios,horarios_5y6,horarios_7y8,horarios_titulacion]
   console.log(horarios)
-  const idSpreadsheet = '1o6HftjnQiU4EB1T9mwZ5FntfkZqy9Bj5wkZKbyHl-m0';
+  const idSpreadsheet = id_hoja_maestro;
   const hoja_maestro = SpreadsheetApp.openById(idSpreadsheet).getSheetByName('MAESTRO');
   const col_lunes= obtenerNumeroDeColumna(hoja_maestro,"Lunes",1)
   const col_martes= obtenerNumeroDeColumna(hoja_maestro,"Martes",1)
@@ -733,6 +736,40 @@ function actualizar_maestro(){
   
   escribirDatosYResaltar(hoja_maestro,data_maestro)
   agregar_listas_desplegables(data_maestro,hoja_maestro,col_dias,dias)
+}
+function actualizarDesplegables(){
+  const hojasActuales = SpreadsheetApp.getActiveSpreadsheet();
+  const hoja_plan_comun = hojasActuales.getSheetByName("PLAN COMUN")
+  const bloques = hojasActuales.getSheetByName("DATOS MAESTRO").getDataRange().getDisplayValues()
+  const detalles = hojasActuales.getSheetByName("DETALLES SEMESTRE").getDataRange().getDisplayValues()
+
+  const bloques_plan_comun=bloques.filter((bloque,idx)=>contieneEnRango(detalles[idx],1,4)).map((curso)=>{
+    return [curso[2],"seccion "+curso[1],curso[6]]
+  });
+  const bloques_5y6=bloques.filter((bloque,idx)=>contieneEnRango(detalles[idx],5,6)).map((curso)=>{
+    return [curso[2],"seccion "+curso[1],curso[6]]
+  });
+  const bloques_7y8=bloques.filter((bloque,idx)=>contieneEnRango(detalles[idx],7,8)).map((curso)=>{
+    return [curso[2],"seccion "+curso[1],curso[6]]
+  });
+  const bloques_titulacion=bloques.filter((bloque,idx)=>contieneEnRango(detalles[idx],9,11)||(bloque[0][3]=="5")||(bloque[0][3]=="6")).map((curso)=>{
+    return [curso[2],"seccion "+curso[1],curso[6]]
+  });
+  const hoja_5y6_comun = hojasActuales.getSheetByName("V,VI")
+  const hoja_7y8_comun = hojasActuales.getSheetByName("VII,VIII")
+  const hoja_tutulacion_comun = hojasActuales.getSheetByName("TITULACION")
+  
+actualizar_calendario(hoja_plan_comun,bloques_plan_comun)
+
+
+actualizar_calendario(hoja_5y6_comun,bloques_5y6)
+
+
+actualizar_calendario(hoja_7y8_comun,bloques_7y8)
+
+
+actualizar_calendario(hoja_tutulacion_comun,bloques_titulacion)
+
 }
 
 
