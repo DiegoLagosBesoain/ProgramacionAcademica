@@ -61,11 +61,12 @@ function generar_Entradas(secciones,data_nrc,data_catalogo,hoja_catalogo,hoja_li
   const col_Habilidades_transversales_maestro= obtenerNumeroDeColumna(hoja_maestro,"Habilidades Transversales",1)
   const col_SCT_Chile_catalogo= obtenerNumeroDeColumna(hoja_catalogo,"SCT-Chile",1)
   const col_Requisitos_catalogo= obtenerNumeroDeColumna(hoja_catalogo,"Requisitos",1)
+  const col_codigo_catalogo = obtenerNumeroDeColumna(hoja_catalogo,"CODIGO",1)
   const col_Habilidades_catalogo= obtenerNumeroDeColumna(hoja_catalogo,"Habilidades Transversales",1)
   const col_codigo_maestro=obtenerNumeroDeColumna(hoja_maestro,"CURSO",1)
   const col_materia_maestro=obtenerNumeroDeColumna(hoja_maestro,"MATERIA",1)
-  const col_area=obtenerNumeroDeColumna(hoja_maestro,"MATERIA",1)
-  
+  const col_area_catalogo=obtenerNumeroDeColumna(hoja_catalogo,"AREA",1)
+  const col_titulo_catalogo=obtenerNumeroDeColumna(hoja_catalogo,"TITULO",1)
   
   return secciones.map((seccion,idx)=>{
 
@@ -79,15 +80,15 @@ function generar_Entradas(secciones,data_nrc,data_catalogo,hoja_catalogo,hoja_li
 
     let codigo_seccion = seccion[0]+seccion[1]//ING11011
     entrada[3]= codigo_seccion
-    let datos_catalogo=data_catalogo.find((curso)=>curso[0]===seccion[0])
+    let datos_catalogo=data_catalogo.find((curso)=>curso[col_codigo_catalogo]===seccion[0])
     
     //Puede que no encuentre ningun dato asociado en catalogo
     if (datos_catalogo===undefined){
     datos_catalogo = Array(data_catalogo[0].length) 
     }
-    console.log("datos_catalogo",datos_catalogo,seccion[0])
-    entrada[1]=datos_catalogo[3]
-    entrada[10]=datos_catalogo[4]
+    
+    entrada[1]=datos_catalogo[col_area_catalogo]
+    entrada[10]=datos_catalogo[col_titulo_catalogo]
     let datos_nrc = data_nrc.find((curso)=>curso[3]===seccion[2])//Busca por nrc
     if (datos_nrc===undefined){
     datos_nrc= Array(data_nrc[0].length) 

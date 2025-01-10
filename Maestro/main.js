@@ -1,6 +1,21 @@
-var id_hoja_programacion='1pQBxylZzoIWAY0RKcbgDMUKrZLg6u0cGIsxd-GleUYE'
-var id_archivo_actual="1o6HftjnQiU4EB1T9mwZ5FntfkZqy9Bj5wkZKbyHl-m0"
-var id_carpeta_archivos_cordinadores="1_65rwp56jrcRsxoMO-HnBAOFGFI1z9Mc"
+var id_hoja_programacion='1pQBxylZzoIWAY0RKcbgDMUKrZLg6u0cGIsxd-GleUYE'//Hoja de programacion apra los cursos
+var id_archivo_actual="1o6HftjnQiU4EB1T9mwZ5FntfkZqy9Bj5wkZKbyHl-m0"//Cambiar aqui archivo actual
+var id_carpeta_archivos_cordinadores="1_65rwp56jrcRsxoMO-HnBAOFGFI1z9Mc"//Cambiar aqui carpeta cordinadores
+var personas_para_envio_de_hojas =[
+    {name:"Diego Lagos",mail:"diego.lagos.besoain@gmail.com",archivos:["MATEMATICA","COMPUTACION"]}
+    
+    //cambiar aqui las diferentes areas de cordinacion y sus encargados
+
+  ]
+var personas_para_quitar_permisos =[
+    {name:"Diego Lagos",mail:"diego.lagos.besoain@gmail.com",archivos:["MATEMATICA","COMPUTACION"]}
+    
+    //cambiar aqui las diferentes areas de cordinacion y sus encargados
+
+  ]
+var linkFormulario1 = "https://script.google.com/macros/s/AKfycbxSHjR1VZxcZqeYqyuIbQ2D9Y-HXpkL_kL30ym4l3WzAEJkhr-OT43EeTZVrYFTtd2D/exec"; // Cambiar por el link del formulario Honorarios
+var linkFormulario2 = "https://script.google.com/macros/s/AKfycbyobQf5Zffk-bDaIY1JszLMKDSdLVs_IxBWkNtCFFdfXlDElu3D1qiCzxtDjFSbPSAw/exec"; // Cambiar por el link del formulario Jornada
+var mensaje_intermedio=""
 function onOpen(){
   const ui = SpreadsheetApp.getUi(); //crea referencia a la interfaz de usuario de Spreadsheet
 
@@ -53,8 +68,7 @@ const curso_materia = obtener_columnas_especificas(data_catalogo,[col_codigo,col
 const hoja_listado_nrc = hojasActuales.getSheetByName('NRC POR PERIODO ESPEJO')
 const data_listado_nrc = hoja_listado_nrc.getDataRange().getValues();
 
-const cursosConSecciones = asignarSecciones(curso_codigo_nombre, data_listado_nrc);
-
+const cursosConSecciones = asignarSecciones(curso_codigo_nombre,data_listado_nrc);
 const hoja_maestro=hojasActuales.getSheetByName('MAESTRO');
 const col_area_maestro = obtenerNumeroDeColumna(hoja_maestro,"AREA",1)
 const col_curso_maestro = obtenerNumeroDeColumna(hoja_maestro,"CURSO",1)
@@ -203,12 +217,8 @@ function pedirParametro_fechas(mensaje_grande,mensaje_pequeno) {
   }
 }
 function compartirYEnviarEnlace() {
-  const lista_datos =[
-    {name:"Diego Lagos",mail:"diego.lagos.besoain@gmail.com",archivos:["MATEMATICA","COMPUTACION"]}
-    //cambiar aqui las diferentes areas de cordinacion y sus encargados
-
-  ]
-    enviarLinksConPermisos(id_carpeta_archivos_cordinadores,lista_datos)
+  
+    enviarLinksConPermisos(id_carpeta_archivos_cordinadores,personas_para_envio_de_hojas)
 
 
 
@@ -365,8 +375,7 @@ function enviarFormulariosCondicional() {
   const data = sheet.getDataRange().getDisplayValues(); 
   data.shift()
   // Links de los formularios
-  const linkFormulario1 = "https://script.google.com/macros/s/AKfycbxSHjR1VZxcZqeYqyuIbQ2D9Y-HXpkL_kL30ym4l3WzAEJkhr-OT43EeTZVrYFTtd2D/exec"; // Cambiar por el link del formulario Honorarios
-  const linkFormulario2 = "https://script.google.com/macros/s/AKfycbyobQf5Zffk-bDaIY1JszLMKDSdLVs_IxBWkNtCFFdfXlDElu3D1qiCzxtDjFSbPSAw/exec"; // Cambiar por el link del formulario Jornada
+  
 
   data.forEach((fila, i) => {
     const email1 = fila[colMail1];
@@ -525,14 +534,8 @@ escribirFechasEnFila(listaFechas,dias_feriados,1, columnainicio)
 
 }
 function quitar_permisos(){
-  const lista_datos =[
-    {name:"Diego Lagos",mail:"diego.lagos.besoain@gmail.com",archivos:["MATEMATICA","COMPUTACION"]}
-    
-    //cambiar aqui las diferentes areas de cordinacion y sus encargados
-
-  ]
-  
-  removePermissionsFromList(id_carpeta_archivos_cordinadores, lista_datos)
+ 
+  removePermissionsFromList(id_carpeta_archivos_cordinadores,personas_para_quitar_permisos)
 
 
   
