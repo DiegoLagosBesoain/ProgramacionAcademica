@@ -1,4 +1,4 @@
-var id_hoja_programacion='1pQBxylZzoIWAY0RKcbgDMUKrZLg6u0cGIsxd-GleUYE'//Hoja de programacion apra los cursos
+var id_hoja_programacion='1pQBxylZzoIWAY0RKcbgDMUKrZLg6u0cGIsxd-GleUYE'//Hoja de programacion para los cursos
 var id_archivo_actual="1o6HftjnQiU4EB1T9mwZ5FntfkZqy9Bj5wkZKbyHl-m0"//Cambiar aqui archivo actual
 var id_carpeta_archivos_cordinadores="1_65rwp56jrcRsxoMO-HnBAOFGFI1z9Mc"//Cambiar aqui carpeta cordinadores
 var personas_para_envio_de_hojas =[
@@ -339,6 +339,7 @@ const col_comentarios=obtenerNumeroDeColumna(hoja_maestro,"COMENTARIOS PROFESOR"
 const col_examen=obtenerNumeroDeColumna(hoja_maestro,"EXAMEN (Sí o No)",1)
 const col_cantidad_evaluaciones=obtenerNumeroDeColumna(hoja_maestro,"CANTIDAD EVALUACIONES (semestrales)",1)
 const col_tipo=obtenerNumeroDeColumna(hoja_maestro,"HORARIO EVALUACIONES (19:30 o en clases o en ayudantías)",1)
+const col_check_respuesta=obtenerNumeroDeColumna(hoja_maestro,"INGRESO DE HORARIO",1)
 data_maestro.forEach(fila => {
     
     const curso_seccion = data_otros.find(prof => (prof[1] == fila[col_codigo])&&(prof[2] == fila[col_seccion])); 
@@ -348,6 +349,7 @@ data_maestro.forEach(fila => {
         fila[col_examen]=curso_seccion[4]
         fila[col_cantidad_evaluaciones]=curso_seccion[5]
         fila[col_tipo]=curso_seccion[6]
+        fila[col_check_respuesta]="SI"
         // Actualizar cada columna de día con los datos del resultado
         
     }

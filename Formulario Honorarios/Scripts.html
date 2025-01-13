@@ -1,158 +1,158 @@
 <script>
-    var nombre = "";
-    var rut = "";
-    var horariosSeleccionados = [];
-    var horariosSeleccionados2 = [];
-    var horas_a_realizar=0
-    var horariosNoPermitidos= ["Viernes 12:30-13:20"];
-    var cursos_3_horas = []
-    var elecciones=[]
-    var mensaje_auxiliar
-    var dataProfe=[]
-    var cometn=[]
-    var exam=[]
-    var evaluaciones
-    var types
+  var nombre = "";
+  var rut = "";
+  var horariosSeleccionados = [];
+  var horariosSeleccionados2 = [];
+  var horas_a_realizar=0
+  var horariosNoPermitidos= ["Viernes 12:30-13:20"];
+  var cursos_3_horas = []
+  var elecciones=[]
+  var mensaje_auxiliar
+  var dataProfe=[]
+  var cometn=[]
+  var exam=[]
+  var evaluaciones
+  var types
 
-    // Validar el nombre
-    function validarNombre() {
-    nombre = document.getElementById("nombre").value.trim();
-    console.log(nombre)
+  // Validar el nombre
+  function validarNombre() {
+  nombre = document.getElementById("nombre").value.trim();
+  console.log(nombre)
 
-    mostrarCarga(); // Muestra la animación de carga.
+  mostrarCarga(); // Muestra la animación de carga.
 
-    google.script.run
-      .withSuccessHandler((respuesta) => {
-        ocultarCarga(); // Oculta la animación al recibir respuesta.
+  google.script.run
+    .withSuccessHandler((respuesta) => {
+      ocultarCarga(); // Oculta la animación al recibir respuesta.
 
-        if (respuesta.success) {
-          // Si la respuesta indica éxito, muestra el mensaje al usuario.
-          mostrarPreguntaRut(respuesta.message);
-        } else {
-          // Si no es exitosa, muestra el mensaje de error al usuario.
-          alert(`Error: ${respuesta.message}`);
-        }
-    })
-    .withFailureHandler((error) => {
-      ocultarCarga(); // Oculta la animación en caso de fallo de red o script.
-      alert("Ha ocurrido un error inesperado. Intenta nuevamente más tarde.");
-      console.error(error);
-    })
-    .pedirRut(nombre); // Llama al backend con el nombre.
-    
+      if (respuesta.success) {
+        // Si la respuesta indica éxito, muestra el mensaje al usuario.
+        mostrarPreguntaRut(respuesta.message);
+      } else {
+        // Si no es exitosa, muestra el mensaje de error al usuario.
+        alert(`Error: ${respuesta.message}`);
+      }
+  })
+  .withFailureHandler((error) => {
+    ocultarCarga(); // Oculta la animación en caso de fallo de red o script.
+    alert("Ha ocurrido un error inesperado. Intenta nuevamente más tarde.");
+    console.error(error);
+  })
+  .pedirRut(nombre); // Llama al backend con el nombre.
+  
 }
 
-    // Mostrar la pregunta del RUT
-    function mostrarPreguntaRut(mensaje) {
-      document.getElementById("pregunta1").style.display = "none";
-      document.getElementById("mensajeRut").innerText = mensaje;
-      document.getElementById("pregunta2").style.display = "block";
-    }
+  // Mostrar la pregunta del RUT
+  function mostrarPreguntaRut(mensaje) {
+    document.getElementById("pregunta1").style.display = "none";
+    document.getElementById("mensajeRut").innerText = mensaje;
+    document.getElementById("pregunta2").style.display = "block";
+  }
 
-    // Validar el RUT
+  // Validar el RUT
 function validarRut() {
 rut = document.getElementById("rut").value.trim();
 
 if (rut) {
-  mostrarCarga();
-  google.script.run
-    .withSuccessHandler((respuesta) => {
-      ocultarCarga();
+mostrarCarga();
+google.script.run
+  .withSuccessHandler((respuesta) => {
+    ocultarCarga();
 
-      cursos_3_horas = respuesta.cursos3; // Guardar los cursos de 3 horas
-      console.log("Cursos cargados:", cursos_3_horas);
-      dataProfe=respuesta.data_profe
+    cursos_3_horas = respuesta.cursos3; // Guardar los cursos de 3 horas
+    console.log("Cursos cargados:", cursos_3_horas);
+    dataProfe=respuesta.data_profe
 
-      if (respuesta.success) {
-        horas_a_realizar = respuesta.horas_totales;
-        mensaje_auxiliar=respuesta.message
-        if (respuesta.restriccion_horario_plan_comun) {
-          horariosNoPermitidos = horariosNoPermitidos.concat([
-            "Martes 17:30-18:20",
-            "Martes 18:30-19:20",
-            "Viernes 10:30-11:20",
-            "Viernes 11:30-12:20",
-          ]);
-        }
-
-        nombre = respuesta.nombre;
-
-        // Mostrar pregunta opcional si hay cursos de 3 horas, sino pasar a pregunta3
-        
-      mostrarCursos(respuesta.message);
-        
-      } else {
-        if(respuesta.message=="Este RUT ya fue registrado previamente."){
-          document.getElementById("pregunta2").style.display = "none";
-          document.getElementById("Rut ya enviado").style.display = "block";
-        }
-        alert(`Error: ${respuesta.message}`);
+    if (respuesta.success) {
+      horas_a_realizar = respuesta.horas_totales;
+      mensaje_auxiliar=respuesta.message
+      if (respuesta.restriccion_horario_plan_comun) {
+        horariosNoPermitidos = horariosNoPermitidos.concat([
+          "Martes 17:30-18:20",
+          "Martes 18:30-19:20",
+          "Viernes 10:30-11:20",
+          "Viernes 11:30-12:20",
+        ]);
       }
-    })
-    .withFailureHandler(errorCarga)
-    .validarRut(rut, nombre);
-} else {
-  alert("Por favor, ingresa tu RUT.");
-}
-}
 
-    // Mostrar cursos
-    function cambiarPregunta(actual, siguiente) {
-      document.getElementById(actual).style.display = "none"; // Oculta la pregunta actual
-      document.getElementById(siguiente).style.display = "block"; // Muestra la siguiente pregunta
-    }      
-    function mostrarCursos(cursos) {
-      document.getElementById("pregunta2").style.display = "none";
-      document.getElementById("mensajeCursos").innerText = cursos;
-      document.getElementById("pregunta3").style.display = "block";
-    }
-    function mostrarCursos2(cursos) {
-      document.getElementById("preguntaOpcional").style.display = "none";
-      document.getElementById("mensajeCursos").innerText = cursos;
-      document.getElementById("pregunta3").style.display = "block";
-    }
-    function terminar_formulario() {
-      document.getElementById("preguntaAbierta").style.display = "none";
+      nombre = respuesta.nombre;
+
+      // Mostrar pregunta opcional si hay cursos de 3 horas, sino pasar a pregunta3
       
-      document.getElementById("preguntafinal").style.display = "block";
-      mostrarCarga()
-      google.script.run
-          .withSuccessHandler((e) => {
-            ocultarCarga();
-            console.log("Comentarios guardados exitosamente.");
-            if(!e.success){
-              document.getElementById("preguntafinal").style.display = "none";
-              document.getElementById("Rut ya enviado").style.display = "block";
-
-            }
-            
-          })
-          .withFailureHandler(errorCarga)
-          .enviar_datos(nombre,rut,horariosSeleccionados2,elecciones,cometn,exam,evaluaciones,types); 
-
-    }
-    function salto(){
-      if(cursos_3_horas.length>0){
-        mostrarPreguntaOpcional(cursos_3_horas)
-        
+    mostrarCursos(respuesta.message);
+      
+    } else {
+      if(respuesta.message=="Este RUT ya fue registrado previamente."){
+        document.getElementById("pregunta2").style.display = "none";
+        document.getElementById("Rut ya enviado").style.display = "block";
       }
-      else{
-        mostrarCalendario()
-      }
-
+      alert(`Error: ${respuesta.message}`);
     }
+  })
+  .withFailureHandler(errorCarga)
+  .validarRut(rut, nombre);
+} else {
+alert("Por favor, ingresa tu RUT.");
+}
+}
 
-    // Mostrar el calendario para seleccionar horarios
+  // Mostrar cursos
+  function cambiarPregunta(actual, siguiente) {
+    document.getElementById(actual).style.display = "none"; // Oculta la pregunta actual
+    document.getElementById(siguiente).style.display = "block"; // Muestra la siguiente pregunta
+  }      
+  function mostrarCursos(cursos) {
+    document.getElementById("pregunta2").style.display = "none";
+    document.getElementById("mensajeCursos").innerText = cursos;
+    document.getElementById("pregunta3").style.display = "block";
+  }
+  function mostrarCursos2(cursos) {
+    document.getElementById("preguntaOpcional").style.display = "none";
+    document.getElementById("mensajeCursos").innerText = cursos;
+    document.getElementById("pregunta3").style.display = "block";
+  }
+  function terminar_formulario() {
+    document.getElementById("preguntaAbierta").style.display = "none";
     
+    document.getElementById("preguntafinal").style.display = "block";
+    mostrarCarga()
+    google.script.run
+        .withSuccessHandler((e) => {
+          ocultarCarga();
+          console.log("Comentarios guardados exitosamente.");
+          if(!e.success){
+            document.getElementById("preguntafinal").style.display = "none";
+            document.getElementById("Rut ya enviado").style.display = "block";
+
+          }
+          
+        })
+        .withFailureHandler(errorCarga)
+        .enviar_datos(nombre,rut,horariosSeleccionados2,elecciones,cometn,exam,evaluaciones,types); 
+
+  }
+  function salto(){
+    if(cursos_3_horas.length>0){
+      mostrarPreguntaOpcional(cursos_3_horas)
+      
+    }
+    else{
+      mostrarCalendario()
+    }
+
+  }
+
+  // Mostrar el calendario para seleccionar horarios
+  
 function mostrarCalendario() {
 document.getElementById("pregunta3").style.display = "none";
 document.getElementById("pregunta4").style.display = "block";
 const calendario = document.getElementById("calendario");
 const dias = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes"];
 const horas = [
-  "8:30-9:20", "9:30-10:20", "10:30-11:20", "11:30-12:20",
-  "12:30-13:20","13:30-14:20", "14:30-15:20", "15:30-16:20", "16:30-17:20",
-  "17:30-18:20", "18:30-19:20"
+"8:30-9:20", "9:30-10:20", "10:30-11:20", "11:30-12:20",
+"12:30-13:20","13:30-14:20", "14:30-15:20", "15:30-16:20", "16:30-17:20",
+"17:30-18:20", "18:30-19:20"
 ];
 
 
@@ -161,33 +161,33 @@ calendario.innerHTML = "";
 
 
 dias.forEach(dia => {
-  calendario.appendChild(createCell(dia, "calendario-header"));
+calendario.appendChild(createCell(dia, "calendario-header"));
 });
 
 // se cran las fials de horas
 horas.forEach(hora => {
-  dias.forEach((dia) => {
-    const horario = `${dia} ${hora}`;
+dias.forEach((dia) => {
+  const horario = `${dia} ${hora}`;
 
-    // le doy la clase para el estilo
-    const celda = createCell(hora, horariosNoPermitidos.includes(horario) ? "calendario-dia no-permitido" : "calendario-dia");
+  // le doy la clase para el estilo
+  const celda = createCell(hora, horariosNoPermitidos.includes(horario) ? "calendario-dia no-permitido" : "calendario-dia");
 
-    // Deshabilitar interacción si el horario no está permitido
-    if (!horariosNoPermitidos.includes(horario)) {
-      celda.onclick = () => {
-        celda.classList.toggle("seleccionado");
-        if (horariosSeleccionados.includes(horario)) {
-          horariosSeleccionados = horariosSeleccionados.filter(h => h !== horario);
-        } else {
-          horariosSeleccionados.push(horario);
-        }
-      };
-    } else {
-      celda.title = "Este horario no está disponible";
-    }
+  // Deshabilitar interacción si el horario no está permitido
+  if (!horariosNoPermitidos.includes(horario)) {
+    celda.onclick = () => {
+      celda.classList.toggle("seleccionado");
+      if (horariosSeleccionados.includes(horario)) {
+        horariosSeleccionados = horariosSeleccionados.filter(h => h !== horario);
+      } else {
+        horariosSeleccionados.push(horario);
+      }
+    };
+  } else {
+    celda.title = "Este horario no está disponible";
+  }
 
-    calendario.appendChild(celda);
-  });
+  calendario.appendChild(celda);
+});
 });
 }
 function agregarBotonRegresarPregunta4() {
@@ -196,20 +196,20 @@ const botonContinuar = document.getElementById("guardarHorarios"); // Botón de 
 
 // Verifica si el botón ya existe para evitar duplicados
 if (!document.getElementById("botonRegresarPregunta4")) {
-  const botonRegresar = document.createElement("button");
-  botonRegresar.id = "botonRegresarPregunta4";
-  botonRegresar.className = "submit-btn";
-  botonRegresar.textContent = "Regresar";
+const botonRegresar = document.createElement("button");
+botonRegresar.id = "botonRegresarPregunta4";
+botonRegresar.className = "submit-btn";
+botonRegresar.textContent = "Regresar";
 
-  // Define el evento para regresar a la Pregunta Opcional
-  botonRegresar.onclick = () => {
-    document.getElementById("pregunta4").style.display = "none";
-    document.getElementById("preguntaOpcional").style.display = "block";
-    horariosSeleccionados=[]
-  };
+// Define el evento para regresar a la Pregunta Opcional
+botonRegresar.onclick = () => {
+  document.getElementById("pregunta4").style.display = "none";
+  document.getElementById("preguntaOpcional").style.display = "block";
+  horariosSeleccionados=[]
+};
 
-  // Inserta el botón de regresar antes del botón de continuar
-  pregunta4.insertBefore(botonRegresar, botonContinuar);
+// Inserta el botón de regresar antes del botón de continuar
+pregunta4.insertBefore(botonRegresar, botonContinuar);
 }
 }
 function mostrarCalendario2() {
@@ -222,9 +222,9 @@ agregarBotonRegresarPregunta4()
 const calendario = document.getElementById("calendario");
 const dias = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes"];
 const horas = [
-  "8:30-9:20", "9:30-10:20", "10:30-11:20", "11:30-12:20",
-  "12:30-13:20","13:30-14:20", "14:30-15:20", "15:30-16:20", "16:30-17:20",
-  "17:30-18:20", "18:30-19:20"
+"8:30-9:20", "9:30-10:20", "10:30-11:20", "11:30-12:20",
+"12:30-13:20","13:30-14:20", "14:30-15:20", "15:30-16:20", "16:30-17:20",
+"17:30-18:20", "18:30-19:20"
 ];
 
 // Limpiar contenido anterior
@@ -233,33 +233,33 @@ calendario.innerHTML = "";
 // Crear encabezado de los días
 
 dias.forEach(dia => {
-  calendario.appendChild(createCell(dia, "calendario-header"));
+calendario.appendChild(createCell(dia, "calendario-header"));
 });
 
 // Crear filas de horas
 horas.forEach(hora => {
-  dias.forEach((dia) => {
-    const horario = `${dia} ${hora}`;
+dias.forEach((dia) => {
+  const horario = `${dia} ${hora}`;
 
-    // Crear celda con la clase apropiada
-    const celda = createCell(hora, horariosNoPermitidos.includes(horario) ? "calendario-dia no-permitido" : "calendario-dia");
+  // Crear celda con la clase apropiada
+  const celda = createCell(hora, horariosNoPermitidos.includes(horario) ? "calendario-dia no-permitido" : "calendario-dia");
 
-    // Deshabilitar interacción si el horario no está permitido
-    if (!horariosNoPermitidos.includes(horario)) {
-      celda.onclick = () => {
-        celda.classList.toggle("seleccionado");
-        if (horariosSeleccionados.includes(horario)) {
-          horariosSeleccionados = horariosSeleccionados.filter(h => h !== horario);
-        } else {
-          horariosSeleccionados.push(horario);
-        }
-      };
-    } else {
-      celda.title = "Este horario no está disponible";
-    }
+  // Deshabilitar interacción si el horario no está permitido
+  if (!horariosNoPermitidos.includes(horario)) {
+    celda.onclick = () => {
+      celda.classList.toggle("seleccionado");
+      if (horariosSeleccionados.includes(horario)) {
+        horariosSeleccionados = horariosSeleccionados.filter(h => h !== horario);
+      } else {
+        horariosSeleccionados.push(horario);
+      }
+    };
+  } else {
+    celda.title = "Este horario no está disponible";
+  }
 
-    calendario.appendChild(celda);
-  });
+  calendario.appendChild(celda);
+});
 });
 }
 
@@ -270,67 +270,67 @@ cell.innerText = content;
 return cell;
 }
 
-    // Guardar horarios seleccionados
+  // Guardar horarios seleccionados
 function guardarHorarios() {
 // Verificar si se seleccionaron suficientes horas
 console.log(horas_a_realizar)
 if (horariosSeleccionados.length < horas_a_realizar) {
-  alert(`Por favor, seleccione un mínimo de ${horas_a_realizar} horas.`);
-  return;
+alert(`Por favor, seleccione un mínimo de ${horas_a_realizar} horas.`);
+return;
 }
 
 // Verificar si hay suficientes bloques de 3 horas para las preferencias
 const horariosPorDia = {};
 horariosSeleccionados.forEach(horario => {
-  const [dia, hora] = horario.split(" ");
-  if (!horariosPorDia[dia]) {
-    horariosPorDia[dia] = [];
-  }
-  horariosPorDia[dia].push(hora);
+const [dia, hora] = horario.split(" ");
+if (!horariosPorDia[dia]) {
+  horariosPorDia[dia] = [];
+}
+horariosPorDia[dia].push(hora);
 });
 
 // Buscar bloques de 3 horas consecutivas por día
 let bloquesContinuos = 0;
 Object.values(horariosPorDia).forEach(horasDelDia => {
-  // Ordenar las horas del día para verificar continuidad
-  horasDelDia.sort((a, b) => ordenarHoras(a, b));
+// Ordenar las horas del día para verificar continuidad
+horasDelDia.sort((a, b) => ordenarHoras(a, b));
 
-  for (let i = 0; i < horasDelDia.length - 2; i++) {
-    if (
-      verificarContinuidad(horasDelDia[i], horasDelDia[i + 1]) &&
-      verificarContinuidad(horasDelDia[i + 1], horasDelDia[i + 2])
-    ) {
-      bloquesContinuos++;
-      i += 2; // Saltar al siguiente conjunto después de contar este bloque
-    }
+for (let i = 0; i < horasDelDia.length - 2; i++) {
+  if (
+    verificarContinuidad(horasDelDia[i], horasDelDia[i + 1]) &&
+    verificarContinuidad(horasDelDia[i + 1], horasDelDia[i + 2])
+  ) {
+    bloquesContinuos++;
+    i += 2; // Saltar al siguiente conjunto después de contar este bloque
   }
+}
 });
 
 const total3Juntas = elecciones.filter(curso => curso.preferencia === "3-juntas").length;
 
 if (bloquesContinuos < total3Juntas) {
-  alert(
-    `Faltan bloques de 3 horas continuas. Necesitas al menos ${total3Juntas} bloques de 3 horas continuas, y actualmente tienes ${bloquesContinuos}.`
-  );
-  return;
+alert(
+  `Faltan bloques de 3 horas continuas. Necesitas al menos ${total3Juntas} bloques de 3 horas continuas, y actualmente tienes ${bloquesContinuos}.`
+);
+return;
 }
 
 console.log(nombre);
 mostrarCarga();
 // Llamada al servidor para guardar los horarios
 google.script.run
-  .withSuccessHandler(() => {
-    horariosSeleccionados2=[...horariosSeleccionados]
-    horariosSeleccionados = []; // Limpia la selección
-    document.querySelectorAll(".seleccionado").forEach(celda => {
-      celda.classList.remove("seleccionado");
-    });
+.withSuccessHandler(() => {
+  horariosSeleccionados2=[...horariosSeleccionados]
+  horariosSeleccionados = []; // Limpia la selección
+  document.querySelectorAll(".seleccionado").forEach(celda => {
+    celda.classList.remove("seleccionado");
+  });
 
-    mostrarConfirmacion("Horarios guardados exitosamente.");
-    mostrarPreguntaExamen();
-  })
-  .withFailureHandler(errorCarga) // Manejo de errores
-  .todo_bien()
+  mostrarConfirmacion("Horarios guardados exitosamente.");
+  mostrarPreguntaExamen();
+})
+.withFailureHandler(errorCarga) // Manejo de errores
+.todo_bien()
 }
 function mostrarCarga() {
 document.getElementById("loading-indicator").style.display = "flex";
@@ -347,7 +347,7 @@ desactivarBotones(false);
 function desactivarBotones(estado) {
 const botones = document.querySelectorAll("button");
 botones.forEach(boton => {
-  boton.disabled = estado;
+boton.disabled = estado;
 });
 }
 function mostrarConfirmacion(mensaje) {
@@ -367,20 +367,20 @@ contenedor.innerHTML = ""; // Limpiar contenido previo
 console.log("Mostrando pregunta opcional:", cursos3Horas);
 
 cursos3Horas.forEach((curso, index) => {
-  const preguntaDiv = document.createElement("div");
-  preguntaDiv.setAttribute("data-valor", `${curso[0]} ${curso[1]}`);
-  preguntaDiv.innerHTML = `
-    <h4>${curso[2]} seccion ${curso[1]}</h4>
-    <label>
-      <input type="radio" name="opcionHoras${index}" value="3-juntas" />
-      3 horas continuas
-    </label><br />
-    <label>
-      <input type="radio" name="opcionHoras${index}" value="2+1-separadas" />
-      2 horas juntas y 1 hora separada
-    </label>
-  `;
-  contenedor.appendChild(preguntaDiv);
+const preguntaDiv = document.createElement("div");
+preguntaDiv.setAttribute("data-valor", `${curso[0]} ${curso[1]}`);
+preguntaDiv.innerHTML = `
+  <h4>${curso[2]} seccion ${curso[1]}</h4>
+  <label>
+    <input type="radio" name="opcionHoras${index}" value="3-juntas" />
+    3 horas continuas
+  </label><br />
+  <label>
+    <input type="radio" name="opcionHoras${index}" value="2+1-separadas" />
+    2 horas juntas y 1 hora separada
+  </label>
+`;
+contenedor.appendChild(preguntaDiv);
 });
 
 document.getElementById("preguntaOpcional").style.display = "block";
@@ -394,20 +394,20 @@ contenedor.innerHTML = ""; // Limpiar contenido previo
 ;
 
 dataProfe.forEach((curso, index) => {
-  const preguntaDiv = document.createElement("div");
-  preguntaDiv.setAttribute("data-valor", `${curso[2]} ${curso[3]}`);
+const preguntaDiv = document.createElement("div");
+preguntaDiv.setAttribute("data-valor", `${curso[2]} ${curso[3]}`);
 
-  // Creamos un ID único para cada campo de comentario
-  const comentarioId = `comentario-${index}`;
+// Creamos un ID único para cada campo de comentario
+const comentarioId = `comentario-${index}`;
 
-  preguntaDiv.innerHTML = `
-    <h4>${curso[1]} seccion ${curso[3]}</h4>
-    <label>
-      <input class="response-input" type="text" id="${comentarioId}" placeholder="Comentarios o sugerencias:" />
-    </label>
-  `;
-  
-  contenedor.appendChild(preguntaDiv);
+preguntaDiv.innerHTML = `
+  <h4>${curso[1]} seccion ${curso[3]}</h4>
+  <label>
+    <input class="response-input" type="text" id="${comentarioId}" placeholder="Comentarios o sugerencias:" />
+  </label>
+`;
+
+contenedor.appendChild(preguntaDiv);
 });
 
 
@@ -420,20 +420,20 @@ const preferencias = [];
 let faltaSeleccion = false;
 
 Array.from(contenedor.children).forEach((preguntaDiv, index) => {
-  const seleccion = preguntaDiv.querySelector(`input[name="opcionHoras${index}"]:checked`);
-  if (!seleccion) {
-    faltaSeleccion = true;
-    return;
-  }
-  preferencias.push({
-    curso: preguntaDiv.getAttribute("data-valor"),
-    preferencia: seleccion.value,
-  });
+const seleccion = preguntaDiv.querySelector(`input[name="opcionHoras${index}"]:checked`);
+if (!seleccion) {
+  faltaSeleccion = true;
+  return;
+}
+preferencias.push({
+  curso: preguntaDiv.getAttribute("data-valor"),
+  preferencia: seleccion.value,
+});
 });
 
 if (faltaSeleccion) {
-  alert("Por favor, selecciona una opción para cada curso.");
-  return;
+alert("Por favor, selecciona una opción para cada curso.");
+return;
 }
 
 console.log("Preferencias seleccionadas:", preferencias);
@@ -442,19 +442,19 @@ elecciones=[...preferencias]
 
 // Enviar preferencias al backend
 google.script.run
-  .withSuccessHandler(() => {
-    ocultarCarga();
-    console.log("Preferencias guardadas exitosamente.");
-    mostrarCalendario2(); // Avanzar a pregunta3
-  })
-  .withFailureHandler(errorCarga)
-  .todo_bien()
+.withSuccessHandler(() => {
+  ocultarCarga();
+  console.log("Preferencias guardadas exitosamente.");
+  mostrarCalendario2(); // Avanzar a pregunta3
+})
+.withFailureHandler(errorCarga)
+.todo_bien()
 }
 function verificarContinuidad(horaActual, horaSiguiente) {
 const horas = [
-  "8:30-9:20", "9:30-10:20", "10:30-11:20", "11:30-12:20",
-  "12:30-13:20", "13:30-14:20", "14:30-15:20", "15:30-16:20",
-  "16:30-17:20", "17:30-18:20", "18:30-19:20"
+"8:30-9:20", "9:30-10:20", "10:30-11:20", "11:30-12:20",
+"12:30-13:20", "13:30-14:20", "14:30-15:20", "15:30-16:20",
+"16:30-17:20", "17:30-18:20", "18:30-19:20"
 ];
 const indiceActual = horas.indexOf(horaActual);
 const indiceSiguiente = horas.indexOf(horaSiguiente);
@@ -465,9 +465,9 @@ return indiceSiguiente === indiceActual + 1;
 // Función para ordenar horas
 function ordenarHoras(a, b) {
 const horas = [
-  "8:30-9:20", "9:30-10:20", "10:30-11:20", "11:30-12:20",
-  "12:30-13:20", "13:30-14:20", "14:30-15:20", "15:30-16:20",
-  "16:30-17:20", "17:30-18:20", "18:30-19:20"
+"8:30-9:20", "9:30-10:20", "10:30-11:20", "11:30-12:20",
+"12:30-13:20", "13:30-14:20", "14:30-15:20", "15:30-16:20",
+"16:30-17:20", "17:30-18:20", "18:30-19:20"
 ];
 return horas.indexOf(a) - horas.indexOf(b);
 }
@@ -477,14 +477,14 @@ const comentarios = [];
 
 // Itera sobre cada hijo del contenedor de comentarios
 Array.from(contenedor.children).forEach((preguntaDiv) => {
-  // Encuentra el input de texto dentro de cada bloque
-  const inputTexto = preguntaDiv.querySelector('.response-input');
-  const comentario = inputTexto ? inputTexto.value.trim() : "";
+// Encuentra el input de texto dentro de cada bloque
+const inputTexto = preguntaDiv.querySelector('.response-input');
+const comentario = inputTexto ? inputTexto.value.trim() : "";
 
-  comentarios.push({
-    curso: preguntaDiv.querySelector('h4').textContent, // Extrae el texto del curso
-    comentario: comentario || "Sin comentario", // Asigna un valor por defecto si está vacío
-  });
+comentarios.push({
+  curso: preguntaDiv.querySelector('h4').textContent, // Extrae el texto del curso
+  comentario: comentario || "Sin comentario", // Asigna un valor por defecto si está vacío
+});
 });
 
 console.log("Comentarios seleccionados:", comentarios);
@@ -492,13 +492,13 @@ mostrarCarga();
 cometn=[...comentarios]
 // Enviar comentarios al backend
 google.script.run
-  .withSuccessHandler(() => {
-    ocultarCarga();
-    console.log("Comentarios guardados exitosamente.");
-    terminar_formulario();
-  })
-  .withFailureHandler(errorCarga)
-  .todo_bien(); // Ajusta este método según tu backend
+.withSuccessHandler(() => {
+  ocultarCarga();
+  console.log("Comentarios guardados exitosamente.");
+  terminar_formulario();
+})
+.withFailureHandler(errorCarga)
+.todo_bien(); // Ajusta este método según tu backend
 }
 function mostrarPreguntaExamen() {
 document.getElementById("pregunta4").style.display = "none";
@@ -507,20 +507,20 @@ contenedor.innerHTML = ""; // Limpiar contenido previo
 
 
 dataProfe.forEach((curso, index) => {
-  const preguntaDiv = document.createElement("div");
-  preguntaDiv.setAttribute("data-valor", `${curso[2]} ${curso[3]}`);
-  preguntaDiv.innerHTML = `
-    <h4>${curso[1]} seccion ${curso[3]}</h4>
-    <label>
-      <input type="radio" name="opcionHoras${index}" value="SI" />
-      Con examen
-    </label><br />
-    <label>
-      <input type="radio" name="opcionHoras${index}" value="NO" />
-      Sin examen
-    </label>
-  `;
-  contenedor.appendChild(preguntaDiv);
+const preguntaDiv = document.createElement("div");
+preguntaDiv.setAttribute("data-valor", `${curso[2]} ${curso[3]}`);
+preguntaDiv.innerHTML = `
+  <h4>${curso[1]} seccion ${curso[3]}</h4>
+  <label>
+    <input type="radio" name="opcionHoras${index}" value="SI" />
+    Con examen
+  </label><br />
+  <label>
+    <input type="radio" name="opcionHoras${index}" value="NO" />
+    Sin examen
+  </label>
+`;
+contenedor.appendChild(preguntaDiv);
 });
 
 document.getElementById("preguntaExamen").style.display = "block";
@@ -531,20 +531,20 @@ const examenes = [];
 let faltaSeleccion = false;
 
 Array.from(contenedor.children).forEach((preguntaDiv, index) => {
-  const seleccion = preguntaDiv.querySelector(`input[name="opcionHoras${index}"]:checked`);
-  if (!seleccion) {
-    faltaSeleccion = true;
-    return;
-  }
-  examenes.push({
-    curso: preguntaDiv.getAttribute("data-valor"),
-    preferencia: seleccion.value,
-  });
+const seleccion = preguntaDiv.querySelector(`input[name="opcionHoras${index}"]:checked`);
+if (!seleccion) {
+  faltaSeleccion = true;
+  return;
+}
+examenes.push({
+  curso: preguntaDiv.getAttribute("data-valor"),
+  preferencia: seleccion.value,
+});
 });
 
 if (faltaSeleccion) {
-  alert("Por favor, selecciona una opción para cada curso.");
-  return;
+alert("Por favor, selecciona una opción para cada curso.");
+return;
 }
 
 console.log("Preferencias seleccionadas:", examenes);
@@ -553,13 +553,13 @@ exam=[...examenes]
 
 // Enviar preferencias al backend
 google.script.run
-  .withSuccessHandler(() => {
-    ocultarCarga();
-    console.log("Preferencias guardadas exitosamente.");
-    mostrarPreguntaEvaluaciones(); // Avanzar a pregunta3
-  })
-  .withFailureHandler(errorCarga)
-  .todo_bien()
+.withSuccessHandler(() => {
+  ocultarCarga();
+  console.log("Preferencias guardadas exitosamente.");
+  mostrarPreguntaEvaluaciones(); // Avanzar a pregunta3
+})
+.withFailureHandler(errorCarga)
+.todo_bien()
 }
 function mostrarPreguntaEvaluaciones() {
 document.getElementById("preguntaExamen").style.display = "none";
@@ -568,18 +568,18 @@ contenedor.innerHTML = ""; // Limpiar contenido previo
 
 
 dataProfe.forEach((curso, index) => {
-  const preguntaDiv = document.createElement("div");
-  preguntaDiv.setAttribute("data-valor", `${curso[2]} ${curso[3]}`);
-  preguntaDiv.innerHTML = `
-      <h4>${curso[1]} seccion ${curso[3]}</h4>
-      <label>
-        <span>Selecciona la cantidad de evaluaciones que quieres: </span>
-        <select id="numeroSeleccionado${index}">
-          ${Array.from({ length: 7 }, (_, i) => `<option value="${i}">${i}</option>`).join('')}
-        </select>
-      </label>
-  `;
-  contenedor.appendChild(preguntaDiv);
+const preguntaDiv = document.createElement("div");
+preguntaDiv.setAttribute("data-valor", `${curso[2]} ${curso[3]}`);
+preguntaDiv.innerHTML = `
+    <h4>${curso[1]} seccion ${curso[3]}</h4>
+    <label>
+      <span>Selecciona la cantidad de evaluaciones que quieres: </span>
+      <select id="numeroSeleccionado${index}">
+        ${Array.from({ length: 7 }, (_, i) => `<option value="${i}">${i}</option>`).join('')}
+      </select>
+    </label>
+`;
+contenedor.appendChild(preguntaDiv);
 });
 
 document.getElementById("preguntaEvaluaciones").style.display = "block";
@@ -590,14 +590,14 @@ const cant_evaluaciones = [];
 let faltaSeleccion = false;
 
 Array.from(contenedor.children).forEach((preguntaDiv) => {
-  const curso = preguntaDiv.getAttribute("data-valor"); // Curso y sección
-  const select = preguntaDiv.querySelector("select"); // Seleccionar el desplegable
-  const cantidadEvaluaciones = select.value; // Valor seleccionado
+const curso = preguntaDiv.getAttribute("data-valor"); // Curso y sección
+const select = preguntaDiv.querySelector("select"); // Seleccionar el desplegable
+const cantidadEvaluaciones = select.value; // Valor seleccionado
 
-  cant_evaluaciones.push({
-    curso: curso,
-    nevaluaciones: cantidadEvaluaciones,
-  });
+cant_evaluaciones.push({
+  curso: curso,
+  nevaluaciones: cantidadEvaluaciones,
+});
 });
 
 console.log("Preferencias seleccionadas: ", cant_evaluaciones);
@@ -606,13 +606,13 @@ evaluaciones = [...cant_evaluaciones]
 
 // Enviar preferencias al backend
 google.script.run
-  .withSuccessHandler(() => {
-    ocultarCarga();
-    console.log("Preferencias guardadas exitosamente.");
-    mostrarPreguntaTipo(); // Avanzar a pregunta3
-  })
-  .withFailureHandler(errorCarga)
-  .todo_bien()
+.withSuccessHandler(() => {
+  ocultarCarga();
+  console.log("Preferencias guardadas exitosamente.");
+  mostrarPreguntaTipo(); // Avanzar a pregunta3
+})
+.withFailureHandler(errorCarga)
+.todo_bien()
 }
 function mostrarPreguntaTipo() {
 document.getElementById("preguntaEvaluaciones").style.display = "none";
@@ -621,34 +621,34 @@ contenedor.innerHTML = ""; // Limpiar contenido previo
 
 
 dataProfe.forEach((curso, index) => {
-  const preguntaDiv = document.createElement("div");
-  preguntaDiv.setAttribute("data-valor", `${curso[2]} ${curso[3]}`);
-  preguntaDiv.innerHTML = `
-  <h4 class="pregunta-titulo">${curso[1]} seccion ${curso[3]}</h4>
-    <div class="opcion-grupo">
-      <label>
-        <input type="radio" name="opcionHoras${index}" value="" />
-        No aplica
-      </label>
-      <label>
-        <input type="radio" name="opcionHoras${index}" value="TARDE" />
-        19:30-21:20
-      </label>
-      <label>
-        <input type="radio" name="opcionHoras${index}" value="AYUDANTIA" />
-        Ayudantía
-      </label>
-      <label>
-        <input type="radio" name="opcionHoras${index}" value="CLASE" />
-        Clase
-      </label>
-      <label>
-        <input type="radio" name="opcionHoras${index}" value="LABORATORIO" />
-        Laboratorio
-      </label>
-    </div>
-  `;
-  contenedor.appendChild(preguntaDiv);
+const preguntaDiv = document.createElement("div");
+preguntaDiv.setAttribute("data-valor", `${curso[2]} ${curso[3]}`);
+preguntaDiv.innerHTML = `
+<h4 class="pregunta-titulo">${curso[1]} seccion ${curso[3]}</h4>
+  <div class="opcion-grupo">
+    <label>
+      <input type="radio" name="opcionHoras${index}" value="" />
+      No aplica
+    </label>
+    <label>
+      <input type="radio" name="opcionHoras${index}" value="TARDE" />
+      19:30-21:20
+    </label>
+    <label>
+      <input type="radio" name="opcionHoras${index}" value="AYUDANTIA" />
+      Ayudantía
+    </label>
+    <label>
+      <input type="radio" name="opcionHoras${index}" value="CLASE" />
+      Clase
+    </label>
+    <label>
+      <input type="radio" name="opcionHoras${index}" value="LABORATORIO" />
+      Laboratorio
+    </label>
+  </div>
+`;
+contenedor.appendChild(preguntaDiv);
 });
 
 document.getElementById("preguntaTipo").style.display = "block";
@@ -659,20 +659,20 @@ const tipos = []; // Almacena las preferencias seleccionadas
 
 // Recorre cada bloque dentro del contenedor
 Array.from(contenedor.children).forEach((preguntaDiv, index) => {
-  const curso = preguntaDiv.querySelector(".pregunta-titulo").textContent; // Obtiene el título del curso
-  const seleccion = preguntaDiv.querySelector(`input[name="opcionHoras${index}"]:checked`); // Busca la opción seleccionada
+const curso = preguntaDiv.querySelector(".pregunta-titulo").textContent; // Obtiene el título del curso
+const seleccion = preguntaDiv.querySelector(`input[name="opcionHoras${index}"]:checked`); // Busca la opción seleccionada
 
-  // Valida si hay una selección
-  if (seleccion) {
-    tipos.push({
-      curso: curso,
-      preferencia: seleccion.value,
-    });
-  } else {
-    // Si no hay selección, muestra un mensaje y termina la función
-    alert(`Por favor selecciona una opción para: ${curso}`);
-    return;
-  }
+// Valida si hay una selección
+if (seleccion) {
+  tipos.push({
+    curso: curso,
+    preferencia: seleccion.value,
+  });
+} else {
+  // Si no hay selección, muestra un mensaje y termina la función
+  alert(`Por favor selecciona una opción para: ${curso}`);
+  return;
+}
 });
 
 // Si todas las preguntas tienen respuesta, continúa
@@ -681,14 +681,14 @@ mostrarCarga();
 types = [...tipos]
 // Opcional: Enviar las preferencias al backend
 google.script.run
-  .withSuccessHandler(() => {
-    ocultarCarga();
-    console.log("Preferencias guardadas exitosamente.");
-    mostrarPreguntaAbierta(); // Avanzar a pregunta3
-    
-  })
-  .withFailureHandler(errorCarga)
-  .todo_bien();
+.withSuccessHandler(() => {
+  ocultarCarga();
+  console.log("Preferencias guardadas exitosamente.");
+  mostrarPreguntaAbierta(); // Avanzar a pregunta3
+  
+})
+.withFailureHandler(errorCarga)
+.todo_bien();
 }
 
 

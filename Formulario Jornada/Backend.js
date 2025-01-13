@@ -36,27 +36,6 @@ function validarRut(rut,nombre) {
   if (data_profesores.length < 1) {
     throw new Error("El rut ingresado no es valido(si es guion 'k' ingreselo en mayusculas)."); // Lanza un error si el rut no es válido.
     }
-  const ss = SpreadsheetApp.openById("1o6HftjnQiU4EB1T9mwZ5FntfkZqy9Bj5wkZKbyHl-m0")
-  const hoja = ss.getSheetByName("ENTREGADOS");
-  
-  if (!hoja) {
-    Logger.log("La hoja 'ENTREGADOS' no existe.");
-    return { success: false, message: "La hoja 'ENTREGADOS' no existe." };
-  }
-
-  // Obtener los valores de la primera columna (RUTs registrados)
-  const lastRow = hoja.getLastRow();
-  let rutColumna = [];
-  
-  if (lastRow > 0) {
-    // Obtener los valores de la primera columna solo si hay datos
-    rutColumna = hoja.getRange(1, 1, lastRow).getValues().flat();
-  }
-  console.log(rut,rutColumna)
-  // Verificar si el RUT ya está registrado
-  if (rutColumna.some((dato)=>dato==rut)) {
-    return { success: false, message: "Este RUT ya fue registrado previamente." };
-  }
   const semestres_protegidos_minor=["2","3","4","5"]
   const horas_totales = data_profesores.reduce((total, actual) => 
   actual[4] == 0 
