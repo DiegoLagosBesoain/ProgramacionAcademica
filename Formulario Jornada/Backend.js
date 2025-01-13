@@ -1,3 +1,4 @@
+var id_hoja_maestro='1o6HftjnQiU4EB1T9mwZ5FntfkZqy9Bj5wkZKbyHl-m0'
 function doGet() {
   return HtmlService.createTemplateFromFile('index').evaluate();
 }
@@ -78,7 +79,7 @@ function validarRut(rut,nombre) {
 
 // Función para obtener los cursos del profesor
 function obtener_data_profesor(rut) {
-  const idSpreadsheet = '1o6HftjnQiU4EB1T9mwZ5FntfkZqy9Bj5wkZKbyHl-m0';
+  const idSpreadsheet = id_hoja_maestro;
   const hoja_maestro = SpreadsheetApp.openById(idSpreadsheet).getSheetByName('MAESTRO');
   const data_maestro = hoja_maestro.getDataRange().getDisplayValues();
   const col_rut = obtenerNumeroDeColumna(hoja_maestro, "RUT PROFESOR 1", 1);
@@ -133,7 +134,7 @@ function guardarHorariosEnHoja(nombre, rut, horarios) {
     // Establecer el bloqueo
     scriptProperties.setProperty(lockKey, true);
     
-    const sheet = SpreadsheetApp.openById("1o6HftjnQiU4EB1T9mwZ5FntfkZqy9Bj5wkZKbyHl-m0").getSheetByName("RESPUESTAS");
+    const sheet = SpreadsheetApp.openById(id_hoja_maestro).getSheetByName("RESPUESTAS");
     const data = sheet.getDataRange().getDisplayValues();
 
     // Eliminar respuestas previas
@@ -160,7 +161,7 @@ function guardarHorariosEnHoja(nombre, rut, horarios) {
 }
 function guardarPreferenciasHoras(rut, preferencias) {
   try {
-    const hoja = SpreadsheetApp.openById("1o6HftjnQiU4EB1T9mwZ5FntfkZqy9Bj5wkZKbyHl-m0").getSheetByName("PREFERENCIAS");
+    const hoja = SpreadsheetApp.openById().getSheetByName("PREFERENCIAS");
     preferencias.forEach(preferencia => {
       hoja.appendRow([rut, ...preferencia.curso.split(" "), preferencia.preferencia, new Date()]);
     });
@@ -170,7 +171,7 @@ function guardarPreferenciasHoras(rut, preferencias) {
   }
 }
 function enviar_datos(nombre, rut, horarios, preferencias, comentarios, examenes, evaluaciones, tipos) {
-  const ss = SpreadsheetApp.openById("1o6HftjnQiU4EB1T9mwZ5FntfkZqy9Bj5wkZKbyHl-m0")
+  const ss = SpreadsheetApp.openById(id_hoja_maestro)
   const hoja = ss.getSheetByName("ENTREGADOS");
   
   if (!hoja) {
@@ -210,7 +211,7 @@ function enviar_datos(nombre, rut, horarios, preferencias, comentarios, examenes
 }
 function enviar_datos_otros(rut,comentarios,examenes,evaluaciones,tipos){
   try {
-    const hoja = SpreadsheetApp.openById("1o6HftjnQiU4EB1T9mwZ5FntfkZqy9Bj5wkZKbyHl-m0").getSheetByName("OTROS");
+    const hoja = SpreadsheetApp.openById(id_hoja_maestro).getSheetByName("OTROS");
     comentarios.forEach((preferencia,idx) => {
       hoja.appendRow([rut, ...examenes[idx].curso.split(" "), preferencia.comentario,examenes[idx].preferencia,
       evaluaciones[idx].nevaluaciones,tipos[idx].preferencia ,new Date()]);
