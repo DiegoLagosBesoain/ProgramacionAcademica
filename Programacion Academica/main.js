@@ -9,7 +9,6 @@ function onOpen() {
       ui.createMenu("Templates")
         .addItem("Crear templates", "crear_templates")
         .addItem("Extraer datos maestro", "extaer_datos_maestro")
-        .addItem("Generar visualizaciones", "visualizar")
         .addItem("Enviar maestro","actualizar_maestro")
         .addItem("Actualizar Hojas","actualizarDesplegables")
         
@@ -31,8 +30,8 @@ function onOpen() {
         .addItem("Verificar Disponibilidad profesores 5to y 6to semestre","verificar_Disponibilidad_5to_y_6to")
         .addItem("Verificar Salas Especiales 5to y 6to semestre","verificar_topes_Salas_Especiales_5to_y_6to")
         .addItem("Verificar Horarios Protegidos 5to y 6to semestre","verificar_Horarios_5to_y_6to")
-        .addItem("Verificar concentraciones 5to y 6to semestre Par", "verifica_concentraciones_5to_y_6to_primer_semestre")
-        .addItem("Verificar concentraciones 5to y 6to semestre Impar", "verifica_concentraciones_5to_y_6to_segundo_semestre")
+        .addItem("Verificar concentraciones 5to y 6to semestre Impar", "verifica_concentraciones_5to_y_6to_primer_semestre")
+        .addItem("Verificar concentraciones 5to y 6to semestre Par", "verifica_concentraciones_5to_y_6to_segundo_semestre")
         .addItem("Crear Visualizacion 5to y 6to semestre","visualizar5y6")
     )
     .addSubMenu(
@@ -40,8 +39,8 @@ function onOpen() {
         .addItem("Verificar topes mismo semestre 7mo y 8vo","verificar_topes_mismo_semestre_7mo_y_8vo")
         .addItem("Verificar Disponibilidad profesores 7mo y 8vo semestre","verificar_Disponibilidad_7mo_y_8vo")
         .addItem("Verificar Salas Especiales 7mo y 8vo semestre","verificar_topes_Salas_Especiales_7mo_y_8vo")
-        .addItem("Verificar concentraciones 7mo y 8vo semestre Par", "verifica_concentraciones_7mo_y_8vo_primer_semestre")
-        .addItem("Verificar concentraciones 7mo y 8vo semestre Impar", "verifica_concentraciones_7mo_y_8vo_segundo_semestre")
+        .addItem("Verificar concentraciones 7mo y 8vo semestre Impar", "verifica_concentraciones_7mo_y_8vo_primer_semestre")
+        .addItem("Verificar concentraciones 7mo y 8vo semestre Par", "verifica_concentraciones_7mo_y_8vo_segundo_semestre")
         .addItem("Crear Visualizacion 7mo y 8vo semestre","visualizar7y8")
     
 
@@ -113,105 +112,7 @@ function extaer_datos_maestro(){
   return bloques
 
 }
-function verificar_plan_comun(){
-  const hojasActuales = SpreadsheetApp.getActiveSpreadsheet();
-  const hoja_plan_comun = hojasActuales.getSheetByName("PLAN COMUN")
-  const hoja_5y6_comun = hojasActuales.getSheetByName("V,VI")
-  const hoja_7y8_comun = hojasActuales.getSheetByName("VII,VIII")
-  const hoja_tutulacion_comun = hojasActuales.getSheetByName("TITULACION")
-  const hoja_data_maestro = hojasActuales.getSheetByName("DATOS MAESTRO")
-  //const hoja_detalles_malla= hojasActuales.getSheetByName("DETALLES SEMESTRE")
-  //const data_detalles_malla = hoja_detalles_malla.getDataRange().getDisplayValues()
-  
-  const bloques = obtenerBloquesPorHoraYDia(hoja_plan_comun,hoja_data_maestro)
-  const bloques4y5 = obtenerBloquesPorHoraYDia(hoja_5y6_comun,hoja_data_maestro)
-  const bloques5y6 = obtenerBloquesPorHoraYDia(hoja_7y8_comun,hoja_data_maestro)
-  const bloques7y8 = obtenerBloquesPorHoraYDia(hoja_tutulacion_comun,hoja_data_maestro)
-  Logger.log("bloques creados")
-  const topes=obtener_topes_semestre(bloques)
-  
-  pintarCeldasConComentario(hoja_plan_comun,topes,"TOPE MISMO SEMESTRE")
 
-  const topes_horario_protegido=obtener_topes_horario_protegido(bloques)
-  pintarCeldasConComentario(hoja_plan_comun,topes_horario_protegido,"PROGRAMADO EN HORARIO PROTEGIDO")
-  const topes_sala_especial = obtener_topes_sala_especial(bloques)
-
-  pintarCeldasConComentario(hoja_plan_comun,topes_sala_especial,"MISMA SALA ESPECIAL EN USO PARA DIFERENTES SECCIONES")
-  const topes_sala_esoacial_otras_hojas = obtener_topes_sala_especial_otras_hojas( bloques,bloques4y5,bloques5y6,bloques7y8)
-  console.log(topes_sala_esoacial_otras_hojas)
-  pintarCeldasConComentario(hoja_plan_comun,topes_sala_esoacial_otras_hojas,"SALA ESPECIAL YA ASIGNADA EN ESTE BLOQUE DE HORARIO")
-  const topes_disponibilidad_profesores = obtener_topes_disponibilidad_profesores(bloques,bloques4y5,bloques5y6,bloques7y8)
-  pintarCeldasConComentario(hoja_plan_comun,topes_disponibilidad_profesores[0],"BLOQUE DE HORARIO YA ASIGNADO AL PROFESOR")
-  pintarCeldasConComentario(hoja_plan_comun,topes_disponibilidad_profesores[1],"HORARIO FUERA DE LA DISPONIBILIADAD DEL PROFESOR")
-
-}
-function verificar_5_6(){
-
-  const hojasActuales = SpreadsheetApp.getActiveSpreadsheet();
-  const hoja_plan_comun = hojasActuales.getSheetByName("PLAN COMUN")
-  const hoja_5y6_comun = hojasActuales.getSheetByName("V,VI")
-  const hoja_7y8_comun = hojasActuales.getSheetByName("VII,VIII")
-  const hoja_tutulacion_comun = hojasActuales.getSheetByName("TITULACION")
-  const hoja_data_maestro = hojasActuales.getSheetByName("DATOS MAESTRO")
-  const hoja_detalles_malla= hojasActuales.getSheetByName("DETALLES SEMESTRE")
-  //const data_detalles_malla = hoja_detalles_malla.getDataRange().getDisplayValues() 
- 
-  const bloques = obtenerBloquesPorHoraYDia(hoja_plan_comun,hoja_data_maestro)
-  const bloques4y5 = obtenerBloquesPorHoraYDia(hoja_5y6_comun,hoja_data_maestro)//estan mal los numeros pero se entiende la diferencia
-  const bloques5y6 = obtenerBloquesPorHoraYDia(hoja_7y8_comun,hoja_data_maestro)
-  const bloques7y8 = obtenerBloquesPorHoraYDia(hoja_tutulacion_comun,hoja_data_maestro)
-  Logger.log("bloques creados",bloques4y5)
-  const topes=obtener_topes_semestre(bloques4y5)
-  pintarCeldasConComentario(hoja_5y6_comun,topes,"TOPE MISMO SEMESTRE")
-
-  const topes_sala_especial = obtener_topes_sala_especial(bloques4y5)
-
-  pintarCeldasConComentario(hoja_5y6_comun,topes_sala_especial,"MISMA SALA ESPECIAL EN USO PARA DIFERENTES SECCIONES")
-  const topes_disponibilidad_profesores = obtener_topes_disponibilidad_profesores(bloques4y5,bloques,bloques5y6,bloques7y8)
-  pintarCeldasConComentario(hoja_5y6_comun,topes_disponibilidad_profesores[0],"BLOQUE DE HORARIO YA ASIGNADO AL PROFESOR")
-  pintarCeldasConComentario(hoja_5y6_comun,topes_disponibilidad_profesores[1],"HORARIO FUERA DE LA DISPONIBILIADAD DEL PROFESOR")
-  console.log("preparando nuevos bloques")
-  //const bloques4y5_con_detalles= agregar_detalles(bloques4y5,data_detalles_malla)
-  
-  //console.log(bloques4y5_con_detalles)
-
-  
-
-
-
-
-  
-}
-function visualizar(){
-  const hojasActuales = SpreadsheetApp.getActiveSpreadsheet();
-  const hoja_plan_comun = hojasActuales.getSheetByName("PLAN COMUN")
-  const hoja_5y6_comun = hojasActuales.getSheetByName("V,VI")
-  const hoja_7y8_comun = hojasActuales.getSheetByName("VII,VIII")
-  const hoja_tutulacion_comun = hojasActuales.getSheetByName("TITULACION")
-  const hoja_data_maestro = hojasActuales.getSheetByName("DATOS MAESTRO")
-  const bloques_plan_comun = obtenerBloquesPorHoraYDia_sin_transformar(hoja_plan_comun,hoja_data_maestro)
-  const bloques4y5 = obtenerBloquesPorHoraYDia_sin_transformar(hoja_5y6_comun,hoja_data_maestro)//estan mal los numeros pero se entiende la diferencia
-  const bloques5y6 = obtenerBloquesPorHoraYDia_sin_transformar(hoja_7y8_comun,hoja_data_maestro)
-  const bloques7y8 = obtenerBloquesPorHoraYDia_sin_transformar(hoja_tutulacion_comun,hoja_data_maestro)
-  Logger.log("bloques plan comun",bloques_plan_comun)
-  const agrupacion_plan_comun = agruparSecciones(bloques_plan_comun)
-  const agrupacion_5y6 = agruparSecciones(bloques4y5)
-  const agrupacion_7y8 = agruparSecciones(bloques5y6)
-  const agrupacion_titulacion = agruparSecciones(bloques7y8)
-  console.log(agrupacion_plan_comun)
-  let hoja=crear_hoja_nombre("PLAN COMUN VISUALIZACION",hojasActuales)
-  escribirEnHojaAgrupacion(agrupacion_plan_comun,hoja)
-  hoja=crear_hoja_nombre("V,VI VISUALIZACION",hojasActuales)
-  escribirEnHojaAgrupacion(agrupacion_5y6,hoja)
-  hoja=crear_hoja_nombre("VII,VIII VISUALIZACION",hojasActuales)
-  escribirEnHojaAgrupacion(agrupacion_7y8,hoja)
-  hoja=crear_hoja_nombre("TITULACION VISUALIZACION",hojasActuales)
-  escribirEnHojaAgrupacion(agrupacion_titulacion,hoja)
-  
-
-
-
-}
 function verifica_concentraciones_5to_y_6to_primer_semestre(){
 const hojasActuales = SpreadsheetApp.getActiveSpreadsheet();
 const hoja_5y6_comun = hojasActuales.getSheetByName("V,VI")
@@ -222,9 +123,8 @@ const data_detalles_malla = hoja_detalles_malla.getDataRange().getDisplayValues(
 const data_maestro=hoja_data_maestro.getDataRange().getDisplayValues()
 const data_maestro_con_detalles=data_maestro.map((elemento,idx)=>elemento.concat(data_detalles_malla[idx]))
 const bloques4y5_con_detalles= agregar_detalles(bloques4y5,data_detalles_malla)
-console.log(bloques4y5_con_detalles)
 const topes_concentraciones=obtener_topes_concentraciones_primer_semestre(bloques4y5_con_detalles)
-console.log(topes_concentraciones)
+
 limpiarBackgroundsYComentarios(hoja_5y6_comun,2,2,"CONCENTRACION TOPANDO CON RAMOS DEL SEMESTRE",data_maestro_con_detalles)
 pintarCeldasConComentario(hoja_5y6_comun,topes_concentraciones,"CONCENTRACION TOPANDO CON RAMOS DEL SEMESTRE")
 
@@ -248,35 +148,7 @@ const topes_concentraciones=obtener_topes_concentraciones_segundo_semestre(bloqu
 pintarCeldasConComentario(hoja_5y6_comun,topes_concentraciones,"CONCENTRACION TOPANDO CON RAMOS DEL SEMESTRE")
 
 }
-function verificar_7_8(){
-  const hojasActuales = SpreadsheetApp.getActiveSpreadsheet();
-  const hoja_plan_comun = hojasActuales.getSheetByName("PLAN COMUN")
-  const hoja_5y6_comun = hojasActuales.getSheetByName("V,VI")
-  const hoja_7y8_comun = hojasActuales.getSheetByName("VII,VIII")
-  const hoja_tutulacion_comun = hojasActuales.getSheetByName("TITULACION")
-  const hoja_data_maestro = hojasActuales.getSheetByName("DATOS MAESTRO")
-  const hoja_detalles_malla= hojasActuales.getSheetByName("DETALLES SEMESTRE")
-  //const data_detalles_malla = hoja_detalles_malla.getDataRange().getDisplayValues() 
- 
-  const bloques = obtenerBloquesPorHoraYDia(hoja_plan_comun,hoja_data_maestro)
-  const bloques4y5 = obtenerBloquesPorHoraYDia(hoja_5y6_comun,hoja_data_maestro)//estan mal los numeros pero se entiende la diferencia
-  const bloques5y6 = obtenerBloquesPorHoraYDia(hoja_7y8_comun,hoja_data_maestro)
-  const bloques7y8 = obtenerBloquesPorHoraYDia(hoja_tutulacion_comun,hoja_data_maestro)
-  Logger.log("bloques creados",bloques7y8)
-  const topes=obtener_topes_semestre(bloques7y8)
-  pintarCeldasConComentario(hoja_7y8_comun,topes,"TOPE MISMO SEMESTRE")
 
-  const topes_sala_especial = obtener_topes_sala_especial(bloques7y8)
-
-  pintarCeldasConComentario(hoja_7y8_comun,topes_sala_especial,"MISMA SALA ESPECIAL EN USO PARA DIFERENTES SECCIONES")
-  const topes_disponibilidad_profesores = obtener_topes_disponibilidad_profesores(bloques5y6,bloques4y5,bloques,bloques7y8)
-  pintarCeldasConComentario(hoja_7y8_comun,topes_disponibilidad_profesores[0],"BLOQUE DE HORARIO YA ASIGNADO AL PROFESOR")
-  pintarCeldasConComentario(hoja_7y8_comun,topes_disponibilidad_profesores[1],"HORARIO FUERA DE LA DISPONIBILIADAD DEL PROFESOR")
-  console.log("preparando nuevos bloques")
-  //const bloques4y5_con_detalles= agregar_detalles(bloques4y5,data_detalles_malla)
-  
-  //console.log(bloques4y5_con_detalles)
-}
 function verifica_concentraciones_7mo_y_8vo_primer_semestre(){
 const hojasActuales = SpreadsheetApp.getActiveSpreadsheet();
 const hoja_5y6_comun = hojasActuales.getSheetByName("VII,VIII")
@@ -314,35 +186,7 @@ limpiarBackgroundsYComentarios(hoja_5y6_comun,2,2,"CONCENTRACION TOPANDO CON RAM
 pintarCeldasConComentario(hoja_5y6_comun,topes_concentraciones,"CONCENTRACION TOPANDO CON RAMOS DEL SEMESTRE")
 
 }
-function verificar_titulacion(){
-  const hojasActuales = SpreadsheetApp.getActiveSpreadsheet();
-  const hoja_plan_comun = hojasActuales.getSheetByName("PLAN COMUN")
-  const hoja_5y6_comun = hojasActuales.getSheetByName("V,VI")
-  const hoja_7y8_comun = hojasActuales.getSheetByName("VII,VIII")
-  const hoja_tutulacion_comun = hojasActuales.getSheetByName("TITULACION")
-  const hoja_data_maestro = hojasActuales.getSheetByName("DATOS MAESTRO")
-  const hoja_detalles_malla= hojasActuales.getSheetByName("DETALLES SEMESTRE")
-  //const data_detalles_malla = hoja_detalles_malla.getDataRange().getDisplayValues() 
- 
-  const bloques = obtenerBloquesPorHoraYDia(hoja_plan_comun,hoja_data_maestro)
-  const bloques4y5 = obtenerBloquesPorHoraYDia(hoja_5y6_comun,hoja_data_maestro)//estan mal los numeros pero se entiende la diferencia
-  const bloques5y6 = obtenerBloquesPorHoraYDia(hoja_7y8_comun,hoja_data_maestro)
-  const bloques7y8 = obtenerBloquesPorHoraYDia(hoja_tutulacion_comun,hoja_data_maestro)
-  Logger.log("bloques creados",bloques7y8)
-  const topes=obtener_topes_semestre(bloques7y8)
-  pintarCeldasConComentario(hoja_tutulacion_comun,topes,"TOPE MISMO SEMESTRE")
 
-  const topes_sala_especial = obtener_topes_sala_especial(bloques7y8)
-
-  pintarCeldasConComentario(hoja_tutulacion_comun,topes_sala_especial,"MISMA SALA ESPECIAL EN USO PARA DIFERENTES SECCIONES")
-  const topes_disponibilidad_profesores = obtener_topes_disponibilidad_profesores(bloques7y8,bloques5y6,bloques4y5,bloques)
-  pintarCeldasConComentario(hoja_tutulacion_comun,topes_disponibilidad_profesores[0],"BLOQUE DE HORARIO YA ASIGNADO AL PROFESOR")
-  pintarCeldasConComentario(hoja_tutulacion_comun,topes_disponibilidad_profesores[1],"HORARIO FUERA DE LA DISPONIBILIADAD DEL PROFESOR")
-  console.log("preparando nuevos bloques")
-  //const bloques4y5_con_detalles= agregar_detalles(bloques4y5,data_detalles_malla)
-  
-  //console.log(bloques4y5_con_detalles)
-}
 function verificar_topes_mismo_semestre_plan_comun(){
 const hojasActuales = SpreadsheetApp.getActiveSpreadsheet();
 
@@ -414,21 +258,32 @@ const hoja_plan_comun = hojasActuales.getSheetByName("PLAN COMUN")
 const hoja_5y6_comun = hojasActuales.getSheetByName("V,VI")
 const hoja_7y8_comun = hojasActuales.getSheetByName("VII,VIII")
 const hoja_tutulacion_comun = hojasActuales.getSheetByName("TITULACION")
-const bloques4y5 = obtenerBloquesPorHoraYDia(hoja_5y6_comun,hoja_data_maestro)//estan mal los numeros pero se entiende la diferencia
-const bloques5y6 = obtenerBloquesPorHoraYDia(hoja_7y8_comun,hoja_data_maestro)
-const bloques7y8 = obtenerBloquesPorHoraYDia(hoja_tutulacion_comun,hoja_data_maestro)
 const bloques = obtenerBloquesPorHoraYDia(hoja_plan_comun,hoja_data_maestro)
+console.log("bloques paln comun creados",bloques)
+const bloques4y5 = obtenerBloquesPorHoraYDia(hoja_5y6_comun,hoja_data_maestro)//estan mal los numeros pero se entiende la diferencia
+console.log("bloques 5y6 creados")
+const bloques5y6 = obtenerBloquesPorHoraYDia(hoja_7y8_comun,hoja_data_maestro)
+console.log("bloques 7y8 comun creados")
+const bloques7y8 = obtenerBloquesPorHoraYDia(hoja_tutulacion_comun,hoja_data_maestro)
+console.log("bloques titulacion comun creados")
+
+
+
+
+const topes_sala_especial = obtener_topes_sala_especial(bloques)
+console.log("topes encontrados: ",topes_sala_especial)
+
+const topes_sala_esoacial_otras_hojas = obtener_topes_sala_especial_otras_hojas(bloques,bloques4y5,bloques5y6,bloques7y8)
+
+
 const hoja_detalles_malla= hojasActuales.getSheetByName("DETALLES SEMESTRE")
 const data_detalles_malla = hoja_detalles_malla.getDataRange().getDisplayValues()
 const data_maestro=hoja_data_maestro.getDataRange().getDisplayValues()
 const data_maestro_con_detalles=data_maestro.map((elemento,idx)=>elemento.concat(data_detalles_malla[idx]))
-console.log(data_maestro_con_detalles)
+
 limpiarBackgroundsYComentarios(hoja_plan_comun,2,2,"SALA ESPECIAL YA ASIGNADA EN ESTE BLOQUE DE HORARIO EN OTRA HOJA",data_maestro_con_detalles)
 limpiarBackgroundsYComentarios(hoja_plan_comun,2,2,"MISMA SALA ESPECIAL EN USO PARA DIFERENTES SECCIONES",data_maestro_con_detalles)
-const topes_sala_especial = obtener_topes_sala_especial(bloques)
 pintarCeldasConComentario(hoja_plan_comun,topes_sala_especial,"MISMA SALA ESPECIAL EN USO PARA DIFERENTES SECCIONES")
-const topes_sala_esoacial_otras_hojas = obtener_topes_sala_especial_otras_hojas( bloques,bloques4y5,bloques5y6,bloques7y8)
-console.log(topes_sala_esoacial_otras_hojas)
 pintarCeldasConComentario(hoja_plan_comun,topes_sala_esoacial_otras_hojas,"SALA ESPECIAL YA ASIGNADA EN ESTE BLOQUE DE HORARIO EN OTRA HOJA")
 }
 

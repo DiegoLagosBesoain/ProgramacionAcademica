@@ -154,6 +154,7 @@ function obtener_topes_semestre(bloques){
 }
 function obtener_topes_semestre_nuevo(bloques){
   let topes = []
+  let filas_avanzadas=0
   Object.keys(bloques).forEach((hora,idx2)=>{
     Object.keys(bloques[hora]).forEach((dia,idx)=>{
 
@@ -165,14 +166,14 @@ function obtener_topes_semestre_nuevo(bloques){
       let columna=idx+2;
       
       indices.forEach((indice)=>{
-      topes.push([2+indice+idx2*10,columna])   
+      topes.push([2+indice+filas_avanzadas,columna])   
         
     })
 
 
 
     })
-
+    filas_avanzadas=filas_avanzadas+bloques[hora]["Lunes"].length
 
 
 
@@ -186,6 +187,7 @@ function obtener_topes_semestre_nuevo(bloques){
 }
 function obtener_topes_horario_protegido(bloques){
   let topes = []
+  let filas_avanzadas=0
   Object.keys(bloques).forEach((hora,idx2)=>{
     Object.keys(bloques[hora]).forEach((dia,idx)=>{
       
@@ -197,20 +199,27 @@ function obtener_topes_horario_protegido(bloques){
       if(Number(curso[7])>1&&Number(curso[7])<5){
         if(hora=="18:30-19:20"||hora=="17:30-18:20"){
           if(dia=="Martes"){
-            topes.push([2+indice+idx2*10,columna])
+            topes.push([2+indice+filas_avanzadas,columna])
           }
 
         }
         if(hora=="10:30-11:20"||hora=="11:30-12:20"){
           if(dia=="Viernes"){
-            topes.push([2+indice+idx2*10,columna])
+            topes.push([2+indice+filas_avanzadas,columna])
           }
 
         }
+        if(hora=="18:30-19:20"||hora=="17:30-18:20"){
+          if(dia=="Miércoles"){
+            topes.push([2+indice+filas_avanzadas,columna])
+          }
+
+        }
+        
       }
       if(hora=="12:30-13:20"&&entrada!=" "){
           if(dia=="Viernes"){
-            topes.push([2+indice+idx2*10,columna])
+            topes.push([2+indice+filas_avanzadas,columna])
           }
       }
       
@@ -219,7 +228,7 @@ function obtener_topes_horario_protegido(bloques){
          
         
     })
-
+    filas_avanzadas=filas_avanzadas+bloques[hora]["Lunes"].length
 
 
     })
@@ -231,6 +240,7 @@ function obtener_topes_horario_protegido(bloques){
 }
 function obtener_topes_horario_protegido_5_y_6(bloques){
   let topes = []
+  let filas_avanzadas=0
   Object.keys(bloques).forEach((hora,idx2)=>{
     Object.keys(bloques[hora]).forEach((dia,idx)=>{
       
@@ -242,13 +252,19 @@ function obtener_topes_horario_protegido_5_y_6(bloques){
       if(curso.slice(-7).includes("5")){
         if(hora=="18:30-19:20"||hora=="17:30-18:20"){
           if(dia=="Martes"){
-            topes.push([2+indice+idx2*10,columna])
+            topes.push([2+indice+filas_avanzadas,columna])
           }
 
         }
         if(hora=="10:30-11:20"||hora=="11:30-12:20"){
           if(dia=="Viernes"){
-            topes.push([2+indice+idx2*10,columna])
+            topes.push([2+indice+filas_avanzadas,columna])
+          }
+
+        }
+        if(hora=="18:30-19:20"||hora=="17:30-18:20"){
+          if(dia=="Miércoles"){
+            topes.push([2+indice+filas_avanzadas,columna])
           }
 
         }
@@ -257,7 +273,7 @@ function obtener_topes_horario_protegido_5_y_6(bloques){
       if(hora=="12:30-13:20"&&entrada!=" "){
           console.log("entrada: ",curso)
           if(dia=="Viernes"){
-            topes.push([2+indice+idx2*10,columna])
+            topes.push([2+indice+filas_avanzadas,columna])
           }
       }
       
@@ -266,7 +282,7 @@ function obtener_topes_horario_protegido_5_y_6(bloques){
          
         
     })
-
+    filas_avanzadas=filas_avanzadas+bloques[hora]["Lunes"].length
 
 
     })
@@ -276,8 +292,10 @@ function obtener_topes_horario_protegido_5_y_6(bloques){
   return topes
 
 }
+//Quizas sea bueno cambiar la logica
 function obtener_topes_sala_especial(bloques){
   let topes = []
+  let filas_avanzadas=0
   Object.keys(bloques).forEach((hora,idx2)=>{
     Object.keys(bloques[hora]).forEach((dia,idx)=>{
       
@@ -294,7 +312,7 @@ function obtener_topes_sala_especial(bloques){
         
         indices=[...new Set(indices)]
         indices.forEach((indice)=>{
-        topes.push([2+indice+idx2*10,columna])}) 
+        topes.push([2+indice+filas_avanzadas,columna])}) 
 
 
 
@@ -303,7 +321,7 @@ function obtener_topes_sala_especial(bloques){
          
         
     })
-
+     filas_avanzadas=filas_avanzadas+bloques[hora]["Lunes"].length
 
 
     })
@@ -315,6 +333,7 @@ function obtener_topes_sala_especial(bloques){
 }
 function obtener_topes_sala_especial_otras_hojas(bloques,bloques1,bloques2,bloques3){
   let topes = []
+  let filas_avanzadas=0
   Object.keys(bloques).forEach((hora,idx2)=>{
     Object.keys(bloques[hora]).forEach((dia,idx)=>{
       
@@ -325,7 +344,7 @@ function obtener_topes_sala_especial_otras_hojas(bloques,bloques1,bloques2,bloqu
         if (seccion!=""&&(curso[6]=="LAB/TALLER"||curso[6]=="AYUD")&&curso[5]!=""){
           console.log("ayudantia o lab encontrado",curso)
           if(revisar_otras_hojas_salas(bloques1[hora][dia],bloques2[hora][dia],bloques3[hora][dia],curso[5])){
-            topes.push([2+indice+idx2*10,columna])
+            topes.push([2+indice+filas_avanzadas,columna])
 
           }
 
@@ -337,12 +356,14 @@ function obtener_topes_sala_especial_otras_hojas(bloques,bloques1,bloques2,bloqu
       
               
     })
+    filas_avanzadas=filas_avanzadas+bloques[hora]["Lunes"].length
     })
   return topes
 
 }
 function obtener_topes_concentraciones_primer_semestre(bloques){
   let topes = []
+  let filas_avanzadas=0
   Object.keys(bloques).forEach((hora,idx2)=>{
     Object.keys(bloques[hora]).forEach((dia,idx)=>{
       let columna = idx+2;
@@ -351,7 +372,7 @@ function obtener_topes_concentraciones_primer_semestre(bloques){
       
       if(curso[20] != "" &&curso[20]!=undefined){
         let semestre_de_concentracion=curso[20]
-        console.log(semestre_de_concentracion,curso)
+        
         if(semestre_de_concentracion.length===2){
         semestre_de_concentracion=semestre_de_concentracion[0]
         }
@@ -359,8 +380,8 @@ function obtener_topes_concentraciones_primer_semestre(bloques){
         let bloque_filtrado=bloques[hora][dia].filter((seccion)=>seccion.split(" ")[0]!=curso[0])
         let columnasPermitidas=buscar_columnas_permitidas(semestre_de_concentracion,curso.slice(-7,-1))
         if(analizar_bloques_concentraciones(semestre_de_concentracion,bloque_filtrado,columnasPermitidas)){
-          console.log("concentracion mal asignada",curso)
-          topes.push([2+indice+idx2*10,columna])
+          console.log("concentracion mal asignada:",curso)
+          topes.push([2+indice+filas_avanzadas,columna])
         }
 
         }
@@ -376,7 +397,7 @@ function obtener_topes_concentraciones_primer_semestre(bloques){
          
         
     })
-    
+    filas_avanzadas=filas_avanzadas+bloques[hora]["Lunes"].length
   })
   
   return topes
@@ -384,6 +405,7 @@ function obtener_topes_concentraciones_primer_semestre(bloques){
 }
 function obtener_topes_concentraciones_segundo_semestre(bloques){
   let topes = []
+  let filas_avanzadas=0
   Object.keys(bloques).forEach((hora,idx2)=>{
     Object.keys(bloques[hora]).forEach((dia,idx)=>{
       let columna = idx+2;
@@ -392,17 +414,17 @@ function obtener_topes_concentraciones_segundo_semestre(bloques){
       
       if(curso[20] != "" &&curso[20]!=undefined){
         let semestre_de_concentracion=curso[20]
-        console.log(semestre_de_concentracion,curso)
+        
         if(semestre_de_concentracion.length===2){
         semestre_de_concentracion=semestre_de_concentracion[0]
         }
         if(Number(semestre_de_concentracion)%2==0){
         let bloque_filtrado=bloques[hora][dia].filter((seccion)=>seccion.split(" ")[0]!=curso[0])
         let columnasPermitidas=buscar_columnas_permitidas(semestre_de_concentracion,curso.slice(-7,-1))
-        console.log(curso,columnasPermitidas)
+        
         if(analizar_bloques_concentraciones(semestre_de_concentracion,bloque_filtrado,columnasPermitidas)){
-          console.log("concentracion mal asignada",curso)
-          topes.push([2+indice+idx2*10,columna])
+          
+          topes.push([2+indice+filas_avanzadas,columna])
         }
 
         }
@@ -416,7 +438,7 @@ function obtener_topes_concentraciones_segundo_semestre(bloques){
          
         
     })
-    
+    filas_avanzadas=filas_avanzadas+bloques[hora]["Lunes"].length
   })
   
   return topes
@@ -427,6 +449,7 @@ function obtener_topes_disponibilidad_profesores(bloques,bloques5y6,bloques7y8,b
   let topes_disponibilidad=[]
   let topes_bloque_ya_asignado=[]
   let horarios_usados = {}
+  let filas_avanzadas=0
   Object.keys(bloques).forEach((hora,idx2)=>{
     horarios_usados[hora]={}
     Object.keys(bloques[hora]).forEach((dia,idx)=>{
@@ -442,16 +465,16 @@ function obtener_topes_disponibilidad_profesores(bloques,bloques5y6,bloques7y8,b
         if(dia=="Lunes"){
             
             if(revisar_otras_hojas(bloques5y6[hora][dia],bloques7y8[hora][dia],bloques_titulacion[hora][dia],curso[3])){
-              topes_bloque_ya_asignado.push([2+indice+idx2*10,columna])
+              topes_bloque_ya_asignado.push([2+indice+filas_avanzadas,columna])
               
 
 
             }
             if(!curso[8].includes(hora)&&curso[6]!="LAB/TALLER"){
-              topes_disponibilidad.push([2+indice+idx2*10,columna])
+              topes_disponibilidad.push([2+indice+filas_avanzadas,columna])
             }
             if(existe_rut_bloque(bloques[hora][dia].filter((elemento)=>elemento!=entrada),curso[3])){//ese horario ya se ocupo para ese profesor
-              topes_bloque_ya_asignado.push([2+indice+idx2*10,columna])
+              topes_bloque_ya_asignado.push([2+indice+filas_avanzadas,columna])
             }
             
 
@@ -461,17 +484,17 @@ function obtener_topes_disponibilidad_profesores(bloques,bloques5y6,bloques7y8,b
         }
         if(dia=="Martes"){
             if(revisar_otras_hojas(bloques5y6[hora][dia],bloques7y8[hora][dia],bloques_titulacion[hora][dia],curso[3])){
-              topes_bloque_ya_asignado.push([2+indice+idx2*10,columna])
+              topes_bloque_ya_asignado.push([2+indice+filas_avanzadas,columna])
               
 
 
             }          
           
             if(!curso[9].includes(hora)&&curso[6]!="LAB/TALLER"){
-              topes_disponibilidad.push([2+indice+idx2*10,columna])
+              topes_disponibilidad.push([2+indice+filas_avanzadas,columna])
             }
             if(existe_rut_bloque(bloques[hora][dia].filter((elemento)=>elemento!=entrada),curso[3])){//ese horario ya se ocupo para ese profesor
-              topes_bloque_ya_asignado.push([2+indice+idx2*10,columna])
+              topes_bloque_ya_asignado.push([2+indice+filas_avanzadas,columna])
             }
             
           
@@ -479,16 +502,16 @@ function obtener_topes_disponibilidad_profesores(bloques,bloques5y6,bloques7y8,b
         }
         if(dia=="Miercoles"){
             if(revisar_otras_hojas(bloques5y6[hora][dia],bloques7y8[hora][dia],bloques_titulacion[hora][dia],curso[3])){
-              topes_bloque_ya_asignado.push([2+indice+idx2*10,columna])
+              topes_bloque_ya_asignado.push([2+indice+filas_avanzadas,columna])
               
 
 
             }          
             if(!curso[10].includes(hora)&&curso[6]!="LAB/TALLER"){
-              topes_disponibilidad.push([2+indice+idx2*10,columna])
+              topes_disponibilidad.push([2+indice+filas_avanzadas,columna])
             }
             if(existe_rut_bloque(bloques[hora][dia].filter((elemento)=>elemento!=entrada),curso[3])){//ese horario ya se ocupo para ese profesor
-              topes_bloque_ya_asignado.push([2+indice+idx2*10,columna])
+              topes_bloque_ya_asignado.push([2+indice+filas_avanzadas,columna])
             }
             
           
@@ -496,16 +519,16 @@ function obtener_topes_disponibilidad_profesores(bloques,bloques5y6,bloques7y8,b
         }
         if(dia=="Jueves"){
             if(revisar_otras_hojas(bloques5y6[hora][dia],bloques7y8[hora][dia],bloques_titulacion[hora][dia],curso[3])){
-              topes_bloque_ya_asignado.push([2+indice+idx2*10,columna])
+              topes_bloque_ya_asignado.push([2+indice+filas_avanzadas,columna])
               
 
 
             }          
             if(!curso[11].includes(hora)&&curso[6]!="LAB/TALLER"){
-              topes_disponibilidad.push([2+indice+idx2*10,columna])
+              topes_disponibilidad.push([2+indice+filas_avanzadas,columna])
             }
             if(existe_rut_bloque(bloques[hora][dia].filter((elemento)=>elemento!=entrada),curso[3])){//ese horario ya se ocupo para ese profesor
-              topes_bloque_ya_asignado.push([2+indice+idx2*10,columna])
+              topes_bloque_ya_asignado.push([2+indice+filas_avanzadas,columna])
             }
             
           
@@ -513,16 +536,16 @@ function obtener_topes_disponibilidad_profesores(bloques,bloques5y6,bloques7y8,b
         }
         if(dia=="Viernes"){
             if(revisar_otras_hojas(bloques5y6[hora][dia],bloques7y8[hora][dia],bloques_titulacion[hora][dia],curso[3])){
-              topes_bloque_ya_asignado.push([2+indice+idx2*10,columna])
+              topes_bloque_ya_asignado.push([2+indice+filas_avanzadas,columna])
               
 
 
             }          
             if(!curso[12].includes(hora)&&curso[6]!="LAB/TALLER"){
-              topes_disponibilidad.push([2+indice+idx2*10,columna])
+              topes_disponibilidad.push([2+indice+filas_avanzadas,columna])
             }
             if(existe_rut_bloque(bloques[hora][dia].filter((elemento)=>elemento!=entrada),curso[3])){//ese horario ya se ocupo para ese profesor
-              topes_bloque_ya_asignado.push([2+indice+idx2*10,columna])
+              topes_bloque_ya_asignado.push([2+indice+filas_avanzadas,columna])
             }
             
           
@@ -537,7 +560,7 @@ function obtener_topes_disponibilidad_profesores(bloques,bloques5y6,bloques7y8,b
         
     })
 
-
+    filas_avanzadas=filas_avanzadas+bloques[hora]["Lunes"].length
 
     })
 

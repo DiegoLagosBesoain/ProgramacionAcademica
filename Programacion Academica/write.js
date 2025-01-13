@@ -298,7 +298,7 @@ function crear_calendario(hoja,opcionesLista) {
  }
  function limpiarBackgroundsYComentarios(sheet, startRow, startCol, substringObjetivo,data_maestro_con_detalles) {
    // Obtener el rango desde la fila y columna especificadas hasta el final de la hoja
-   console.log("dentro de la escritura",data_maestro_con_detalles)
+   
    const lastRow = sheet.getLastRow();
    const lastCol = sheet.getLastColumn();
    const range = sheet.getRange(startRow, startCol, lastRow - startRow + 1, lastCol - startCol + 1);
