@@ -41,6 +41,16 @@ Está diseñado para usarse en el entorno de Google Sheets, utilizando Google Ap
 ## CalendarioHorario
 ### Descripción
 Este programa se dedica a la craion y asignacion de horarios para cada tipod e reunion existente en cada asginatura para cada seccion, el programa se centre en la deteccion de restricciones presentes en al programacion de horarios para mas detalles de las restricciones visitar [la documentacion ](https://docs.google.com/document/d/18BQm9B1-aJW8mY22hJDP9fxbyFzg-mBxT-zZ_NI6Zqc/edit?tab=t.0) admeas actualiza automaticamente el maestro con los horarios asignados, adicionalemnte tien un sistema de visualizaciones y sistemas de colores para mejorar la comprension
+### Requisitos
+
+- Acceso a una cuenta de Google.
+- Permisos para modificar Google Sheets a través de Google Apps Script de las diferentes hojas.
+- Un archivo de hoja de cálculo de Google Sheets con las plantillas y datos necesarios:
+    1. Hoja `DATOS MAESTRO` vacia
+    2. Hoja `DETALLES SEMESTRE` vacia
+    3.  Hoja `SALAS ESPECIALES` con una columna de lista que se se usara como desplegable para als salas especiales
+   
+- Carpeta Hoja maestro creada y que el usuario que esta usando este programa tenga acceso de edicion a ella
     
 
 
