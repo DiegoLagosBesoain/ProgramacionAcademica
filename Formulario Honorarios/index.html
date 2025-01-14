@@ -11,14 +11,14 @@
       <!-- Pregunta 1: Nombre -->
       <div id="pregunta1">
         <p>¿Cuál es tu nombre?</p>
-        <input class="response-input" type="text" id="nombre" placeholder="Escribe tu nombre" />
+        <input class="response-input" type="text" id="nombre" placeholder="Escriba su nombre" />
         <button class="submit-btn" onclick="validarNombre()">Siguiente</button>
       </div>
 
       <!-- Pregunta 2: Rut -->
       <div id="pregunta2" style="display: none;">
         <p id="mensajeRut"></p>
-        <input class="response-input" type="text" id="rut" placeholder="Escribe tu RUT" />
+        <input class="response-input" type="text" id="rut" placeholder="Escriba su RUT" />
         <button class="submit-btn" onclick="validarRut()">Siguiente</button>
       </div>
 
@@ -39,7 +39,7 @@
 
       <!-- Pregunta 4: Selección de horarios -->
       <div id="pregunta4" style="display: none;">
-        <p>Selecciona tus horarios disponibles, sea consciente a la hora de responder:</p>
+        <p>Por favor seleccionar los horarios disponibles,haciendo click en casilla de horario</p>
         <div id="calendario" class="calendario">
           <!-- El calendario será generado dinámicamente -->
         </div>
@@ -47,19 +47,19 @@
       </div>
       <!-- Pregunta Abierta -->
       <div id="preguntaAbierta" style="display: none;">
-        <h3>Esta es una seccicon de comentarios para cada curso</h3>
+        <h3>Esta es una sección de comentarios para cada curso</h3>
         <div id="contenedor-comentarios"></div>
         <button class="submit-btn" onclick="cambiarPregunta('preguntaAbierta', 'preguntaTipo')">Regresar</button>
         <button class="submit-btn" onclick="validar_pregunta_abierta()">FINALIZAR</button>
       </div>
       <div id="preguntaExamen" style="display: none;">
-        <h3>Elija si prefiere examen programado por facultad para los siguientes cursos: </h3>
+        <h3>Seleccione si prefiere que la Facultad examen programe el examen para los siguientes cursos: </h3>
         <div id="contenedor-examen"></div>
         <button class="submit-btn" onclick="cambiarPregunta('preguntaExamen', 'pregunta4')">Regresar</button>
         <button class="submit-btn" onclick="validar_pregunta_examen()">Continuar</button>
       </div>
       <div id="preguntaEvaluaciones" style="display: none;">
-        <h3>Elija la cantiad de Evaluaciones(sin contar el examen) prefiere realizar: </h3>
+        <h3>Seleccione la cantiad de evaluaciones (sin contar examen) que desea que la facultad programe. Esta información sera validada con el cooridnador de área: </h3>
         <div id="contenedor-evaluaciones"></div>
         <button class="submit-btn" onclick="cambiarPregunta('preguntaEvaluaciones', 'preguntaExamen')">Regresar</button>
         <button class="submit-btn" onclick="validar_pregunta_Evaluaciones()">Continuar</button>
@@ -74,12 +74,12 @@
 
       <!-- Pregunta final -->
       <div id="preguntafinal" style="display: none;">
-        <p>Muchas gracias por su respuesta, es de mucha ayuda para elaborar la programación académica.  
+        <p>Muchas gracias por su respuesta.  
         </p>
         
       </div>
       <div id="Rut ya enviado" style="display: none;">
-        <p>Este RUT ya está asociado a una respuesta. En caso de querer entregar una nueva respuesta o si se ha entregado una respuesta incorrecta, se solicita que se comunique con el área de Análisis Curricular.
+        <p>Este RUT ya está asociado a una respuesta. En caso de querer entregar una nueva respuesta o modificar esta, se solicita que se comunique con el área de Dirección Curricular.
         </p>
         
       </div>
