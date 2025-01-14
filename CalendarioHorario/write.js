@@ -296,17 +296,22 @@ function crear_calendario(hoja,opcionesLista) {
    // Escribe los datos actualizados en el rango
    rango.setValues(datos);
  }
- function limpiarBackgroundsYComentarios(sheet, startRow, startCol, substringObjetivo,data_maestro_con_detalles) {
-   // Obtener el rango desde la fila y columna especificadas hasta el final de la hoja
-   
+ function limpiarBackgroundsYComentarios(sheet, startRow, startCol, substringObjetivo, data_maestro_con_detalles) {
    const lastRow = sheet.getLastRow();
    const lastCol = sheet.getLastColumn();
+ 
+   // Verificar si la hoja tiene datos
+   if (lastRow < startRow || lastCol < startCol) {
+     console.log("No hay datos suficientes para limpiar comentarios o fondos.");
+     return;
+   }
+ 
    const range = sheet.getRange(startRow, startCol, lastRow - startRow + 1, lastCol - startCol + 1);
-   
-   // Obtener todos los comentarios y valores de fondo del rango en una sola operación
-   const valores = range.getDisplayValues(); 
-   const comments = range.getNotes(); // Obtiene una matriz con los comentarios del rango
-   const backgrounds = range.getBackgrounds(); // Obtiene una matriz con los colores de fondo
+ 
+   // Obtener valores, comentarios y fondos
+   const valores = range.getDisplayValues();
+   const comments = range.getNotes();
+   const backgrounds = range.getBackgrounds();
  
    // Iterar sobre las filas y columnas del rango
    for (let i = 0; i < comments.length; i++) {
@@ -318,22 +323,23 @@ function crear_calendario(hoja,opcionesLista) {
          // Eliminar todas las ocurrencias del substring en el comentario
          comment = comment.split(substringObjetivo).join("").trim();
  
-         // Si el comentario queda vacío, eliminamos el fondo y el comentario
+         // Si el comentario queda vacío, eliminar fondo y comentario
          if (comment === "") {
-           comments[i][j] = null; // Limpiar el comentario
-           let valor = valores[i][j]
-           backgrounds[i][j] = retornar_por_semestre_visualizacion(valor,data_maestro_con_detalles); // Limpiar el fondo
+           comments[i][j] = null; // Limpiar comentario
+           let valor = valores[i][j];
+           backgrounds[i][j] = retornar_por_semestre_visualizacion(valor, data_maestro_con_detalles);
          } else {
-           comments[i][j] = comment; // Actualizar el comentario modificado
+           comments[i][j] = comment; // Actualizar comentario modificado
          }
        }
      }
    }
  
-   // Aplicar las modificaciones al rango en una sola operación
-   range.setNotes(comments); // Aplica los comentarios modificados
-   range.setBackgrounds(backgrounds); // Actualiza los fondos
+   // Aplicar las modificaciones al rango
+   range.setNotes(comments);
+   range.setBackgrounds(backgrounds);
  }
+ 
  function agregar_listas_desplegables(data_maestro,hoja_maestro,col_dias,dias){
    const columna_inicio=obtenerNumeroDeColumna(hoja_maestro,"OBSERVACION",1)+1
    const columnaFinal=data_maestro[0].length-1
@@ -420,67 +426,27 @@ function crear_calendario(hoja,opcionesLista) {
      }
    });
  }
- function actualizar_calendario(hoja,opcionesLista) {
-   
-   opcionesLista=opcionesLista.map((lista)=>lista.join(" "))
+ function actualizar_listas_desplegables(hoja, opcionesLista) {
    const dias = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes"];
-   hoja.getRange(1, 2, 1, dias.length).setValues([dias]).setFontWeight("bold");
    
-   // Configurar horarios
-   const horaInicio = "08:30";
-   const horaFin = "19:20";
-   const duracionBloque = 50; // Duración en minutos
-   const intervaloDescanso = 10; // Duración en minutos entre bloques
-   const filasPorBloque = 10; // Filas por bloque horario
-   const horarios = [];
-   let horaActual = new Date(`1970-01-01T${horaInicio}:00`);
-   const fin = new Date(`1970-01-01T${horaFin}:00`);
-   
-   while (horaActual <= fin) {
-     const siguienteHora = new Date(horaActual.getTime() + duracionBloque * 60000);
-     horarios.push(
-       `${horaActual.getHours()}:${horaActual.getMinutes().toString().padStart(2, "0")}-` +
-       `${siguienteHora.getHours()}:${siguienteHora.getMinutes().toString().padStart(2, "0")}`
-     );
-     horaActual = new Date(siguienteHora.getTime() + intervaloDescanso * 60000); // Sumar descanso
-   }
-   
-   // Escribir horarios y días con colores alternados
-   let fila = 2; // Comenzar en la fila 2
-   horarios.forEach((rango, index) => {
-     const color = index % 2 === 0 ? "#d9eaf7" : "#f7d9d9"; // Alternar colores por bloque
-     
-     for (let i = 0; i < filasPorBloque; i++) {
-       // Escribir horario en la columna 1
-       hoja.getRange(fila, 1)
-         .setValue(rango)
-         .setFontWeight("bold")
-         .setBackground(color);
-       
-       // Espacios por día con listas desplegables
-       dias.forEach((_, colIndex) => {
-         const columna = colIndex + 2; // Días comienzan en la columna 2
-         const celda = hoja.getRange(fila, columna);
-         
-         celda.setDataValidation(SpreadsheetApp.newDataValidation()
+   // Convertir opciones a formato de texto
+   opcionesLista = opcionesLista.map((lista) => lista.join(" "));
+ 
+   // Obtener el rango de las celdas para cada día y asignar listas desplegables
+   const ultimaFila = hoja.getLastRow();
+   const primeraFilaDatos = 2; // Asumimos que los horarios comienzan desde la fila 2
+ 
+   for (let fila = primeraFilaDatos; fila <= ultimaFila; fila++) {
+     dias.forEach((_, colIndex) => {
+       const columna = colIndex + 2; // Días comienzan en la columna 2
+       hoja.getRange(fila, columna).setDataValidation(
+         SpreadsheetApp.newDataValidation()
            .requireValueInList(opcionesLista)
            .setAllowInvalid(false)
-           .build());
-       });
-       
-       fila++; // Siguiente fila
-     }
-   });
-   
-   // Ajustar tamaño de columnas y filas
-   hoja.setColumnWidth(1, 120); // Columna de horarios
-   hoja.setColumnWidths(2, dias.length, 350); // Columnas de días
-   hoja.setRowHeights(2, horarios.length * filasPorBloque,40); // Altura de filas
-   
-   // Formato de la hoja
-   hoja.getRange(1, 1, 1, dias.length + 1).setFontWeight("bold").setBackground("#f4b084"); // Encabezados
-   hoja.setFrozenRows(1); // Fijar encabezados
-   hoja.setFrozenColumns(1);
+           .build()
+       );
+     });
+   }
  }
  
  
