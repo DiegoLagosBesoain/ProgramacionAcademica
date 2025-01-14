@@ -48,7 +48,7 @@ Este programa se dedica a la craion y asignacion de horarios para cada tipod e r
 - Un archivo de hoja de cálculo de Google Sheets con las plantillas y datos necesarios:
     1. Hoja `DATOS MAESTRO` vacia
     2. Hoja `DETALLES SEMESTRE` vacia
-    3.  Hoja `SALAS ESPECIALES` con una columna de lista que se se usara como desplegable para als salas especiales
+    3.  Hoja `SALAS ESPECIALES` con una columna de lista que se se usara como desplegable para las salas especiales
    
 - Carpeta Hoja maestro creada y que el usuario que esta usando este programa tenga acceso de edicion a ella
     
