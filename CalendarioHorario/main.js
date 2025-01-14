@@ -59,7 +59,8 @@ function onOpen() {
 function crear_templates(){
 
 const hojasActuales = SpreadsheetApp.getActiveSpreadsheet();
-const hoja_plan_comun = hojasActuales.getSheetByName("PLAN COMUN")
+
+const hoja_plan_comun = createSheetByName(hojasActuales,"PLAN COMUN")
 const bloques = hojasActuales.getSheetByName("DATOS MAESTRO").getDataRange().getDisplayValues()
 const detalles = hojasActuales.getSheetByName("DETALLES SEMESTRE").getDataRange().getDisplayValues()
 
@@ -75,9 +76,9 @@ const bloques_7y8=bloques.filter((bloque,idx)=>contieneEnRango(detalles[idx],7,8
 const bloques_titulacion=bloques.filter((bloque,idx)=>contieneEnRango(detalles[idx],9,11)||(bloque[0][3]=="5")||(bloque[0][3]=="6")).map((curso)=>{
   return [curso[2],"seccion "+curso[1],curso[6]]
 });
-const hoja_5y6_comun = hojasActuales.getSheetByName("V,VI")
-const hoja_7y8_comun = hojasActuales.getSheetByName("VII,VIII")
-const hoja_tutulacion_comun = hojasActuales.getSheetByName("TITULACION")
+const hoja_5y6_comun = createSheetByName(hojasActuales,"V,VI")
+const hoja_7y8_comun = createSheetByName(hojasActuales,"VII,VIII")
+const hoja_tutulacion_comun = createSheetByName(hojasActuales,"TITULACION")
 limpiarBackgroundsYComentarios(hoja_plan_comun,2,2)
 crear_calendario(hoja_plan_comun,bloques_plan_comun)
 
