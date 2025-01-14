@@ -17,7 +17,7 @@ Está diseñado para usarse en el entorno de Google Sheets, utilizando Google Ap
     4. `NRC POR PERIODO ESPEJO` semestre espejo con encabezado y la informacion desde la segunda fila
     5. Hoja `CATALOGO ANTIGUO`(opcional)
     6. Hoja `PROFESORES` con la informacion de los profesores de jornada con rut en la segunda columna
-    7. Hoja `RESPUESTAS`,`PREFERENCIAS`,`OTROS`Creadas y vacias para poder recibir las respuestas de los formularios
+    7. Hoja `RESPUESTAS`,`PREFERENCIAS`,`OTROS`,`ENTREGADOS`Creadas y vacias para poder recibir las respuestas de los formularios
 - Carpeta en dirve con permisos para crear las hojas de cordinadores
 
 
@@ -28,12 +28,8 @@ Está diseñado para usarse en el entorno de Google Sheets, utilizando Google Ap
 3. Copia y pega el código del script en el editor de Apps Script En los archivos creados con el mismo nombre.
 4. Guarda los cambios.
 5. Asegúrate de otorgar los permisos adecuados para ejecutar el script (autenticación).
-
-### Uso
-
-- **Ejecutar el script manualmente:**
-  - Abre el editor de Apps Script y selecciona la función que desees ejecutar.
-  - Haz clic en el ícono de "Ejecutar" para iniciar el proceso.
+6.  Abre el editor de Apps Script y selecciona la función que desees ejecutar.
+7. Haz clic en el ícono de "Ejecutar" para iniciar el proceso.
 
 - **Consideraciones:**
   - De cambiar el nombre de las hojas o no existir alguna el programa puede presentar fallas en su funcionamiento.
