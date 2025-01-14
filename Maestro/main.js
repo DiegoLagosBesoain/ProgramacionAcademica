@@ -21,17 +21,17 @@ function onOpen(){
 
   ui.createMenu("Macros")
     .addItem("Agregar secciones", "agregar_secciones")
-    .addItem("Crear hoja por area","crear_hoja_por_area")
-    .addItem("Validar Cambios","validar_cambios")
     .addItem("Crear Calendario","crearCalendario")
-    .addItem("Compartir enlaces","compartirYEnviarEnlace")
+    .addItem("Crear hoja por area","crear_hoja_por_area")
     .addItem("Quitar permisos de edicion archivos cordinaldores","quitar_permisos")
     .addItem("Extraer datos Hojas cordinadores","extraer_datos")
-    .addItem("Actualizar con datos formulario","actualizar_datos")
+    .addItem("Compartir enlaces","compartirYEnviarEnlace")
+    .addItem("Validar Cambios","validar_cambios")
     .addItem("Envio de formularios Jornada y honorarios","enviarFormulariosCondicional")
+    .addItem("Actualizar con datos formulario","actualizar_datos")
     .addItem("Crear archivo para DPSA","crear_template_dpsa")
     .addItem("Crear archivo para Alumnos","crear_template_HorariosING")
-    .addItem("Actualizar areas con catalogo antiguo","actualizarCatalogo")
+    .addItem("Actualizar areas con catalogo antiguo (Opcional)","actualizarCatalogo")
     
     
     .addToUi();
@@ -160,7 +160,7 @@ areas.forEach((area)=>{
   copiarEncabezado(hoja_maestro,hoja_area)
   escribirDatosYResaltar(hoja_area,data_cordinador)
 
-  const col_cupos_actuales = obtenerNumeroDeColumna(hoja_area,"CUPOS 202420",1)
+  const col_cupos_actuales = obtenerNumeroDeColumna(hoja_area,"CUPOS",1)
   const col_clave = obtenerNumeroDeColumna(hoja_area,"CODIGO",1)
   const col_seccion = obtenerNumeroDeColumna(hoja_area,"SECCIONES",1)
   resaltarCambiosEnHoja(hoja_area,data_maestro,2, [col_clave,col_seccion], col_cupos_actuales, data_cordinador)
@@ -232,7 +232,7 @@ function validar_cambios(){
   const hoja_maestro = hojasActuales.getSheetByName("MAESTRO");
   const data_maestro = hoja_maestro.getDataRange().getValues();
   data_maestro.shift()
-  const col_cupos_actuales = obtenerNumeroDeColumna(hoja_actual,"CUPOS 202420",1)
+  const col_cupos_actuales = obtenerNumeroDeColumna(hoja_actual,"CUPOS",1)
   const col_clave_seccion = obtenerNumeroDeColumna(hoja_actual,"LLAVE Código- sec ",1)
   const data_maestro_actualizada = actualizarListaOriginal(data_maestro, data_verificada, col_clave_seccion, col_cupos_actuales)
   console.log(data_maestro_actualizada)

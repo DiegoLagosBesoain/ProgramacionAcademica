@@ -351,7 +351,7 @@ function rellenar_dpsa(data_maestro,col_dias,dias,hoja_maestro){
   const col_profesor1=obtenerNumeroDeColumna(hoja_maestro,"RUT PROFESOR 1",1)
   const col_profesor2=obtenerNumeroDeColumna(hoja_maestro,"RUT PROFESOR 2",1)
   const col_profesor_lab=obtenerNumeroDeColumna(hoja_maestro,"RUT PROFESOR LABT",1)
-  const col_cupos=obtenerNumeroDeColumna(hoja_maestro,"CUPOS 202420",1)
+  const col_cupos=obtenerNumeroDeColumna(hoja_maestro,"CUPOS",1)
   const col_mandante=obtenerNumeroDeColumna(hoja_maestro,"CURSO MANDANTE",1)
   const dPSA=[]
   const col_conector_liga=obtenerNumeroDeColumna(hoja_maestro,"CONECTOR DE LIGA",1)
@@ -474,7 +474,7 @@ function rellenar_HORARIO_ING(data_maestro,col_dias,dias,hoja_maestro){
   const col_mandante=obtenerNumeroDeColumna(hoja_maestro,"CURSO MANDANTE",1)
   const col_profesor2=obtenerNumeroDeColumna(hoja_maestro,"RUT PROFESOR 2",1)
   const col_profesor_lab=obtenerNumeroDeColumna(hoja_maestro,"RUT PROFESOR LABT",1)
-  const col_cupos=obtenerNumeroDeColumna(hoja_maestro,"CUPOS 202420",1)
+  const col_cupos=obtenerNumeroDeColumna(hoja_maestro,"CUPOS",1)
   
   const dPSA=[]
   console.log("numero de columnas dias",col_dias)
@@ -578,7 +578,7 @@ function rellenar_evaluaciones(data_maestro,hoja_maestro,encabezado){
   const col_profesor1=obtenerNumeroDeColumna(hoja_maestro,"RUT PROFESOR 1",1)
   const col_profesor2=obtenerNumeroDeColumna(hoja_maestro,"RUT PROFESOR 2",1)
   const col_profesor_lab=obtenerNumeroDeColumna(hoja_maestro,"RUT PROFESOR LABT",1)
-  const col_cupos=obtenerNumeroDeColumna(hoja_maestro,"CUPOS 202420",1)
+  const col_cupos=obtenerNumeroDeColumna(hoja_maestro,"CUPOS",1)
   const col_mandante=obtenerNumeroDeColumna(hoja_maestro,"CURSO MANDANTE",1)
   const col_observaciones=obtenerNumeroDeColumna(hoja_maestro,"OBSERVACION",1)
   const col_area=obtenerNumeroDeColumna(hoja_maestro,"AREA",1)
