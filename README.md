@@ -17,7 +17,7 @@ Está diseñado para usarse en el entorno de Google Sheets, utilizando Google Ap
     4. `NRC POR PERIODO ESPEJO` semestre espejo con encabezado y la informacion desde la segunda fila
     5. Hoja `CATALOGO ANTIGUO`(opcional)
     6. Hoja `PROFESORES` con la informacion de los profesores de jornada con rut en la segunda columna
-    7. Hoja `RESPUESTAS`,`PREFERENCIAS`,`OTROS`Creadas y vacias para poder recibir las respuestas de los formularios
+    7. Hoja `RESPUESTAS`,`PREFERENCIAS`,`OTROS`,`ENTREGADOS`Creadas y vacias para poder recibir las respuestas de los formularios
 - Carpeta en dirve con permisos para crear las hojas de cordinadores
 
 
