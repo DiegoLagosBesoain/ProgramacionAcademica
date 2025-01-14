@@ -614,16 +614,16 @@ function actualizarDesplegables(){
   const hoja_7y8_comun = hojasActuales.getSheetByName("VII,VIII")
   const hoja_tutulacion_comun = hojasActuales.getSheetByName("TITULACION")
   
-actualizar_calendario(hoja_plan_comun,bloques_plan_comun)
+actualizar_listas_desplegables(hoja_plan_comun,bloques_plan_comun)
 
 
-actualizar_calendario(hoja_5y6_comun,bloques_5y6)
+actualizar_listas_desplegables(hoja_5y6_comun,bloques_5y6)
 
 
-actualizar_calendario(hoja_7y8_comun,bloques_7y8)
+actualizar_listas_desplegables(hoja_7y8_comun,bloques_7y8)
 
 
-actualizar_calendario(hoja_tutulacion_comun,bloques_titulacion)
+actualizar_listas_desplegables(hoja_tutulacion_comun,bloques_titulacion)
 
 }
 

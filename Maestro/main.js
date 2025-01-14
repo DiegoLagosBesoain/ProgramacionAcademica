@@ -432,8 +432,8 @@ function crear_template_dpsa(){
   const col_viernes= obtenerNumeroDeColumna(hoja_maestro,"Viernes",1)
   const col_dias=[col_lunes,col_martes,col_miercoles,col_jueves,col_viernes]
   const dias=["Lunes","Martes","Miercoles","Jueves","Viernes"]
-  const encabezado=["NRC","MATERIA",	"CURSO",	"TITULO",	"SECC.",	"LISTA CRUZADA",	"TIPO DE HORARIO",	"PARTE PERIODO",	"CALIFICABLE",	"CUPOS TOTALES NRC",	"TIPO DE REUNIÓN",	"INICIO",	"FIN",	"DIA",	"HORA INICIO",	"HORA FIN",	"INDICADOR SESION LINEA/PROFESOR",	"PROFESOR PRINCIPAL",	"OTROS PROFESORES",	"LABORATORIOS",	"SALA CARACTERISTICA ESPECIAL",	"SOBREPASO",	"OBSERVACIONES"," "]
-  const encabezado2=["NRC",	"MATERIA","CURSO",	"TITULO",	"SECC.",	"LISTA CRUZADA",	"TIPO DE HORARIO",	"PARTE PERIODO",	"CALIFICABLE",	"CUPOS TOTALES NRC",	"TIPO DE REUNIÓN",	"INICIO",	"FIN",	"DIA",	"HORA INICIO",	"HORA FIN",	"INDICADOR SESION LINEA/PROFESOR",	"PROFESOR PRINCIPAL",	"OTROS PROFESORES",	"LABORATORIOS",	"SALA CARACTERISTICA ESPECIAL",	"SOBREPASO",	"OBSERVACIONES","OBSERVACIONES INTERNA"]
+  const encabezado=["NRC","MATERIA",	"CURSO",	"TITULO",	"SECC.","LISTA CRUZADA","IDENTIFICADOR LIGA",	"TIPO DE HORARIO",	"PARTE PERIODO",	"CALIFICABLE",	"CUPOS TOTALES NRC",	"TIPO DE REUNIÓN",	"INICIO",	"FIN",	"DIA",	"HORA INICIO",	"HORA FIN",	"INDICADOR SESION LINEA/PROFESOR",	"PROFESOR PRINCIPAL",	"OTROS PROFESORES",	"LABORATORIOS",	"SALA CARACTERISTICA ESPECIAL",	"SOBREPASO",	"OBSERVACIONES"," "]
+  const encabezado2=["NRC",	"MATERIA","CURSO",	"TITULO",	"SECC.","LISTA CRUZADA","IDENTIFICADOR LIGA",	"TIPO DE HORARIO",	"PARTE PERIODO",	"CALIFICABLE",	"CUPOS TOTALES NRC",	"TIPO DE REUNIÓN",	"INICIO",	"FIN",	"DIA",	"HORA INICIO",	"HORA FIN",	"INDICADOR SESION LINEA/PROFESOR",	"PROFESOR PRINCIPAL",	"OTROS PROFESORES",	"LABORATORIOS",	"SALA CARACTERISTICA ESPECIAL",	"SOBREPASO",	"OBSERVACIONES","OBSERVACIONES INTERNA"]
   const fecha_inicio_clases=pedirParametro_fechas("Introduce la fecha de INICIO de clases","dd/mm/aaaa")
   const fecha_fin_clases=pedirParametro_fechas("Introduce la fecha de FIN de clases","dd/mm/aaaa")
   const fecha_inicio_ayud=pedirParametro_fechas("Introduce la fecha de \INICIO de AYUD/LAB","en formato dd/mm/aaaa")
@@ -459,11 +459,11 @@ function crear_template_dpsa(){
 
   const hoja_ajustes=crear_hoja_nombre("AJUSTES DPSA",hojasActuales)
   
-  const llaves_p=[0,1,2,4,5,10,13]
-  const enunciado_evaluaciones=["AJUSTES","HORA-DIA CAMBIO","NRC",	"MATERIA","CURSO",	"TITULO",	"SECC.",	"LISTA CRUZADA",	"TIPO DE HORARIO",	"PARTE PERIODO",	"CALIFICABLE",	"CUPOS TOTALES NRC",	"TIPO DE REUNIÓN",	"INICIO",	"FIN",	"DIA",	"HORA INICIO",	"HORA FIN",	"INDICADOR SESION LINEA/PROFESOR",	"PROFESOR PRINCIPAL",	"OTROS PROFESORES",	"LABORATORIOS",	"SALA CARACTERISTICA ESPECIAL",	"SOBREPASO",	"OBSERVACIONES","OBSERVACIONES INTERNA"]
+  const llaves_p=[0,1,2,4,5,11,14]
+  const enunciado_evaluaciones=["AJUSTES","HORA-DIA CAMBIO","NRC",	"MATERIA","CURSO",	"TITULO",	"SECC.","IDENTIFICADOR LIGA",	"LISTA CRUZADA",	"TIPO DE HORARIO",	"PARTE PERIODO",	"CALIFICABLE",	"CUPOS TOTALES NRC",	"TIPO DE REUNIÓN",	"INICIO",	"FIN",	"DIA",	"HORA INICIO",	"HORA FIN",	"INDICADOR SESION LINEA/PROFESOR",	"PROFESOR PRINCIPAL",	"OTROS PROFESORES",	"LABORATORIOS",	"SALA CARACTERISTICA ESPECIAL",	"SOBREPASO",	"OBSERVACIONES","OBSERVACIONES INTERNA"]
   const cambios=compareLists(data_dpsa_anterior,dPSA,llaves_p,enunciado_evaluaciones).filter((elemento)=>elemento[0]!="")
   const enunciado=["AJUSTES","HORA-DIA CAMBIO","NRC",	"MATERIA/CURSO",	"MATERIA",	"CURSO",	"TITULO",	"SECC.",	"LISTA CRUZADA",	"TIPO DE HORARIO",	"PARTE PERIODO",	"CALIFICABLE",	"CUPOS TOTALES NRC",	"TIPO DE REUNIÓN",	"INICIO",	"FIN",	"DIA",	"HORA INICIO",	"HORA FIN",	"INDICADOR SESION LINEA/PROFESOR",	"PROFESOR PRINCIPAL",	"OTROS PROFESORES",	"LABORATORIOS",	"SALA CARACTERISTICA ESPECIAL",	"SOBREPASO",	"OBSERVACIONES"]
-  const llaves_evaluaciones=[0,1,2,4,5,10,11,12]
+  const llaves_evaluaciones=[0,1,2,4,5,11,12,13]
   const cambios_evaluaciones=compareLists(data_evaluaciones_anterior,evaluaciones,llaves_evaluaciones,enunciado_evaluaciones).filter((elemento)=>elemento[0]!="")
   
   agregarAlFinal(hoja_ajustes,cambios,enunciado_evaluaciones)
