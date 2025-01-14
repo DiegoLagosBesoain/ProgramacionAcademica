@@ -40,6 +40,7 @@ Está diseñado para usarse en el entorno de Google Sheets, utilizando Google Ap
   - la hoja `NRC POR PERIODO ESPEJO` es improtante no cambiar el orden de las columnas de lo contrario no podra traer los cupos historicos ni los nrc existentes
 ## CalendarioHorario
 ### Descripción
+Este programa se dedica a la craion y asignacion de horarios para cada tipod e reunion existente en cada asginatura para cada seccion, el programa se centre en la deteccion de restricciones presentes en al programacion de horarios para mas detalles de las restricciones visitar [la documentacion ](https://docs.google.com/document/d/18BQm9B1-aJW8mY22hJDP9fxbyFzg-mBxT-zZ_NI6Zqc/edit?tab=t.0) admeas actualiza automaticamente el maestro con los horarios asignados, adicionalemnte tien un sistema de visualizaciones y sistemas de colores para mejorar la comprension
     
 
 
