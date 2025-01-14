@@ -354,6 +354,7 @@ function rellenar_dpsa(data_maestro,col_dias,dias,hoja_maestro){
   const col_cupos=obtenerNumeroDeColumna(hoja_maestro,"CUPOS 202420",1)
   const col_mandante=obtenerNumeroDeColumna(hoja_maestro,"CURSO MANDANTE",1)
   const dPSA=[]
+  const col_conector_liga=obtenerNumeroDeColumna(hoja_maestro,"CONECTOR DE LIGA",1)
   console.log("numero de columnas dias",col_dias)
   data_maestro.forEach((entrada)=>{
     col_dias.forEach((columna,idx)=>{
@@ -369,34 +370,36 @@ function rellenar_dpsa(data_maestro,col_dias,dias,hoja_maestro){
         let tipo = tipo_hora.trim().split(" ")[0]
         let hora = tipo_hora.trim().split(" ")[1]
         
-        let nueva_entrada=new Array(24).fill("")
+        let nueva_entrada=new Array(25).fill("")
         nueva_entrada[0]=entrada[col_NRC]
         nueva_entrada[1]=entrada[col_materia]
         nueva_entrada[2]=entrada[col_curso]
         nueva_entrada[3]=entrada[col_titulo]
         nueva_entrada[4]=entrada[col_seccion]
+        
         nueva_entrada[5]=entrada[col_Lista_cruzada]
         if((entrada[col_Lista_cruzada]&&entrada[col_mandante]!="SI")){
           entrada[col_Lista_cruzada]=""}
-        nueva_entrada[6]="TEORIA"
-        nueva_entrada[7]=entrada[col_codigo]=="ING6103"?"i":"1"
-        nueva_entrada[8]="Y"
-        nueva_entrada[9]=entrada[col_cupos]
+        nueva_entrada[6]=entrada[col_conector_liga]
+        nueva_entrada[7]="TEORIA"
+        nueva_entrada[8]=entrada[col_codigo]=="ING6103"?"i":"1"
+        nueva_entrada[9]="Y"
+        nueva_entrada[10]=entrada[col_cupos]
         if(tipo_hora){
-        nueva_entrada[10]=tipo=="LAB/TALLER"?"LABT":tipo
-        nueva_entrada[11]=""
+        nueva_entrada[11]=tipo=="LAB/TALLER"?"LABT":tipo
         nueva_entrada[12]=""
+        nueva_entrada[13]=""
         console.log(dias[idx],dias,idx)
-        nueva_entrada[13]=dias[idx].toUpperCase()
-        nueva_entrada[14]=hora.split("-")[0]
-        nueva_entrada[15]=hora.split("-")[1]
-        nueva_entrada[16]=tipo=="CLAS"?"1":tipo=="AYUD"?"2":"3"
-        nueva_entrada[17]=tipo=="CLAS"?entrada[col_profesor1]:""
-        nueva_entrada[18]=nueva_entrada[11]=="LABT"? entrada[col_profesor_lab]:tipo=="CLAS"?entrada[col_profesor2]:""
-        nueva_entrada[19]=""
+        nueva_entrada[14]=dias[idx].toUpperCase()
+        nueva_entrada[15]=hora.split("-")[0]
+        nueva_entrada[16]=hora.split("-")[1]
+        nueva_entrada[17]=tipo=="CLAS"?"1":tipo=="AYUD"?"2":"3"
+        nueva_entrada[18]=tipo=="CLAS"?entrada[col_profesor1]:""
+        nueva_entrada[19]=nueva_entrada[11]=="LABT"? entrada[col_profesor_lab]:tipo=="CLAS"?entrada[col_profesor2]:""
         nueva_entrada[20]=""
         nueva_entrada[21]=""
         nueva_entrada[22]=""
+        nueva_entrada[23]=""
         }
 
         dPSA.push(nueva_entrada)
@@ -426,18 +429,18 @@ function agregar_fechas(dpsa,fecha_inicio_clases,fecha_fin_clases,fecha_inicio_a
   
   return dpsa.map((entrada)=>{
     
-    if(!entrada[16]){
+    if(!entrada[17]){
 
       //no hace nada
     }
     else if (entrada[11]=="CLAS"){
-    entrada[11]=fecha_inicio_clases
-    entrada[12]=fecha_fin_clases
+    entrada[12]=fecha_inicio_clases
+    entrada[13]=fecha_fin_clases
     }
     else{
-      entrada[11]=fecha_inicio_ayud
-      entrada[12]=fecha_fin_ayud
-      let tipo=entrada[10]=="LABT"?"LAB/TALLER":entrada[10]
+      entrada[12]=fecha_inicio_ayud
+      entrada[13]=fecha_fin_ayud
+      let tipo=entrada[11]=="LABT"?"LAB/TALLER":entrada[11]
       let sala_especial=data_programacion.find((fila)=>
       entrada[1]==fila[0].slice(0,3)&&
       entrada[2]==fila[0].slice(-4)&&
@@ -446,7 +449,7 @@ function agregar_fechas(dpsa,fecha_inicio_clases,fecha_fin_clases,fecha_inicio_a
       if(sala_especial){
       console.log(entrada)
       console.log(sala_especial)
-      entrada[19]=sala_especial[5]}
+      entrada[20]=sala_especial[5]}
     }
     return entrada
 
@@ -472,6 +475,7 @@ function rellenar_HORARIO_ING(data_maestro,col_dias,dias,hoja_maestro){
   const col_profesor2=obtenerNumeroDeColumna(hoja_maestro,"RUT PROFESOR 2",1)
   const col_profesor_lab=obtenerNumeroDeColumna(hoja_maestro,"RUT PROFESOR LABT",1)
   const col_cupos=obtenerNumeroDeColumna(hoja_maestro,"CUPOS 202420",1)
+  
   const dPSA=[]
   console.log("numero de columnas dias",col_dias)
   data_maestro.forEach((entrada)=>{
@@ -579,6 +583,7 @@ function rellenar_evaluaciones(data_maestro,hoja_maestro,encabezado){
   const col_observaciones=obtenerNumeroDeColumna(hoja_maestro,"OBSERVACION",1)
   const col_area=obtenerNumeroDeColumna(hoja_maestro,"AREA",1)
   const dPSA=[]
+  const col_conector_liga=obtenerNumeroDeColumna(hoja_maestro,"CONECTOR DE LIGA",1)
   const diasSemana = ['DOMINGO', 'LUNES', 'MARTES', 'MIERCOLES', 'JUEVES', 'VIERNES', 'SABADO'];
   const dias = encabezado.slice(col_observaciones)
   data_maestro.forEach((entrada,idx)=>{
@@ -601,7 +606,7 @@ function rellenar_evaluaciones(data_maestro,hoja_maestro,encabezado){
         hora = salida[2]
         }
         console.log("dia:",dia,"tipo:",tipo,"hora:",hora)
-        let nueva_entrada=new Array(24).fill("")
+        let nueva_entrada=new Array(25).fill("")
         nueva_entrada[0]=entrada[col_NRC]
         nueva_entrada[1]=entrada[col_materia]
         nueva_entrada[2]=entrada[col_curso]
@@ -610,25 +615,27 @@ function rellenar_evaluaciones(data_maestro,hoja_maestro,encabezado){
         nueva_entrada[5]=entrada[col_Lista_cruzada]
         if((entrada[col_Lista_cruzada]&&entrada[col_mandante]!="SI")){
           entrada[col_Lista_cruzada]=""}
-        nueva_entrada[6]="TEORIA"
-        nueva_entrada[7]=entrada[col_codigo]=="ING6103"?"i":"1"
-        nueva_entrada[8]=""
-        nueva_entrada[9]=entrada[col_cupos]
-        nueva_entrada[10]=tipo=="EXAM"?"EXAM":"PRBA"
-        nueva_entrada[11]=convertirFechaAString(dias[idx])
-        nueva_entrada[12]=convertirFechaAString(dias[idx])
+        nueva_entrada[6]=entrada[col_conector_liga]
+        nueva_entrada[7]="TEORIA"
         
-        nueva_entrada[13]=diasSemana[dias[idx].getDay()]
-        nueva_entrada[14]=hora.split("-")[0]
-        nueva_entrada[15]=hora.split("-")[1]
-        nueva_entrada[16]=''
-        nueva_entrada[17]=""
+        nueva_entrada[8]=entrada[col_codigo]=="ING6103"?"i":"1"
+        nueva_entrada[9]=""
+        nueva_entrada[10]=entrada[col_cupos]
+        nueva_entrada[11]=tipo=="EXAM"?"EXAM":"PRBA"
+        nueva_entrada[12]=convertirFechaAString(dias[idx])
+        nueva_entrada[13]=convertirFechaAString(dias[idx])
+        
+        nueva_entrada[14]=diasSemana[dias[idx].getDay()]
+        nueva_entrada[15]=hora.split("-")[0]
+        nueva_entrada[16]=hora.split("-")[1]
+        nueva_entrada[17]=''
         nueva_entrada[18]=""
         nueva_entrada[19]=""
         nueva_entrada[20]=""
         nueva_entrada[21]=""
         nueva_entrada[22]=""
-        nueva_entrada[23]=tipo
+        nueva_entrada[23]=""
+        nueva_entrada[24]=tipo
         
 
         dPSA.push(nueva_entrada)
@@ -687,6 +694,7 @@ function rellenar_evaluaciones_horarioING(data_maestro,hoja_maestro,encabezado){
   const col_nombre_profesor1=obtenerNumeroDeColumna(hoja_maestro,"NOMBRE PROFESOR BANNER 1 \n(PROFESOR PRINCIPAL SESIÓN 01)",1)
   const col_nombre_profesor2=obtenerNumeroDeColumna(hoja_maestro,"NOMBRE PROFESOR 2\n(2DO PROFESOR - SESIÓN 02)",1)
   const col_nombre_profesorlab=obtenerNumeroDeColumna(hoja_maestro,"PROFESOR LABT ",1)
+  
   
   const dPSA=[]
   const diasSemana = ['DOMINGO', 'LUNES', 'MARTES', 'MIERCOLES', 'JUEVES', 'VIERNES', 'SABADO'];
@@ -883,16 +891,18 @@ function getCurrentDateDayAndTime() {
   return `${currentDate}, ${currentTime}`;
 }
 function convertirFechaAString(fecha) {
-  const dia = fecha.getDate(); // Día del mes
-  const mes = fecha.getMonth() + 1; // Mes (nota: getMonth() es 0-indexado)
-  const anio = fecha.getFullYear(); // Año completo
-  
-  // Formatear la fecha como dd/mm/aaaa
-  const fechaFormateada = `${dia.toString()}/${mes.toString().padStart(2, '0')}/${anio}`;
-  
-  // Imprimir el resultado
-  console.log(fechaFormateada);
-  return fechaFormateada;
+  // Verificar si es una instancia válida de Date
+  if (!(fecha instanceof Date) || isNaN(fecha)) {
+    throw new Error("Entrada inválida: debe ser una fecha válida.");
+  }
+
+  // Obtener día, mes y año
+  const dia = fecha.getDate().toString().padStart(2, '0');
+  const mes = (fecha.getMonth() + 1).toString().padStart(2, '0');
+  const anio = fecha.getFullYear();
+
+  // Formatear la fecha como "dd/mm/aaaa"
+  return `${dia}/${mes}/${anio}`;
 }
 function removeSpecificPermissions(fileId, emails) {
   // Obtén el archivo por su ID
