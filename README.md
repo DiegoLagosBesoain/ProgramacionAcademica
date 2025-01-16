@@ -68,7 +68,7 @@ var linkFormulario2 = "https://script.google.com/macros/s/AKfycbyk0gcGoHVd4z46Vt
 - Agregar secciones: Toma toda la información que puede de las hojas `MAESTRO`, `Presupuesto`, `CATALOGO` para crear las entradas(filas) de todas las secciones en el maestro.
 - Crear Calendario: Crea las fechas  al final de los datos de la hoja maestro para programar las pruebas en esos horarios, marcando en rojo los fines de semana
 - Crear hojas por área: Separa la informacián creando una hoja y un nuevo archivo en la carpeta de cooridinadores con todos los cursos asociados a esa área para su revisión. Para el uso de este comando es importante que los mails de los cooridinadores ya estén ingresados en este punto.
-- Enviar enlaces: Envía los enlaces y otorga permisos para la edición de los archivos para los cordinadores, los cuales van a recibir un mail automático.
+- Enviar enlaces: Envía un mail con los enlaces y otorga permisos para la edición de los archivos de los cordinadores
 - Quitar permisos de edición archivos coordinaldores: Sustrae los permisos de edición del mail asociado en el diccionario para las personas registradas
 - Extraer datos Hojas cordinadores: Toma toda la información actual del archivo de coordinadores y la extrae en sus respectivas hojas dentro del maestro. Cualquier inserción, eliminacion o cambio dentro de las secciones de esa área resaltará la fila con colores.
 - Validar Cambios: Este comando toma la hoja en la cual uno este actualmente, lo cual reemplaza y actualiza la información del maestro con la presente en la hoja del área donde se estén validando los datos (uno puede volver a crear hojas por área si desea actualizar la informacioón presente)
@@ -102,7 +102,7 @@ Este programa se dedica a la creacion y asignacion de horarios para cada tipod e
  ```javascript
 var id_hoja_maestro="1SxCL4Hzn_F9Uph1tAyvCETrNSi4TdoyE8c1v6LWytHE"
  ```   
-9. Haz clic en el ícono de "Ejecutar" para iniciar el proceso.
+8. Haz clic en el ícono de "Ejecutar" para iniciar el proceso.
  
 
 - **Consideraciones:**
@@ -116,7 +116,7 @@ var id_hoja_maestro="1SxCL4Hzn_F9Uph1tAyvCETrNSi4TdoyE8c1v6LWytHE"
 - Actualizar Hojas: si se requiere usar nueva informacion despues de una extraccion de datos se puede actualizar las listas desplegables con este comendao el cual actualiza todas las hojas
 - Enviar a maestro: envia toda la informacion actual en todas las hojas para crear los horarios en la hoja Maestro en el archivo MAESTRO de forma atomatica
 
---
+---
 VISUALIZACIONES(Todas Las Hojas): Crea una hoja de visualizacion del semestre indicado que agrupa por seccion y tipo de reunion
 VERIFICAR TOPES MISMO SEMESTRE(Todas Las Hojas): verifica topes de cursos que se encuentren en el mismo semestre y esten asignados a un mismo bloque horario
 VERIFICAR SALAS ESPECIALES(Todas Las Hojas): Busca la restriccion de uso de una misma sala especial en un miesmo bloque horario esto sucede tanto en un mismo semestre como en las diferentes hojas se basa en la informacio presente en  `DATOS MAESTRO` para las salas especiales busca en todo tipo de reunion
@@ -158,6 +158,17 @@ var id_hoja_maestro="1SxCL4Hzn_F9Uph1tAyvCETrNSi4TdoyE8c1v6LWytHE"
   - Este proceso se teien que realizar para ambos formularios
   - En caso de tener algun problema para abrir el formulario se recomienda abrir en otro navegador  o en modo ingocnito
   - Si se requiere que un profesor responda nuevamente se deber borrar su rut en la hoja `Entregados` del ARCHIVO maestro al cual se esten eviando respuestas
+- **PREGUNTAS**
+  - Pregutna de nombre para dirigirse al prfesore
+  - Pregutna de rut que encuentra todos lso cursos y seccioens asociados a ese profesor
+  - Pregunta de horarios (Solo Honorarios) de hroas de disponibilidad
+  - Pregunta si quiere examen programado pro al facultad
+  - Pregunta la cantidad de evaluaciones
+  - Pregunta el horario de las evaluaciones
+  - Si el profesor tiene un curso con 3 horas de clase pregunta por la distribucion de esas horas
+  - Agrega una seccion de comentarios que tenga el profesor
+  
+  
 
 
     
