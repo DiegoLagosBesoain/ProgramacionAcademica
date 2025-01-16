@@ -1,5 +1,6 @@
 # Gestión Académica en Google Sheets 📋
 Coleccion de codigos implementados en appscript de Google Drive para automatizar la programacion academica en base al siguiente esquema de relaciones:
+![Diagrama de relacion entre archivos](Diagrama sin título (1).jpg "Diagrama de relaciones")
 
 ## MAESTRO
 ### Descripción
