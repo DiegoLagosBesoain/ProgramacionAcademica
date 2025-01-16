@@ -1,12 +1,12 @@
 # Gestión Académica en Google Sheets 📋
-Coleccion de codigos implementados en appscript de Google Drive para automatizar la programacion academica en base al siguiente esquema de relaciones:
+Colección de códigos implementados en appscript de Google Drive para automatizar la programación Académica en base al siguiente esquema de relaciones:
 ![Diagrama de relacion entre archivos](Diagrama.jpg "Diagrama de relaciones")
 
 ## MAESTRO
 ### Descripción
 
 Este script automatiza procesos administrativos relacionados con la gestión académica, como la creación y actualización de hojas de cálculo para diferentes áreas, validación de cambios en datos, y asignación de horarios o secciones. 
-Está diseñado para usarse en el entorno de Google Sheets, utilizando Google Apps Script para integrar hojas de cálculo con funcionalidades personalizadas, conexion con appWeb de formularios.
+Está diseñado para usarse en el entorno de Google Sheets, utilizando Google Apps Script para integrar hojas de cálculo con funcionalidades personalizadas, conexión con appWeb de formularios.
 
 
 ### Requisitos
@@ -14,26 +14,26 @@ Está diseñado para usarse en el entorno de Google Sheets, utilizando Google Ap
 - Acceso a una cuenta de Google.
 - Permisos para modificar Google Sheets a través de Google Apps Script de las diferentes hojas.
 - Un archivo de hoja de cálculo de Google Sheets con las plantillas y datos necesarios:
-    1. Hoja `MAESTRO` con el encabezado pero vacio
+    1. Hoja `MAESTRO` con el encabezado pero vacío
     2. `Presupuesto`
     3. `CATALOGO`
-    4. `NRC POR PERIODO ESPEJO` semestre espejo con encabezado y la informacion desde la segunda fila
+    4. `NRC POR PERIODO ESPEJO` semestre espejo con encabezado y la información desde la segunda fila
     5. Hoja `CATALOGO ANTIGUO`(opcional)
-    6. Hoja `PROFESORES` con la informacion de los profesores de jornada con rut en la segunda columna
-    7. Hoja `RESPUESTAS`,`PREFERENCIAS`,`OTROS`,`ENTREGADOS`Creadas y vacias para poder recibir las respuestas de los formularios
-- Carpeta en dirve con permisos para crear las hojas de cordinadores
+    6. Hoja `PROFESORES` con la información de los profesores de jornada con rut en la segunda columna
+    7. Hoja `RESPUESTAS`,`PREFERENCIAS`,`OTROS`,`ENTREGADOS`Creadas y vacías para poder recibir las respuestas de los formularios
+- Carpeta en Drive con permisos para crear las hojas de coordinadores
 
 
 ### Instalación
 
-1. Abre tu hoja de cálculo en Google Sheets.
-2. Ve a `Extensiones` > `Apps Script`.
-3. Copia y pega el código del script en el editor de Apps Script En los archivos creados con el mismo nombre.
-4. guardar con CTR+S
-5. Conectar el maestro a la carpeta cordinadores
+1. Abrir tu hoja de cálculo en Google Sheets.
+2. Ir a `Extensiones` > `Apps Script`.
+3. Copiar y pegar el código del script del repositorio de github en el editor de Apps Script manteniendo los archivos creados con el mismo nombre.
+4. Guardar con CTR+S
+5. Conectar el maestro a la carpeta coordinadores
 6. Conectar el maestro al archivo de CALENDARIO HORARIOS
 7. Agregar al maestro los links de los formularios
-8. Agregar las personas con permisos de las hojas y las personas que se le van a sustraer los permisos
+8. Agregar a las personas que tendran permisos a las hojas y recordar luego registrar a las personas que se les va a quitar permiso
 ```javascript
 var id_hoja_programacion='1rMO2IPpYORUyfbQEgOfdTnfTOzGB9Q2b9lQaL9Rnrj4'//Hoja de programacion para los cursos
 var id_archivo_actual="1o6HftjnQiU4EB1T9mwZ5FntfkZqy9Bj5wkZKbyHl-m0"//Cambiar aqui archivo actual
@@ -56,27 +56,27 @@ var personas_para_quitar_permisos =[
 var linkFormulario1 = "https://script.google.com/macros/s/AKfycbzCbKj2BNb_o6ed9E97W5fV8bcLLaPIKwP97DWu3FU6lbxeZr4qqa-skLEAFxaKYKrP/exec"; // Cambiar por el link del formulario Honorarios
 var linkFormulario2 = "https://script.google.com/macros/s/AKfycbyk0gcGoHVd4z46Vtsp49sgz5j_yomWypNpwG11HCpJpv5PDchXl3o6iyLvIYgZwaB9lA/exec";
 ```
-10. Guarda los cambios.
-11. Asegúrate de otorgar los permisos adecuados para ejecutar el script (autenticación).
-12. Abre el editor de Apps Script y selecciona la función que desees ejecutar.
-13. Haz clic en el ícono de "Ejecutar" en el archivo 'Main" para iniciar el proceso.
+10. Guardar los cambios.
+11. Asegúrar de otorgar los permisos adecuados para ejecutar el script (autenticación).
+12. Abrir el editor de Apps Script y selecciona la función que se desee ejecutar.
+13. Hacer clic en el ícono de "Ejecutar" en el archivo 'Main" para iniciar el proceso.
 
 - **Consideraciones:**
-  - De cambiar el nombre de las hojas o no existir alguna el programa puede presentar fallas en su funcionamiento.
-  - la hoja `NRC POR PERIODO ESPEJO` es improtante no cambiar el orden de las columnas de lo contrario no podra traer los cupos historicos ni los nrc existentes
+  - En caso de no existir o de modificar el nombre de las hojas, el programa puede presentar fallas en su funcionamiento.
+  - Para hoja `NRC POR PERIODO ESPEJO` es improtante no cambiar el orden de las columnas, de lo contrario no podrá traer los cupos históricos ni los NRC existentes
 ### USO Y COMANDOS
-- Agregar secciones: Toma toda la informacion que puede de las hojas `MAESTRO`, `Presupuesto`, `CATALOGO` para crear las entradas de todas las secciones en le maestro
-- Crear Calendario: Crea las fechas marcando en rojo fines de semana al final de los datos de la hoja maestro para programar las pruebas en esos horarios
-- Crear hojas por area: Separa la informacion creando una hoja y un nuevo archivo en la carpeta de coridinadores con todos los cursos asosciados al un area para su revision para el uso de este comando es importante que los mails de los coridinadores ya esten ingresados en este punto 
-- enviar enlaces: envia los enlaces y oorga permisos para la edicion de los archivos para los cordinadores los cuales van a recibir un mail automatico
-- Quitar permisos de edicion archivos cordinaldores: Sustrae los permisos de edicion del mail asociado en el diccionario para quitar permisos de edicion
-- Extraer datos Hojas cordinadores: toma toda la informacion actual en el archivo de cordinadores un la extrae en sus respectivas hojas dentro del maestro lo cual resaltare con coleres cualquier insercion eliminacion o cambio dentro de las secciones de esa area
-- Validar Cambios: este comando toma la hoja en la cual uno este actualmente, lo cual remplaza y actualiza la informacion del maestro con la presenten en la hoja del area donde se esten validando datos (uno puede volver a crear hojas por area si deasea actualizar la informacion presente)
-- Envio de formularios Jornada y honorarios: envio automatioc de los links de formularios ingresados para lo cual se require que este el rut y el mail del profesor, el programa hace la diferencia automaticamente en base a la informacion de la hoja `PROFESORES`
-- Actualizar con datos formulario: toma todas las informaciones recibidas de los formularios y actualiza la informacion a los profesores de jornada se le asigna de forma automatica todo el horario disponible, en caso de que en un mismo curos se presenten diferentes disponibilidades el progrmaa solo deja las horas compartidas(interseccion)
-- Crear archivo para DPSA: creacion de los archivos en base a la asignacion de pruebas y la informacion proveniente de Calendario horarios definiendo formato para las listas cruzadas y los conectores de liga ademas crea un archivo de ajustes donde se presentaran todos los ajustes presentes desde la ultima ejecucion de este comando, lso ajustes se acumulan
-- Crear archivo para Alumnos: Creacion del HORARIO ING con todas las columnas necesarias para su creacion incluyendo ligas y listas cruzadas
-- Actualizar areas con catalogo antiguo (Opcional): en caso de tener un catalogo antiguo con la culumna de areas vacia se peude usar este comando para hacer los cruces y en caso de no encontrar ningun curso se dejara en blanco y sera necesario rellenar a mano
+- Agregar secciones: Toma toda la información que puede de las hojas `MAESTRO`, `Presupuesto`, `CATALOGO` para crear las entradas(filas) de todas las secciones en el maestro.
+- Crear Calendario: Crea las fechas  al final de los datos de la hoja maestro para programar las pruebas en esos horarios, marcando en rojo los fines de semana
+- Crear hojas por área: Separa la informacián creando una hoja y un nuevo archivo en la carpeta de cooridinadores con todos los cursos asociados a esa área para su revisión. Para el uso de este comando es importante que los mails de los cooridinadores ya estén ingresados en este punto.
+- Enviar enlaces: Envía los enlaces y otorga permisos para la edición de los archivos para los cordinadores, los cuales van a recibir un mail automático.
+- Quitar permisos de edición archivos coordinaldores: Sustrae los permisos de edición del mail asociado en el diccionario para las personas registradas
+- Extraer datos Hojas cordinadores: Toma toda la información actual del archivo de coordinadores y la extrae en sus respectivas hojas dentro del maestro. Cualquier inserción, eliminacion o cambio dentro de las secciones de esa área resaltará la fila con colores.
+- Validar Cambios: Este comando toma la hoja en la cual uno este actualmente, lo cual reemplaza y actualiza la información del maestro con la presente en la hoja del área donde se estén validando los datos (uno puede volver a crear hojas por área si desea actualizar la informacioón presente)
+- Envio de formularios Jornada y honorarios: Envío automátioco de los links de formularios ingresados. Para esto se require que esté el rut y el mail del profesor en la hoja maestro. El programa hace la diferencia automáticamente en base a la informacion de la hoja `PROFESORES`
+- Actualizar con datos formulario: Toma toda la informaciones recibida de los formularios y actualiza la información. A los profesores jornada se le asigna de forma automatica todo el horario disponible. En caso de que en un mismo curso se presenten diferentes disponibilidades el progrmaa solo deja las horas compartidas (intersección)
+- Crear archivo para DPSA: Creación de los archivos en base a la asignación de pruebas y la información proveniente de Calendario horarios definiendo formato para las listas cruzadas y los conectores de liga, además crea un archivo de ajustes donde se presentarán todos los ajustes presentes desde la última ejecución de este comando, los ajustes se acumulan.
+- Crear archivo para Alumnos: Creacion del HORARIO ING con todas las columnas necesarias para su creación incluyendo ligas y listas cruzadas
+- Actualizar áreas con catalogo antiguo (Opcional): En caso de tener un catálogo antiguo con la columna de áreas vacía, se puede usar este comando para hacer los cruces y en caso de no encontrar ningun curso, se dejará en blanco y será necesario rellenar a mano
 ## CalendarioHorario
 ### Descripción
 Este programa se dedica a la creacion y asignacion de horarios para cada tipod e reunion existente en cada asginatura para cada seccion, el programa se centre en la deteccion de restricciones presentes en al programacion de horarios para mas detalles de las restricciones visitar [la documentacion ](https://docs.google.com/document/d/18BQm9B1-aJW8mY22hJDP9fxbyFzg-mBxT-zZ_NI6Zqc/edit?tab=t.0) admeas actualiza automaticamente el maestro con los horarios asignados, adicionalemnte tien un sistema de visualizaciones y sistemas de colores para mejorar la comprension
