@@ -117,12 +117,12 @@ var id_hoja_maestro="1SxCL4Hzn_F9Uph1tAyvCETrNSi4TdoyE8c1v6LWytHE"
 - Enviar a maestro: envia toda la informacion actual en todas las hojas para crear los horarios en la hoja Maestro en el archivo MAESTRO de forma atomatica
 
 ---
-VISUALIZACIONES(Todas Las Hojas): Crea una hoja de visualizacion del semestre indicado que agrupa por seccion y tipo de reunion
-VERIFICAR TOPES MISMO SEMESTRE(Todas Las Hojas): verifica topes de cursos que se encuentren en el mismo semestre y esten asignados a un mismo bloque horario
-VERIFICAR SALAS ESPECIALES(Todas Las Hojas): Busca la restriccion de uso de una misma sala especial en un miesmo bloque horario esto sucede tanto en un mismo semestre como en las diferentes hojas se basa en la informacio presente en  `DATOS MAESTRO` para las salas especiales busca en todo tipo de reunion
-VERIFICAR DISPONIBILIDAD PROFESOR(Todas Las Hojas):Busca que se este cumpliendo con la disponibilidad entregada por el profesor y ademas de que no se seste asignando en un mismo bloque horario para diferentes secciones de diferentes asignaturas
-VERIFICAR HORARIOS PROTEGIDOS(PLAN COMUN/V,VI): Busca asignaciones en diferentes bloques para horarios protegidos
-VERIFICAR CONCENTRACIONES(V,VI,VI,VII):Busca topes con ramso del mismo semestre con alguna conecntracion en base a sus detalles semestre ocupa la restriccion de P para permitir topes y no toma en cuenta ramos compartidos para evitar falsos topes
+- VISUALIZACIONES(Todas Las Hojas): Crea una hoja de visualizacion del semestre indicado que agrupa por seccion y tipo de reunion
+- VERIFICAR TOPES MISMO SEMESTRE(Todas Las Hojas): verifica topes de cursos que se encuentren en el mismo semestre y esten asignados a un mismo bloque horario
+- VERIFICAR SALAS ESPECIALES(Todas Las Hojas): Busca la restriccion de uso de una misma sala especial en un miesmo bloque horario esto sucede tanto en un mismo semestre como en las diferentes hojas se basa en la informacio presente en  `DATOS MAESTRO` para las salas especiales busca en todo tipo de reunion
+- VERIFICAR DISPONIBILIDAD PROFESOR(Todas Las Hojas):Busca que se este cumpliendo con la disponibilidad entregada por el profesor y ademas de que no se seste asignando en un mismo bloque horario para diferentes secciones de diferentes asignaturas
+- VERIFICAR HORARIOS PROTEGIDOS(PLAN COMUN/V,VI): Busca asignaciones en diferentes bloques para horarios protegidos
+- VERIFICAR CONCENTRACIONES(V,VI,VI,VII):Busca topes con ramso del mismo semestre con alguna conecntracion en base a sus detalles semestre ocupa la restriccion de P para permitir topes y no toma en cuenta ramos compartidos para evitar falsos topes
 
 ## FORMULARIOS
 ### Descripción
