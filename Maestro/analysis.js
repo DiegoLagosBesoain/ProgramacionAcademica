@@ -656,7 +656,7 @@ function rellenar_evaluaciones(data_maestro,hoja_maestro,encabezado){
 
   })
 
-  return dPSA
+  return dPSA.filter((entrada)=>entrada[24]=="EXAM"||entrada[24]=="TARDE")
   
 }
 function agregar_fechas_HORARIO_ING(horario_ing,fecha_inicio_clases,fecha_fin_clases,fecha_inicio_ayud,fecha_fin_ayud,data_programacion){
@@ -970,7 +970,6 @@ function parseCustomDate(dateString, year = new Date().getFullYear()) {
   return new Date(year, month, parseInt(day, 10));
 }
   
-
 
 
 

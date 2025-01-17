@@ -9,6 +9,7 @@ function obterner_data_maestro() {
 ///ATENTO A ESTO
 function obtenerBloquesPorHoraYDia(hoja, hoja_data_maestro) {
   const data_maestro = hoja_data_maestro.getDataRange().getDisplayValues();
+  data_maestro.shift()
 
   // Leer los datos una vez para evitar múltiples accesos a la hoja
   const rangoDias = hoja.getRange(2, 1, hoja.getLastRow() - 1).getValues().flat();
@@ -118,6 +119,3 @@ function obtenerNumeroDeColumna(sheet, nombreColumna, filaEncabezados) {
   // Los índices empiezan desde 0, pero las columnas en Sheets empiezan desde 1
   return indice;
 }
-
-
-

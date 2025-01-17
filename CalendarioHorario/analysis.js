@@ -1,4 +1,4 @@
-function obtener_bloques(data_maestro,encabezado){
+function obtener_bloques(data_maestro,encabezado,datos_antiguos){
   
   const col_codigo_clases=obtener_nombre_columna_data(encabezado,"Clases A PROGRAMAR")
   const col_codigo_ayudantias=obtener_nombre_columna_data(encabezado,"Ayudantías PROGRAMAR")
@@ -107,6 +107,19 @@ function obtener_bloques(data_maestro,encabezado){
   }
 
   })
+  resultados[0]=resultados[0].map((entrada)=>{
+    let entrada_antigua=datos_antiguos.find((fila_antigua)=>
+    fila_antigua[0]==entrada[0]&&//codigo
+    fila_antigua[1]==entrada[1]&&//seccion
+    fila_antigua[6]==entrada[6]//tipo
+    )
+    if(entrada_antigua){
+      entrada[5]=entrada_antigua[5]
+    }
+    return entrada
+
+
+    })
   return resultados
   
 }
@@ -302,7 +315,7 @@ function obtener_topes_sala_especial(bloques){
       let columna = idx+2;
       let labs = bloques[hora][dia].map((elemento)=>elemento.split(" ")).filter((curso)=>{
         
-        return (curso[6]=="LAB/TALLER"||curso[6]=="AYUD")
+        return (curso[6]=="LAB/TALLER"||curso[6]=="AYUD"||curso[6]=="CLAS")
       })
       
       if(labs.length>0){
@@ -1006,10 +1019,3 @@ function actualizar_data_maestro(data_maestro,horarios,col_dias,dias){
   return data_maestro
 
 }
-
-
-
-
-
-
-

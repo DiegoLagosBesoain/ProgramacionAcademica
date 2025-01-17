@@ -92,7 +92,7 @@ function crear_calendario(hoja,opcionesLista) {
      .build();
    
    // Aplicar la validación a todas las celdas de la columna 6 en el rango
-   hoja.getRange(filaInicial, columnaInicial + 5, numFilas, 1).setDataValidation(reglaValidacion);
+   hoja.getRange(filaInicial+1, columnaInicial + 5, numFilas, 1).setDataValidation(reglaValidacion);
  }
  function escribirListaDeListas1(hoja, datos, filaInicial, columnaInicial) {
    // Determinar el tamaño del rango (filas y columnas)

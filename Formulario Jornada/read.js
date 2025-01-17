@@ -58,4 +58,3 @@ function obtenerSpreadsheetDeCarpeta(idCarpeta, nombreArchivo) {
     return null;
   }
 }
-

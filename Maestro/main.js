@@ -1,20 +1,23 @@
-var id_hoja_programacion='1pQBxylZzoIWAY0RKcbgDMUKrZLg6u0cGIsxd-GleUYE'//Hoja de programacion para los cursos
+var id_hoja_programacion='1rMO2IPpYORUyfbQEgOfdTnfTOzGB9Q2b9lQaL9Rnrj4'//Hoja de programacion para los cursos
 var id_archivo_actual="1o6HftjnQiU4EB1T9mwZ5FntfkZqy9Bj5wkZKbyHl-m0"//Cambiar aqui archivo actual
-var id_carpeta_archivos_cordinadores="1_65rwp56jrcRsxoMO-HnBAOFGFI1z9Mc"//Cambiar aqui carpeta cordinadores
+var id_carpeta_archivos_cordinadores="1esRVMIIXJhKiJqT4rwmQl1hQB78V6oL3"//Cambiar aqui carpeta cordinadores
 var personas_para_envio_de_hojas =[
-    {name:"Diego Lagos",mail:"diego.lagos.besoain@gmail.com",archivos:["MATEMATICA","COMPUTACION"]}
-    
+    {name:"Diego Lagos",mail:"diego.lagos.besoain@gmail.com",archivos:["MATEMATICA","COMPUTACION"]},
+    {name:"Francisca Saez",mail:"fdsaez@uandes.cl",archivos:["INDUSTRIAL","ELECTRICA"]},
+    {name:"Diego Eyzaguirre",mail:"deyzaguirre1@miuandes.cl",archivos:["FISICA","AMBIENTAL"]}
     //cambiar aqui las diferentes areas de cordinacion y sus encargados
 
   ]
 var personas_para_quitar_permisos =[
-    {name:"Diego Lagos",mail:"diego.lagos.besoain@gmail.com",archivos:["MATEMATICA","COMPUTACION"]}
+    {name:"Diego Lagos",mail:"diego.lagos.besoain@gmail.com",archivos:["MATEMATICA","COMPUTACION"]},
+    {name:"Francisca Saez",mail:"fdsaez@uandes.cl",archivos:["INDUSTRIAL","ELECTRICA"]},
+    {name:"Diego Eyzaguirre",mail:"deyzaguirre1@miuandes.cl",archivos:["FISICA","AMBIENTAL"]}
     
     //cambiar aqui las diferentes areas de cordinacion y sus encargados
 
   ]
-var linkFormulario1 = "https://script.google.com/macros/s/AKfycbxSHjR1VZxcZqeYqyuIbQ2D9Y-HXpkL_kL30ym4l3WzAEJkhr-OT43EeTZVrYFTtd2D/exec"; // Cambiar por el link del formulario Honorarios
-var linkFormulario2 = "https://script.google.com/macros/s/AKfycbyobQf5Zffk-bDaIY1JszLMKDSdLVs_IxBWkNtCFFdfXlDElu3D1qiCzxtDjFSbPSAw/exec"; // Cambiar por el link del formulario Jornada
+var linkFormulario1 = "https://script.google.com/macros/s/AKfycbzCbKj2BNb_o6ed9E97W5fV8bcLLaPIKwP97DWu3FU6lbxeZr4qqa-skLEAFxaKYKrP/exec"; // Cambiar por el link del formulario Honorarios
+var linkFormulario2 = "https://script.google.com/macros/s/AKfycbyk0gcGoHVd4z46Vtsp49sgz5j_yomWypNpwG11HCpJpv5PDchXl3o6iyLvIYgZwaB9lA/exec"; // Cambiar por el link del formulario Jornada
 var mensaje_intermedio=""
 function onOpen(){
   const ui = SpreadsheetApp.getUi(); //crea referencia a la interfaz de usuario de Spreadsheet
@@ -574,4 +577,3 @@ escribirListaDeListas(hoja_catalogo,data_catalogo,1,1)
 
 
 }
-

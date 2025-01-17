@@ -1,4 +1,4 @@
-var id_hoja_maestro="1o6HftjnQiU4EB1T9mwZ5FntfkZqy9Bj5wkZKbyHl-m0"
+var id_hoja_maestro="1SxCL4Hzn_F9Uph1tAyvCETrNSi4TdoyE8c1v6LWytHE"
 function doGet() {
   return HtmlService.createTemplateFromFile('index').evaluate();
 }
@@ -246,6 +246,5 @@ function enviar_datos_otros(rut,comentarios,examenes,evaluaciones,tipos){
 
 }
 function todo_bien(){}
-
 
 

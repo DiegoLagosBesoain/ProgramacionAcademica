@@ -55,7 +55,8 @@ function aplicarValidacion(hoja, rango, opciones) {
 */
 const hojasActuales = SpreadsheetApp.getActiveSpreadsheet();
 const hoja_data_maestro=hojasActuales.getSheetByName("DATOS MAESTRO")
-var data_maestro_para_triggers=hoja_data_maestro.getDataRange().getDisplayValues()  
+var data_maestro_para_triggers=hoja_data_maestro.getDataRange().getDisplayValues().slice(1) 
+ 
 
 function onEdit(e) {
 
@@ -519,5 +520,3 @@ function retornar_por_semestre_visualizacion(valorEditado,data_maestro_con_detal
     }
   
 }
-
-

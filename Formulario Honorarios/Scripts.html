@@ -1,3 +1,4 @@
+
 <script>
   var nombre = "";
   var rut = "";
@@ -681,7 +682,7 @@ mostrarCarga();
 types = [...tipos]
 // Opcional: Enviar las preferencias al backend
 google.script.run
-.withSuccessHandler(() => {
+.withSuccessHandler(( ) => {
   ocultarCarga();
   console.log("Preferencias guardadas exitosamente.");
   mostrarPreguntaAbierta(); // Avanzar a pregunta3
