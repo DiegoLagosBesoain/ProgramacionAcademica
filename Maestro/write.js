@@ -1,3 +1,13 @@
+function recrearHoja(nombreHoja) {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const hojaExistente = ss.getSheetByName(nombreHoja);
+
+  if (hojaExistente) {
+    ss.deleteSheet(hojaExistente);
+  }
+
+  return ss.insertSheet(nombreHoja);
+}
 function escribirDatosYResaltar(hoja, datos) {
   
 
@@ -148,33 +158,38 @@ function crearSpreadsheetEnCarpeta(nombreArchivo) {
 }
 function crearSpreadsheetEnCarpetaConRemplazo(nombreArchivo) {
   try {
-    // Obtener la carpeta por su ID
-    const idCarpeta = id_carpeta_archivos_cordinadores;
-    const carpeta = DriveApp.getFolderById(idCarpeta);
-    
-    // Buscar si ya existe un archivo con el mismo nombre en la carpeta
-    const archivos = carpeta.getFilesByName(nombreArchivo);
-    if (archivos.hasNext()) {
-      const archivoExistente = archivos.next();
-      Logger.log(`Archivo existente encontrado: ${archivoExistente.getName()}`);
-      return SpreadsheetApp.openById(archivoExistente.getId()); // Retornar el archivo existente
+    const folderId = id_carpeta_archivos_cordinadores;
+
+    // Buscar si existe archivo con ese nombre en la carpeta
+    const query = `'${folderId}' in parents and name = '${nombreArchivo}' and trashed = false`;
+    const res = Drive.Files.list({ q: query, fields: "files(id, name)" });
+
+    if (res.files && res.files.length > 0) {
+      return SpreadsheetApp.openById(res.files[0].id);
     }
 
-    // Crear el nuevo archivo Google Sheets si no existe
-    const nuevoSpreadsheet = SpreadsheetApp.create(nombreArchivo);
+    // Crear Spreadsheet
+    const ss = SpreadsheetApp.create(nombreArchivo);
 
-    // Mover el archivo a la carpeta
-    const archivo = DriveApp.getFileById(nuevoSpreadsheet.getId());
-    carpeta.addFile(archivo);
-    DriveApp.getRootFolder().removeFile(archivo); // Remover de "Mi unidad"
+    // Mover usando Drive API (forma moderna)
+    Drive.Files.update(
+      {},
+      ss.getId(),
+      null,
+      {
+        addParents: folderId,
+        removeParents: "root"
+      }
+    );
 
-    // Retornar el objeto Spreadsheet para editarlo
-    return SpreadsheetApp.openById(nuevoSpreadsheet.getId());
+    return ss;
+
   } catch (e) {
-    Logger.log(`Error: ${e.message}`);
+    Logger.log(e);
     throw new Error("No se pudo crear o mover el archivo Google Sheets.");
   }
 }
+
 function enviarLinksConPermisos(idCarpeta, listaDatos) {
   try {
     // Obtener la carpeta por su ID
@@ -279,6 +294,29 @@ function limpiarColumnas(hoja,columnas) {
   
   // Escribe los datos actualizados en el rango
   rango.setValues(datos);
+}
+function escribirListaDeListasDesdeFila(datos, nombreHoja, filaInicio) {
+  if (!datos || datos.length === 0) return;
+
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const sheet = ss.getSheetByName(nombreHoja);
+  if (!sheet) {
+    throw new Error(`No existe la hoja: ${nombreHoja}`);
+  }
+
+  const numFilas = datos.length;
+  const numColumnas = Math.max(...datos.map(fila => fila.length));
+
+  // Normalizamos filas más cortas (Sheets requiere matriz rectangular)
+  const matriz = datos.map(fila => {
+    const copia = fila.slice();
+    while (copia.length < numColumnas) copia.push("");
+    return copia;
+  });
+
+  sheet
+    .getRange(filaInicio, 1, numFilas, numColumnas)
+    .setValues(matriz);
 }
 function escribirListaDeListas(hoja, datos, filaInicial, columnaInicial) {
   // Determinar el tamaño del rango (filas y columnas)
@@ -400,4 +438,68 @@ function agregarAlFinal(hoja, datos, enunciado) {
     hoja.getRange(nuevaFilaInicio, 1, datos.length, datos[0].length).setValues(datos);
   }
 }
+function reenviarFormularioPorRut(rutObjetivo) {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const sheetMaestro = ss.getSheetByName("MAESTRO");
+  const sheetProfesores = ss.getSheetByName("PROFESORES");
 
+  const rut_profesores_jornada = sheetProfesores
+    .getDataRange()
+    .getDisplayValues()
+    .map(fila => fila[1]);
+
+  const colMail1 = obtenerNumeroDeColumna(sheetMaestro, "EMAIL PROFESOR 1", 1);
+  const colMail2 = obtenerNumeroDeColumna(sheetMaestro, "EMAIL PROFESOR 2", 1);
+  const colRut1  = obtenerNumeroDeColumna(sheetMaestro, "RUT PROFESOR 1", 1);
+  const colRut2  = obtenerNumeroDeColumna(sheetMaestro, "RUT PROFESOR 2", 1);
+
+  const data = sheetMaestro.getDataRange().getDisplayValues();
+  data.shift(); // eliminar encabezado
+
+  data.forEach(fila => {
+    const email1 = fila[colMail1];
+    const email2 = fila[colMail2];
+    const rut1   = fila[colRut1];
+    const rut2   = fila[colRut2];
+
+    if (rut1 === rutObjetivo && email1) {
+      if (condicionPersonalizada(rut1, rut_profesores_jornada)) {
+        enviarCorreo(
+          email1,
+          rut1,
+          linkFormulario2,
+          `Estimado profesor/a,\n\nHemos reiniciado su respuesta. Por favor complete el siguiente formulario:\n${linkFormulario2}\n\nMuchas gracias.\nÁrea de Análisis Curricular`,
+          "FORMULARIO DE PREFERENCIAS"
+        );
+      } else {
+        enviarCorreo(
+          email1,
+          rut1,
+          linkFormulario1,
+          `Estimado profesor/a,\n\nHemos reiniciado su respuesta. Por favor complete el siguiente formulario:\n${linkFormulario1}\n\nMuchas gracias.\nÁrea de Análisis Curricular`,
+          "FORMULARIO DE DISPONIBILIDAD Y PREFERENCIAS"
+        );
+      }
+    }
+
+    if (rut2 === rutObjetivo && email2) {
+      if (condicionPersonalizada(rut2, rut_profesores_jornada)) {
+        enviarCorreo(
+          email2,
+          rut2,
+          linkFormulario2,
+          `Estimado profesor/a,\n\nHemos reiniciado su respuesta. Por favor complete el siguiente formulario:\n${linkFormulario2}\n\nMuchas gracias.\nÁrea de Análisis Curricular`,
+          "FORMULARIO DE PREFERENCIAS"
+        );
+      } else {
+        enviarCorreo(
+          email2,
+          rut2,
+          linkFormulario1,
+          `Estimado profesor/a,\n\nHemos reiniciado su respuesta. Por favor complete el siguiente formulario:\n${linkFormulario1}\n\nMuchas gracias.\nÁrea de Análisis Curricular`,
+          "FORMULARIO DE DISPONIBILIDAD Y PREFERENCIAS"
+        );
+      }
+    }
+  });
+}

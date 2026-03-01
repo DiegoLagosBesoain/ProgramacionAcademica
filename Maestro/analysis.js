@@ -10,7 +10,10 @@ function obtener_columnas_especificas(data,cols) {
   })
 }
 
-
+function numeroALetra(n) {
+  if (n < 1 || n > 26) return null;
+  return String.fromCharCode(64 + n);
+}
 
 
 function cortarColumnas(lista, limiteColumna) {
@@ -24,8 +27,9 @@ function cortarColumnas(lista, limiteColumna) {
 );
 }
 const buscarNRCsUnicos = (codigoCurso, nrcs, usados) => {
+  console.log("codigo curso:",codigoCurso)
   return nrcs
-    .filter((nrc) => `${nrc[6]}${nrc[7]}` === codigoCurso) // Filtra por código de curso
+    .filter((nrc) => `${nrc[6]}${nrc[7]}` == codigoCurso) // Filtra por código de curso
     .map((nrc) => nrc[3]) // Extrae el NRC (posición 3)
     .filter((nrc) => {
       if (!usados.includes(nrc)) { // Si no se ha usado, lo asigna
@@ -38,7 +42,6 @@ const buscarNRCsUnicos = (codigoCurso, nrcs, usados) => {
 const generarSecciones = (curso, nrcs) => {
   let usados = []
   const [codigoCurso, , numSecciones] = curso;
-  console.log("Codigo curso: ",codigoCurso,"nuemro secciones: ",numSecciones)
   const nrcsAsociados = buscarNRCsUnicos(codigoCurso, nrcs, usados);
 
   // Creamos las secciones usando un map sobre un rango de 0 a numSecciones
@@ -67,7 +70,7 @@ function generar_Entradas(secciones,data_nrc,data_catalogo,hoja_catalogo,hoja_li
   const col_materia_maestro=obtenerNumeroDeColumna(hoja_maestro,"MATERIA",1)
   const col_area_catalogo=obtenerNumeroDeColumna(hoja_catalogo,"AREA",1)
   const col_titulo_catalogo=obtenerNumeroDeColumna(hoja_catalogo,"TITULO",1)
-  
+  console.log("data nrc:",data_nrc)
   return secciones.map((seccion,idx)=>{
 
     let entrada = new Array(obtenerCantidadDeColumnas(hoja_maestro))
@@ -89,14 +92,15 @@ function generar_Entradas(secciones,data_nrc,data_catalogo,hoja_catalogo,hoja_li
     
     entrada[1]=datos_catalogo[col_area_catalogo]
     entrada[10]=datos_catalogo[col_titulo_catalogo]
-    let datos_nrc = data_nrc.find((curso)=>curso[3]===seccion[2])//Busca por nrc
+    
+    let datos_nrc = data_nrc.find((curso)=>curso[3]==seccion[2])//Busca por nrc
     if (datos_nrc===undefined){
     datos_nrc= Array(data_nrc[0].length) 
     }
     entrada[12]=datos_nrc[28]//cupos de ese NRC si no encuentra devuelve undefined
     
     let detalles = extraerRango(datos_catalogo,obtenerNumeroDeColumna(hoja_catalogo,"Plan Común",1),obtenerNumeroDeColumna(hoja_catalogo,"Sala especial",1))
-    console.log(detalles)
+    
     entrada = reemplazarParteLista(entrada,16,35,detalles)
     entrada[col_SCT_Chile_maestro]=datos_catalogo[col_SCT_Chile_catalogo]
     entrada[col_Requisitos_maestro]=datos_catalogo[col_Requisitos_catalogo]
@@ -136,7 +140,6 @@ function extraerRango(lista, inicio, fin) {
 }
 function reemplazarParteLista(lista, inicio, fin, sublista) {
   // Elimina desde `inicio` hasta `fin` y agrega `sublista` en su lugar.
-  console.log("lista:",lista,"remplazada por :",sublista)
   lista.splice(inicio, fin - inicio + 1, ...sublista);
   return lista;
 }
@@ -969,7 +972,280 @@ function parseCustomDate(dateString, year = new Date().getFullYear()) {
 
   return new Date(year, month, parseInt(day, 10));
 }
-  
+function contarPorCodigo(data, numColumnaCurso,numColumnaMateria,homologaciones) {
+  const conteo = {};
+
+  data.forEach(row => {
+    const codigo = row[numColumnaMateria]+row[numColumnaCurso];
+
+    if (codigo === "" || codigo == null) return;
+
+    conteo[codigo] = (conteo[codigo] || 0) + 1;
+  });
+  Object.keys(homologaciones).forEach((codigo)=>{
+    console.log(codigo,homologaciones[codigo])
+    if (!conteo[codigo]){
+      conteo[codigo]=0
+    }
+    homologaciones[codigo].forEach((lc)=>{
+      if (conteo[lc[0]]){
+      conteo[codigo]=conteo[codigo]+conteo[lc[0]]}
+
+    })
+  })
+  return conteo;
+}
+function contarPorCodigo2(data,numColumnaCodigo) {
+  const conteo = {};
+
+  data.forEach(row => {
+    const codigo = row[numColumnaCodigo];
+
+    if (codigo === "" || codigo == null) return;
+
+    conteo[codigo] = (conteo[codigo] || 0) + 1;
+  });
+
+  return conteo;
+}
+function parsePercent(raw) {
+    if (raw === null || raw === undefined) return null;
+    if (typeof raw === 'number' && !isNaN(raw)) return raw;
+    var s = String(raw).trim();
+    if (s === "" || /^n\/?a$/i.test(s)) return null;
+    // quitar %
+    s = s.replace("%", "");
+    // cambiar coma decimal a punto
+    s = s.replace(",", ".");
+    var v = parseFloat(s);
+    return isNaN(v) ? null : v;
+  }
+function calcularPromedioReprobacion(sheet, filaEncabezados, filaInicioDatos) {
+  // ========================
+  // Helpers
+  // ========================
+  function parsePercent(raw) {
+    if (raw === null || raw === undefined) return null;
+    if (typeof raw === 'number') return raw;
+    const s = String(raw).trim();
+    if (s === "" || /^n\/?a$/i.test(s)) return null;
+    return parseFloat(s.replace('%', '').replace(',', '.'));
+  }
+
+  // ========================
+  // Obtener encabezados
+  // ========================
+  const encabezados = sheet
+    .getRange(filaEncabezados, 1, 1, sheet.getLastColumn())
+    .getValues()[0];
+
+  // Columnas base
+  const colCodigo = obtenerNumeroDeColumna(sheet, "CODIGO", filaEncabezados);
+  const colSem10 = obtenerNumeroDeColumna(sheet, "Secciones Sem 10", filaEncabezados);
+  const colSem20 = obtenerNumeroDeColumna(sheet, "Secciones Sem 20", filaEncabezados);
+
+  // ========================
+  // Detectar columnas REPROBADOS %
+  // ========================
+  const periodCols = encabezados
+    .map((h, i) => ({ header: h, index: i }))
+    .filter(h =>
+      typeof h.header === "string" &&
+      h.header.startsWith("REPROBADOS %")
+    )
+    .map(h => {
+      const period = h.header.replace("REPROBADOS %", "").trim(); // 202310
+      return {
+        col: h.index,
+        period,
+        sem: period.slice(-2)
+      };
+    })
+    .sort((a, b) => parseInt(a.period) - parseInt(b.period));
+
+  // ========================
+  // Leer datos
+  // ========================
+  const lastRow = sheet.getLastRow();
+  if (lastRow < filaInicioDatos) return {};
+
+  const rows = sheet
+    .getRange(
+      filaInicioDatos,
+      1,
+      lastRow - filaInicioDatos + 1,
+      sheet.getLastColumn()
+    )
+    .getValues();
+
+  // ========================
+  // Procesamiento
+  // ========================
+  const resultado = {};
+
+  rows.forEach(row => {
+    const codigo = row[colCodigo];
+    if (!codigo) return;
+
+    const dicta10 = Boolean(row[colSem10]);
+    const dicta20 = Boolean(row[colSem20]);
+
+    const valores = periodCols
+      .map(p => ({
+        period: p.period,
+        sem: p.sem,
+        value: parsePercent(row[p.col])
+      }))
+      .filter(v => v.value !== null);
+
+    if (valores.length === 0) {
+      resultado[codigo] = null;
+      return;
+    }
+
+    const ultimoPeriodo = valores.reduce((a, b) =>
+      parseInt(a.period) > parseInt(b.period) ? a : b
+    );
+
+    let semestreObjetivo;
+    if (dicta10 && !dicta20) {
+      semestreObjetivo = "10";
+    } else if (dicta20 && !dicta10) {
+      semestreObjetivo = "20";
+    } else if (dicta10 && dicta20) {
+      semestreObjetivo = ultimoPeriodo.sem === "10" ? "20" : "10";
+    } else {
+      semestreObjetivo = ultimoPeriodo.sem;
+    }
+
+    const seleccionados = valores
+      .filter(v => v.sem === semestreObjetivo)
+      .sort((a, b) => parseInt(b.period) - parseInt(a.period))
+      .slice(0, 2);
+
+    if (seleccionados.length === 0) {
+      resultado[codigo] = null;
+      return;
+    }
+    console.log(codigo,seleccionados)
+    const promedio =
+      seleccionados.reduce((s, v) => s + v.value, 0) /
+      seleccionados.length;
+
+    resultado[codigo] = Math.round(promedio * 100) / 100;
+  });
+
+  return resultado;
+}
+function obtenerCodigosDesdeTexto(textoCursos, data, colNombre, colCodigo) {
+  // si viene vacío, null o no es string → []
+  if (!textoCursos || typeof textoCursos !== "string" || textoCursos.trim() === "") {
+    return [];
+  }
+
+  const cursos = textoCursos
+    .split(",")
+    .map(c => c.trim())
+    .filter(c => c && !/\(\s*p\s*\)/i.test(c));
+
+  const mapa = {};
+  data.forEach(row => {
+    const nombre = row[colNombre];
+    const codigo = row[colCodigo];
+    if (nombre && codigo) {
+      mapa[String(nombre).trim().toLowerCase()] = codigo;
+    }
+  });
+
+  return cursos
+    .map(nombreCurso => mapa[nombreCurso.toLowerCase()])
+    .filter(Boolean);
+}
+function obtenerListaUnicos(datos, columna) {
+  const index = columna;
+  const vistos = new Set();
+
+  datos.forEach(fila => {
+    const valor = fila[index];
+
+    if (valor !== "" && valor !== null && valor !== undefined) {
+      vistos.add(valor);
+    }
+  });
+
+  return Array.from(vistos);
+}
+function procesarMultiplesHojasHomologas(sheetNames) {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const seen = new Set();        // diccionario global de códigos ya vistos
+  const resultado = {};          // primary -> [[codigo, nombre], ...]
+
+  for (let i = 0; i < sheetNames.length; i++) {
+    const sheet = ss.getSheetByName(sheetNames[i]);
+    if (!sheet) continue;
+
+    const lastRow = sheet.getLastRow();
+    const lastCol = sheet.getLastColumn();
+    if (lastRow < 3 || lastCol < 1) continue;
+
+    // desde fila 3
+    const datos = sheet.getRange(3, 1, lastRow - 2, lastCol).getValues();
+
+    for (let r = 0; r < datos.length; r++) {
+      const fila = datos[r];
+      const primaryRaw = fila[0];
+      if (!primaryRaw) continue;
+
+      const primary = String(primaryRaw).trim();
+
+      // si ya fue visto, saltamos la fila completa
+      if (seen.has(primary)) continue;
+
+      // lista temporal de cursos nuevos encontrados en esta fila
+      const nuevosCursos = [];
+
+      // recorremos pares C/D, E/F, ...
+      for (let c = 2; c < lastCol; c += 2) {
+        const codeRaw = fila[c];
+        if (!codeRaw) continue;
+
+        const code = String(codeRaw).trim();
+        if (code === primary) continue;
+
+        if (!seen.has(code)) {
+          let nombre = "";
+          if (c + 1 < fila.length && fila[c + 1] != null) {
+            nombre = String(fila[c + 1]).trim();
+          }
+
+          seen.add(code);
+          nuevosCursos.push([code, nombre]);
+        }
+      }
+
+      // solo ahora marcamos el primary como visto
+      // y lo guardamos si realmente hay cursos nuevos
+      if (nuevosCursos.length > 0) {
+        seen.add(primary);
+        resultado[primary] = nuevosCursos;
+      }
+    }
+  }
+
+  return resultado;
+}
+
+function ocultarColumnasExcepto(hoja, columnasVisibles) {
+  const ultimaColumna = hoja.getLastColumn();
+  const encabezados = hoja.getRange(1, 1, 1, ultimaColumna).getValues()[0];
+
+  encabezados.forEach((nombreColumna, index) => {
+    if (!columnasVisibles.includes(nombreColumna)) {
+      hoja.hideColumns(index + 1);
+    }
+  });
+}
+
 
 
 
