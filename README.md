@@ -21,6 +21,10 @@ Está diseñado para usarse en el entorno de Google Sheets, utilizando Google Ap
     5. Hoja `CATALOGO ANTIGUO`(opcional)
     6. Hoja `PROFESORES` con la información de los profesores de jornada con rut en la segunda columna
     7. Hoja `RESPUESTAS`,`PREFERENCIAS`,`OTROS`,`ENTREGADOS`Creadas y vacías para poder recibir las respuestas de los formularios
+    8. Hojas por especialidad (`ICC`, `ICA`, `ICQ`, etc.) con los cursos homologados de cada especialidad
+    9. Hoja `HISTORICO REPROBACION` con los datos históricos de reprobación
+    10. Hoja `CUMPLIMIENTO DE MALLA` con los datos de cumplimiento de malla
+    11. Hoja `RAMOS INSCRITOS POR PERIODO` con los datos de ramos inscritos por periodo
 - Carpeta en Drive con permisos para crear las hojas de coordinadores
 
 
@@ -28,12 +32,15 @@ Está diseñado para usarse en el entorno de Google Sheets, utilizando Google Ap
 
 1. Abrir tu hoja de cálculo en Google Sheets.
 2. Ir a `Extensiones` > `Apps Script`.
-3. Copiar y pegar el código del script del repositorio de github en el editor de Apps Script manteniendo los archivos creados con el mismo nombre.
-4. Guardar con CTR+S
-5. Conectar el maestro a la carpeta coordinadores
-6. Conectar el maestro al archivo de CALENDARIO HORARIOS
-7. Agregar al maestro los links de los formularios
-8. Agregar a las personas que tendran permisos a las hojas y recordar luego registrar a las personas que se les va a quitar permiso
+3. En el editor de Apps Script, ir a `Configuración` (ícono de engranaje) y activar la opción `Mostrar el archivo de manifiesto "appsscript.json" en el editor`.
+4. Copiar y pegar el código del script del repositorio de github en el editor de Apps Script manteniendo los archivos creados con el mismo nombre.
+5. Copiar el contenido del archivo `appscript.json` del repositorio en el archivo de manifiesto que ahora aparece en el editor.
+6. Habilitar el servicio de Drive API: En el editor de Apps Script, hacer clic en el botón `+` junto a `Servicios`, buscar `Drive API`, seleccionar la versión `V3` y hacer clic en `Agregar`.
+7. Guardar con CTR+S
+8. Conectar el maestro a la carpeta coordinadores
+9. Conectar el maestro al archivo de CALENDARIO HORARIOS
+10. Agregar al maestro los links de los formularios
+11. Agregar a las personas que tendran permisos a las hojas y recordar luego registrar a las personas que se les va a quitar permiso
 ```javascript
 var id_hoja_programacion='1rMO2IPpYORUyfbQEgOfdTnfTOzGB9Q2b9lQaL9Rnrj4'//Hoja de programacion para los cursos
 var id_archivo_actual="1o6HftjnQiU4EB1T9mwZ5FntfkZqy9Bj5wkZKbyHl-m0"//Cambiar aqui archivo actual
@@ -56,10 +63,10 @@ var personas_para_quitar_permisos =[
 var linkFormulario1 = "https://script.google.com/macros/s/AKfycbzCbKj2BNb_o6ed9E97W5fV8bcLLaPIKwP97DWu3FU6lbxeZr4qqa-skLEAFxaKYKrP/exec"; // Cambiar por el link del formulario Honorarios
 var linkFormulario2 = "https://script.google.com/macros/s/AKfycbyk0gcGoHVd4z46Vtsp49sgz5j_yomWypNpwG11HCpJpv5PDchXl3o6iyLvIYgZwaB9lA/exec";
 ```
-10. Guardar los cambios.
-11. Asegúrar de otorgar los permisos adecuados para ejecutar el script (autenticación).
-12. Abrir el editor de Apps Script y selecciona la función que se desee ejecutar.
-13. Hacer clic en el ícono de "Ejecutar" en el archivo 'Main" para iniciar el proceso.
+12. Guardar los cambios.
+13. Asegúrar de otorgar los permisos adecuados para ejecutar el script (autenticación).
+14. Abrir el editor de Apps Script y selecciona la función que se desee ejecutar.
+15. Hacer clic en el ícono de "Ejecutar" en el archivo 'Main" para iniciar el proceso.
 
 - **Consideraciones:**
   - En caso de no existir o de modificar el nombre de las hojas, el programa puede presentar fallas en su funcionamiento.
