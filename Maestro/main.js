@@ -42,6 +42,7 @@ function onOpen(){
       ui.createMenu('Nuevas Opciones de Formulario')
         .addItem('Crear Hojas De Respuesta', 'crearHojasDeRespuesta')
         .addItem('Eliminar Respuesta y Reenviar', 'borrarFilasPorRutConInput')
+        .addItem('Reenviar Rezagados', 'enviarRecordatoriosNoRespondidos')
     )
     
     
@@ -153,7 +154,6 @@ areas.forEach((area)=>{
   "CUPOS",
   "SECCIONES",
   "Sala especial",
-  "Requisitos",
   "RUT PROFESOR 1",
   "EMAIL PROFESOR 1",
   "TELEFONO PROFESOR 1",
@@ -165,7 +165,8 @@ areas.forEach((area)=>{
   "MAIL PROFESOR LABT",
   "Clases A PROGRAMAR",
   "Ayudantías PROGRAMAR",
-  "Laboratorios o Talleres PROGRAMAR"
+  "Laboratorios o Talleres PROGRAMAR",
+  "COMENTARIOS COORDINADOR"
   ];
   ocultarColumnasExcepto(hoja_area, columnasVisibles)
 
@@ -210,28 +211,29 @@ areas.forEach((area)=>{
   const casosRaros = []
 
   data_cordinador.forEach((fila, i) => {
-    const codigo  = fila[col_clave ]
-    const seccion = fila[col_seccion]
+  const codigo  = fila[col_clave]
+  const seccion = fila[col_seccion]
 
-    const horasClase  = fila[numColumnaHorasClase ]
-    const horasTaller = fila[numColumnaHorasLaboratorio]
+  const horasClase  = String(fila[numColumnaHorasClase] || "").trim()
+  const horasTaller = String(fila[numColumnaHorasLaboratorio] || "").trim()
+  const rutProf1    = String(fila[numColumnaRutProfesor1] || "").trim()
+  const rutLab      = String(fila[numColumnaRutProfesorLab] || "").trim()
 
-    const rutProf1 = fila[numColumnaRutProfesor1 ]
-    const rutLab   = fila[numColumnaRutProfesorLab ]
+  console.log("Detalles horas", codigo, seccion, horasClase, horasTaller)
 
-    const tieneClase   = horasClase !== "" && horasClase != null
-    const tieneTaller  = horasTaller !== "" && horasTaller != null
+  const tieneClase  = horasClase !== ""
+  const tieneTaller = horasTaller !== ""
 
-    // Caso 1: clases + talleres → debe existir RUT PROFESOR LAB
-    if (tieneClase && tieneTaller && (!rutLab || rutLab === "")) {
-      casosRaros.push(`• ${codigo} / ${seccion} → Clases + Lab sin RUT LAB`)
-    }
+  // Caso 1: clases + talleres → debe existir RUT PROFESOR LAB
+  if (tieneClase && tieneTaller && rutLab === "") {
+    casosRaros.push(`• ${codigo} / ${seccion} → Clases + Lab sin RUT LAB`)
+  }
 
-    // Caso 2: solo talleres → RUT debe estar en PROFESOR 1
-    if (!tieneClase && tieneTaller && (!rutProf1 || rutProf1 === "")) {
-      casosRaros.push(`• ${codigo} / ${seccion} → Curso Solo Lab sin RUT PROFESOR 1`)
-    }
-  })
+  // Caso 2: solo talleres → RUT debe estar en PROFESOR 1
+  if (!tieneClase && tieneTaller && rutProf1 === "") {
+    casosRaros.push(`• ${codigo} / ${seccion} → Curso Solo Lab sin RUT PROFESOR 1`)
+  }
+})
 
   // Popup antes de pasar al siguiente area
   if (casosRaros.length > 0) {
@@ -939,18 +941,120 @@ function borrarFilasPorRutConInput() {
   reenviarFormularioPorRut(rut)
   ui.alert(`Se eliminaron todos los registros asociados al RUT: ${rut}`);
 }
-function doGet(e) {
-  try {
-    return router(e, "GET");
-  } catch (err) {
-    return json({ error: err.message });
-  }
-}
+function enviarRecordatoriosNoRespondidos() {
 
-function doPost(e) {
-  try {
-    return router(e, "POST");
-  } catch (err) {
-    return json({ error: err.message });
-  }
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+
+  const hojasRespuestas = [
+    { name: "RESPUESTAS", colRut: 3 },
+    { name: "PREFERENCIAS", colRut: 1 },
+    { name: "OTROS", colRut: 1 },
+    { name: "ENTREGADOS", colRut: 1 }
+  ];
+
+  const sheetMaestro = ss.getSheetByName("MAESTRO");
+  const sheetProfesores = ss.getSheetByName("PROFESORES");
+
+  const rut_profesores_jornada = sheetProfesores
+    .getDataRange()
+    .getDisplayValues()
+    .map(fila => fila[1]);
+
+  // SET de profesores que ya respondieron
+  const rutsRespondidos = new Set();
+
+  hojasRespuestas.forEach(({ name, colRut }) => {
+
+    const sheet = ss.getSheetByName(name);
+    if (!sheet) return;
+
+    const lastRow = sheet.getLastRow();
+    if (lastRow < 2) return;
+
+    const data = sheet
+      .getRange(2, colRut, lastRow - 1, 1)
+      .getDisplayValues();
+
+    data.forEach(fila => {
+      const rut = String(fila[0]).trim();
+      if (rut) rutsRespondidos.add(rut);
+    });
+
+  });
+
+  // Columnas maestro
+  const colMail1 = obtenerNumeroDeColumna(sheetMaestro, "EMAIL PROFESOR 1", 1);
+  const colMail2 = obtenerNumeroDeColumna(sheetMaestro, "EMAIL PROFESOR 2", 1);
+  const colRut1  = obtenerNumeroDeColumna(sheetMaestro, "RUT PROFESOR 1", 1);
+  const colRut2  = obtenerNumeroDeColumna(sheetMaestro, "RUT PROFESOR 2", 1);
+
+  const data = sheetMaestro.getDataRange().getDisplayValues();
+  data.shift();
+
+  const yaEnviados = new Set();
+
+  data.forEach(fila => {
+
+    const email1 = fila[colMail1];
+    const email2 = fila[colMail2];
+    const rut1 = String(fila[colRut1]).trim();
+    const rut2 = String(fila[colRut2]).trim();
+
+    if (rut1 && email1 && !rutsRespondidos.has(rut1) && !yaEnviados.has(rut1)) {
+
+      if (condicionPersonalizada(rut1, rut_profesores_jornada)) {
+        enviarCorreo(email1, rut1, linkFormulario2,
+`Estimado profesor/a,
+
+Le recordamos completar el siguiente formulario:
+${linkFormulario2}
+
+Muchas gracias.
+Área de Análisis Curricular`,
+"RECORDATORIO: FORMULARIO DE PREFERENCIAS");
+      } else {
+        enviarCorreo(email1, rut1, linkFormulario1,
+`Estimado profesor/a,
+
+Le recordamos completar el siguiente formulario:
+${linkFormulario1}
+
+Muchas gracias.
+Área de Análisis Curricular`,
+"RECORDATORIO: FORMULARIO DE DISPONIBILIDAD Y PREFERENCIAS");
+      }
+
+      yaEnviados.add(rut1);
+    }
+
+    if (rut2 && email2 && !rutsRespondidos.has(rut2) && !yaEnviados.has(rut2)) {
+
+      if (condicionPersonalizada(rut2, rut_profesores_jornada)) {
+        enviarCorreo(email2, rut2, linkFormulario2,
+`Estimado profesor/a,
+
+Le recordamos completar el siguiente formulario:
+${linkFormulario2}
+
+Muchas gracias.
+Área de Análisis Curricular`,
+"RECORDATORIO: FORMULARIO DE PREFERENCIAS");
+      } else {
+        enviarCorreo(email2, rut2, linkFormulario1,
+`Estimado profesor/a,
+
+Le recordamos completar el siguiente formulario:
+${linkFormulario1}
+
+Muchas gracias.
+Área de Análisis Curricular`,
+"RECORDATORIO: FORMULARIO DE DISPONIBILIDAD Y PREFERENCIAS");
+      }
+
+      yaEnviados.add(rut2);
+    }
+
+  });
+
+  SpreadsheetApp.getUi().alert(`Recordatorios enviados a ${yaEnviados.size} profesores.`);
 }
