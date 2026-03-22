@@ -165,6 +165,9 @@ areas.forEach((area)=>{
   deleteSheetByName(hojas_area_archivo,"Hoja 1")
   const columnasVisibles = [
   "NRC",
+  "LC",
+  "CURSO MANDANTE",
+  "COMENTARIOS COORDINADOR",
   "CODIGO",
   "TITULO",
   "CUPOS",
