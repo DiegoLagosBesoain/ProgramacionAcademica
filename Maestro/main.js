@@ -24,29 +24,42 @@ function onOpen(){
   const ui = SpreadsheetApp.getUi(); //crea referencia a la interfaz de usuario de Spreadsheet
 
   ui.createMenu("Macros")
-    .addItem("Agregar secciones", "agregar_secciones")
-    .addItem("Crear hoja por area","crear_hoja_por_area")
-    .addItem("Validar Cambios","validar_cambios")
-    .addItem("Crear Calendario","crearCalendario")
-    .addItem("Compartir enlaces","compartirYEnviarEnlace")
-    .addItem("Quitar permisos de edicion archivos cordinaldores","quitar_permisos")
-    .addItem("Extraer datos Hojas cordinadores","extraer_datos")
-    .addItem("Actualizar con datos formulario","actualizar_datos")
-    .addItem("Envio de formularios Jornada y honorarios","enviarFormulariosCondicional")
-    .addItem("Crear archivo para DPSA","crear_template_dpsa")
-    .addItem("Crear archivo para Alumnos","crear_template_HorariosING")
-    .addItem("Actualizar areas con catalogo antiguo","actualizarCatalogo")
-    .addItem("Añadir cupos tentativos","anadirCuposTentativos")
-    .addItem("Añadir listas cruzadas","anadirListasCruzadas")
+    
     .addSubMenu(
-      ui.createMenu('Nuevas Opciones de Formulario')
+      ui.createMenu('Preparar Hojas')
+        .addItem("Agregar secciones", "agregar_secciones")
+        .addItem("Crear Calendario","crearCalendario")
+        .addItem("Añadir cupos tentativos","anadirCuposTentativos")
+        .addItem("Añadir listas cruzadas","anadirListasCruzadas")
+        .addItem("Actualizar areas con catalogo antiguo","actualizarCatalogo")
+        .addItem("Agregar Columna Horario Sala Especial","agregarDropdownUso")
+    )
+    .addSubMenu(
+      ui.createMenu('Coordinadores')
+        .addItem("Crear hoja por area","crear_hoja_por_area")
+        .addItem("Validar Cambios","validar_cambios")
+        .addItem("Compartir enlaces","compartirYEnviarEnlace")
+        .addItem("Quitar permisos de edicion archivos cordinaldores","quitar_permisos")
+        .addItem("Extraer datos Hojas cordinadores","extraer_datos")        
+    )
+    .addSubMenu(
+      ui.createMenu('Opciones de Formulario')
         .addItem('Crear Hojas De Respuesta', 'crearHojasDeRespuesta')
         .addItem('Eliminar Respuesta y Reenviar', 'borrarFilasPorRutConInput')
         .addItem('Reenviar Rezagados', 'enviarRecordatoriosNoRespondidos')
+        .addItem("Envio de formularios Jornada y honorarios","enviarFormulariosCondicional")
+        .addItem("Actualizar con datos formulario","actualizar_datos")
+    )
+    .addSubMenu(
+      ui.createMenu('CrearHojas')
+        .addItem("Agregar secciones", "agregar_secciones")
+        .addItem("Crear Calendario","crearCalendario")
+        .addItem("Crear archivo para DPSA","crear_template_dpsa")
+        .addItem("Crear archivo para Alumnos","crear_template_HorariosING")
     )
     
-    
     .addToUi();
+    
 }
 function FORZAR_AUTORIZACION() {
   UrlFetchApp.fetch("https://www.google.com");
@@ -82,7 +95,10 @@ const curso_materia = obtener_columnas_especificas(data_catalogo,[col_codigo,col
 const hoja_listado_nrc = hojasActuales.getSheetByName('NRC POR PERIODO ESPEJO')
 const data_listado_nrc = hoja_listado_nrc.getDataRange().getValues();
 console.log(data_listado_nrc)
-const cursosConSecciones = asignarSecciones(curso_codigo_nombre,data_listado_nrc);
+const columnaNRC =obtenerNumeroDeColumna(hoja_listado_nrc,"NRC",1)
+const columnaCurso = obtenerNumeroDeColumna(hoja_listado_nrc,"CURSO",1)
+const columnaMateria = obtenerNumeroDeColumna(hoja_listado_nrc,"MATERIA",1)
+const cursosConSecciones = asignarSecciones(curso_codigo_nombre,data_listado_nrc,columnaCurso,columnaMateria,columnaNRC);
 const hoja_maestro=hojasActuales.getSheetByName('MAESTRO');
 const col_area_maestro = obtenerNumeroDeColumna(hoja_maestro,"AREA",1)
 const col_curso_maestro = obtenerNumeroDeColumna(hoja_maestro,"CURSO",1)
@@ -166,7 +182,9 @@ areas.forEach((area)=>{
   "Clases A PROGRAMAR",
   "Ayudantías PROGRAMAR",
   "Laboratorios o Talleres PROGRAMAR",
-  "COMENTARIOS COORDINADOR"
+  "COMENTARIOS COORDINADOR",
+  "NOMBRE PROFESOR 1 \n(PROFESOR PRINCIPAL SESIÓN 01)",
+  "NOMBRE PROFESOR 2 \n(2DO PROFESOR - SESIÓN 02)"
   ];
   ocultarColumnasExcepto(hoja_area, columnasVisibles)
 
@@ -464,48 +482,81 @@ function actualizar_datos() {
 
 
 function enviarFormulariosCondicional() {
-  const hojasActuales = SpreadsheetApp.getActiveSpreadsheet();
-  const sheet = hojasActuales.getSheetByName("MAESTRO"); // Cambiar al nombre de tu hoja
-  const hoja_profesores=hojasActuales.getSheetByName("PROFESORES");
-  const rut_profesores_jornada=hoja_profesores.getDataRange().getDisplayValues().map((fila)=>fila[1]);
-  
-  // Configuración: Números de columnas para correos y RUTs
-  const colMail1 = obtenerNumeroDeColumna(sheet,"EMAIL PROFESOR 1",1); // Número de columna de correos 1
-  const colMail2 = obtenerNumeroDeColumna(sheet,"EMAIL PROFESOR 2",1); // Número de columna de correos 2
-  const colRut1 = obtenerNumeroDeColumna(sheet,"RUT PROFESOR 1",1);  // Número de columna de RUTs 1
-  const colRut2 = obtenerNumeroDeColumna(sheet,"RUT PROFESOR 2",1);  // Número de columna de RUTs 2
-  
-  // Rango de datos, ajusta según tus necesidades
-  const data = sheet.getDataRange().getDisplayValues(); 
-  data.shift()
-  // Links de los formularios
-  
 
-  data.forEach((fila, i) => {
+  const hojasActuales = SpreadsheetApp.getActiveSpreadsheet();
+  const sheet = hojasActuales.getSheetByName("MAESTRO");
+  const hoja_profesores = hojasActuales.getSheetByName("PROFESORES");
+
+  const rut_profesores_jornada = hoja_profesores
+    .getDataRange()
+    .getDisplayValues()
+    .map((fila)=>fila[1]);
+
+  const enviados = new Set(); // 🔹 registro de RUTs enviados
+
+  const colMail1 = obtenerNumeroDeColumna(sheet,"EMAIL PROFESOR 1",1);
+  const colMail2 = obtenerNumeroDeColumna(sheet,"EMAIL PROFESOR 2",1);
+  const colRut1 = obtenerNumeroDeColumna(sheet,"RUT PROFESOR 1",1);
+  const colRut2 = obtenerNumeroDeColumna(sheet,"RUT PROFESOR 2",1);
+
+  const data = sheet.getDataRange().getDisplayValues();
+  data.shift();
+
+  data.forEach((fila) => {
+
     const email1 = fila[colMail1];
     const email2 = fila[colMail2];
-    const rut1 = fila[colRut1 ];
+    const rut1 = fila[colRut1];
     const rut2 = fila[colRut2];
-    
-    // Verifica si las columnas de correo y RUT no están vacías
-    if (email1 && rut1) {
-      // Condición personalizada: Define aquí la lógica
-      if (condicionPersonalizada(rut1, rut_profesores_jornada)) {//es un jornada
-        enviarCorreo(email1, rut1, linkFormulario1,`Estimado profesor/a,\n\nPor favor, complete el siguiente formulario para su preferencias del semestre: ${linkFormulario2}\n\nMuchas Gracias.\nArea de Analisis Curricular`,"FORMULARIO DE PREFERENCIAS");
+
+    if (email1 && rut1 && !enviados.has(rut1)) {
+
+      if (condicionPersonalizada(rut1, rut_profesores_jornada)) {
+        enviarCorreo(
+          email1,
+          rut1,
+          linkFormulario1,
+          `Estimado profesor/a,\n\nPor favor, complete el siguiente formulario para su preferencias del semestre: ${linkFormulario2}\n\nMuchas Gracias.\nArea de Analisis Curricular`,
+          "FORMULARIO DE PREFERENCIAS"
+        );
       } else {
-        enviarCorreo(email1, rut1, linkFormulario1,`Estimado profesor/a,\n\nPor favor, complete el siguiente formulario para su disponibilidad del semestre: ${linkFormulario1}\n\nMuchas Gracias.\nArea de Analisis Curricular`,"FORMULARIO DE DISPONIBILIDAD Y PREFERENCIAS");
+        enviarCorreo(
+          email1,
+          rut1,
+          linkFormulario1,
+          `Estimado profesor/a,\n\nPor favor, complete el siguiente formulario para su disponibilidad del semestre: ${linkFormulario1}\n\nMuchas Gracias.\nArea de Analisis Curricular`,
+          "FORMULARIO DE DISPONIBILIDAD Y PREFERENCIAS"
+        );
       }
+
+      enviados.add(rut1); // 🔹 marcar como enviado
     }
-    
-    if (email2 && rut2) {
-      // Condición personalizada: Define aquí la lógica
-      if (condicionPersonalizada(rut2,rut_profesores_jornada)) {//es jornada
-        enviarCorreo(email2, rut2, linkFormulario2,`Estimado profesor/a,\n\nPor favor, complete el siguiente formulario para su preferencias del semestre: ${linkFormulario2}\n\nMuchas Gracias.\nArea de Analisis Curricular`,"FORMULARIO DE PREFERENCIAS");
+
+    if (email2 && rut2 && !enviados.has(rut2)) {
+
+      if (condicionPersonalizada(rut2, rut_profesores_jornada)) {
+        enviarCorreo(
+          email2,
+          rut2,
+          linkFormulario2,
+          `Estimado profesor/a,\n\nPor favor, complete el siguiente formulario para su preferencias del semestre: ${linkFormulario2}\n\nMuchas Gracias.\nArea de Analisis Curricular`,
+          "FORMULARIO DE PREFERENCIAS"
+        );
       } else {
-        enviarCorreo(email2, rut2, linkFormulario2,`Estimado profesor/a,\n\nPor favor, complete el siguiente formulario para su disponibilidad del semestre: ${linkFormulario1}\n\nMuchas Gracias.\nArea de Analisis Curricular`,"FORMULARIO DE DISPONIBILIDAD Y PREFERENCIAS");
+        enviarCorreo(
+          email2,
+          rut2,
+          linkFormulario2,
+          `Estimado profesor/a,\n\nPor favor, complete el siguiente formulario para su disponibilidad del semestre: ${linkFormulario1}\n\nMuchas Gracias.\nArea de Analisis Curricular`,
+          "FORMULARIO DE DISPONIBILIDAD Y PREFERENCIAS"
+        );
       }
+
+      enviados.add(rut2); // 🔹 marcar como enviado
     }
+
   });
+
 }
 
 // Función para enviar el correo
@@ -686,8 +737,8 @@ function anadirCuposTentativos(){
   const sheetCatalogo = spreadsheet.getSheetByName('CATALOGO');
   const hojas_homologacion=["ICQ","ICC","ICI","ICE","ICO","ICA"]
   const existencia_discrepancia_codigos = procesarMultiplesHojasHomologas(hojas_homologacion)
-  const numColumnaCurso = obtenerNumeroDeColumna(sheet, "CURSO", 5)
-  const numColumnaMateria = obtenerNumeroDeColumna(sheet, "MATERIA", 5)
+  const numColumnaCurso = obtenerNumeroDeColumna(sheet, "CURSO", 1)
+  const numColumnaMateria = obtenerNumeroDeColumna(sheet, "MATERIA", 1)
   const numColumnaResquisitos = obtenerNumeroDeColumna(sheetCatalogo, "Requisitos", 1)
   const numColumnaNombre = obtenerNumeroDeColumna(sheetCatalogo, "TITULO", 1)
   const numColumnaCodigo = obtenerNumeroDeColumna(sheetCatalogo, "CODIGO", 1)
@@ -695,11 +746,10 @@ function anadirCuposTentativos(){
   const conteo = contarPorCodigo(data, numColumnaCurso,numColumnaMateria,existencia_discrepancia_codigos);
 
   const promediosReprobacion = calcularPromedioReprobacion(sheetReprobaciones, 2, 3)
-  console.log(promediosReprobacion)
+
   const datosCatalogo = obtenerDatosDesdeHoja("CATALOGO", 2)
   const datosMaestro = obtenerDatosDesdeHoja("MAESTRO", 2)
   const cupos = {};
-  console.log(conteo["ING1205"])
   datosCatalogo.forEach(curso => {
     const codigoCurso = curso[numColumnaCodigo];
     const requisitos = obtenerCodigosDesdeTexto(
@@ -813,8 +863,9 @@ function anadirListasCruzadas(){
   console.log(JSON.stringify(existencia_discrepancia_codigos, null, 2));
 
   const dataAvanzeDeMalla = leerHojaSinEncabezado("CUMPLIMIENTO DE MALLA")
-  const numColumnaCodigoCumplimiento = obtenerNumeroDeColumna(sheetCumplimiento, "CODIGO", 1)
-  const codigos_pendientes = obtenerListaUnicos(dataAvanzeDeMalla,numColumnaCodigoCumplimiento)
+  const numColumnareglaCumplimiento = obtenerNumeroDeColumna(sheetCumplimiento, "REGLA", 1)
+  const numColumnaNotaCumplimiento = obtenerNumeroDeColumna(sheetCumplimiento, "NOTA", 1)
+  const codigos_pendientes = obtenerListaUnicos(dataAvanzeDeMalla,numColumnareglaCumplimiento,numColumnaNotaCumplimiento)
   console.log("codigos pendientes:", codigos_pendientes)
   const listas_cruzadas = []
   let contador_secciones_por_codigo = {}
@@ -1057,4 +1108,57 @@ Muchas gracias.
   });
 
   SpreadsheetApp.getUi().alert(`Recordatorios enviados a ${yaEnviados.size} profesores.`);
+}
+function agregarDropdownUso(){
+
+  const nombreColumna = "USO";
+  const opciones = ["CLASE","AYUD","LAB"];
+
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const sheet = ss.getSheetByName("MAESTRO");
+
+  const lastColumn = sheet.getLastColumn();
+  const lastRow = sheet.getLastRow();
+
+  const headers = sheet.getRange(1,1,1,lastColumn).getValues()[0];
+
+  // encontrar índice de la columna
+  const col = headers.indexOf(nombreColumna);
+
+  if (col === -1) {
+    throw new Error("No se encontró la columna: " + nombreColumna);
+  }
+
+  const colSheet = col + 1; // convertir a 1-based para Sheets
+
+  // crear validación
+  const rule = SpreadsheetApp.newDataValidation()
+    .requireValueInList(opciones, true)
+    .setAllowInvalid(false)
+    .build();
+
+  // aplicar validación a toda la columna (sin encabezado)
+  if (lastRow > 1) {
+    sheet
+      .getRange(2, colSheet, lastRow - 1, 1)
+      .setDataValidation(rule);
+  }
+
+}
+
+
+
+function doGet(e) {
+  try {
+    return router(e, "GET");
+  } catch (err) {
+    return json({ error: err.message });
+  }
+}
+function doPost(e) {
+  try {
+    return router(e, "POST");
+  } catch (err) {
+    return json({ error: err.message });
+  }
 }

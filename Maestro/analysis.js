@@ -26,11 +26,11 @@ function cortarColumnas(lista, limiteColumna) {
       return sublista.slice(0, limiteColumna)}
 );
 }
-const buscarNRCsUnicos = (codigoCurso, nrcs, usados) => {
+const buscarNRCsUnicos = (codigoCurso, nrcs, usados,columnaCurso,columnaMateria,columnaNRC) => {
   console.log("codigo curso:",codigoCurso)
   return nrcs
-    .filter((nrc) => `${nrc[6]}${nrc[7]}` == codigoCurso) // Filtra por código de curso
-    .map((nrc) => nrc[3]) // Extrae el NRC (posición 3)
+    .filter((nrc) => `${nrc[columnaMateria]}${nrc[columnaCurso]}` == codigoCurso) // Filtra por código de curso
+    .map((nrc) => nrc[columnaNRC]) // Extrae el NRC (posición 3)
     .filter((nrc) => {
       if (!usados.includes(nrc)) { // Si no se ha usado, lo asigna
         usados.push(nrc); // Marca como usado
@@ -39,10 +39,10 @@ const buscarNRCsUnicos = (codigoCurso, nrcs, usados) => {
       return false; // Si ya está usado, lo descarta
     });
 };
-const generarSecciones = (curso, nrcs) => {
+const generarSecciones = (curso, nrcs,columnaCurso,columnaMateria,columnaNRC) => {
   let usados = []
   const [codigoCurso, , numSecciones] = curso;
-  const nrcsAsociados = buscarNRCsUnicos(codigoCurso, nrcs, usados);
+  const nrcsAsociados = buscarNRCsUnicos(codigoCurso, nrcs, usados,columnaCurso,columnaMateria,columnaNRC);
 
   // Creamos las secciones usando un map sobre un rango de 0 a numSecciones
   return Array.from({ length: numSecciones }, (_, i) => [
@@ -52,8 +52,8 @@ const generarSecciones = (curso, nrcs) => {
   ]);
 };
 
-const asignarSecciones = (cursos, nrcs) => {
-  return cursos.flatMap((curso) => generarSecciones(curso, nrcs));
+const asignarSecciones = (cursos, nrcs,columnaCurso,columnaMateria,columnaNRC) => {
+  return cursos.flatMap((curso) => generarSecciones(curso, nrcs,columnaCurso,columnaMateria,columnaNRC));
 };
 
 
@@ -70,6 +70,8 @@ function generar_Entradas(secciones,data_nrc,data_catalogo,hoja_catalogo,hoja_li
   const col_materia_maestro=obtenerNumeroDeColumna(hoja_maestro,"MATERIA",1)
   const col_area_catalogo=obtenerNumeroDeColumna(hoja_catalogo,"AREA",1)
   const col_titulo_catalogo=obtenerNumeroDeColumna(hoja_catalogo,"TITULO",1)
+  const col_nrc_listado_nrc=obtenerNumeroDeColumna(hoja_listado_nrc,"NRC",1)
+  const col_cupos_listado_nrc=obtenerNumeroDeColumna(hoja_listado_nrc,"CUPOS",1)
   console.log("data nrc:",data_nrc)
   return secciones.map((seccion,idx)=>{
 
@@ -93,11 +95,11 @@ function generar_Entradas(secciones,data_nrc,data_catalogo,hoja_catalogo,hoja_li
     entrada[1]=datos_catalogo[col_area_catalogo]
     entrada[10]=datos_catalogo[col_titulo_catalogo]
     
-    let datos_nrc = data_nrc.find((curso)=>curso[3]==seccion[2])//Busca por nrc
+    let datos_nrc = data_nrc.find((curso)=>curso[col_nrc_listado_nrc]==seccion[2])//Busca por nrc
     if (datos_nrc===undefined){
     datos_nrc= Array(data_nrc[0].length) 
     }
-    entrada[12]=datos_nrc[28]//cupos de ese NRC si no encuentra devuelve undefined
+    entrada[12]=datos_nrc[col_cupos_listado_nrc]//cupos de ese NRC si no encuentra devuelve undefined
     
     let detalles = extraerRango(datos_catalogo,obtenerNumeroDeColumna(hoja_catalogo,"Plan Común",1),obtenerNumeroDeColumna(hoja_catalogo,"Sala especial",1))
     
@@ -1161,14 +1163,15 @@ function obtenerCodigosDesdeTexto(textoCursos, data, colNombre, colCodigo) {
     .map(nombreCurso => mapa[nombreCurso.toLowerCase()])
     .filter(Boolean);
 }
-function obtenerListaUnicos(datos, columna) {
+function obtenerListaUnicos(datos, columna,columnaNota) {
   const index = columna;
   const vistos = new Set();
 
   datos.forEach(fila => {
-    const valor = fila[index];
+    const valor = fila[index].slice(-7);
+    const nota = fila[columnaNota]
 
-    if (valor !== "" && valor !== null && valor !== undefined) {
+    if (valor !== "" && valor !== null && valor !== undefined && nota=="") {
       vistos.add(valor);
     }
   });

@@ -27,7 +27,10 @@ function router(e, method) {
 
     case "sheet.escribir":
       return apiSheetTest(body);
-
+    
+    case "pruebas.fechas":
+      return apiPruebasFechas(body);
+    
     default:
       return json({ error: "acción no válida" });
   }
